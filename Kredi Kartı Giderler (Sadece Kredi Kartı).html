@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Öz Urfa Kebap - Kredi Kartı Giderleri (Nisan 2026)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #eff6ff;
+            margin: 0;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+        h1 {
+            color: #1e40af;
+            border-left: 6px solid #3b82f6;
+            padding-left: 20px;
+        }
+        .total-box {
+            background: #dbeafe;
+            padding: 16px 24px;
+            border-radius: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #bfdbfe;
+        }
+        .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💳 Kredi Kartı Giderleri</h1>
+    <p>01 Nisan 2026 - 30 Nisan 2026 | Öz Urfa Kebap</p>
+
+    <div class="total-box">
+        🧾 Toplam Kredi Kartı Gideri: <span id="totalKredi">0,00</span> ₺
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Tarih & Saat</th><th>Açıklama</th><th>Tutar (₺)</th></tr>
+        </thead>
+        <tbody id="krediTable"></tbody>
+    </table>
+</div>
+
+<script>
+const krediGiderler = [
+    {tarih:"01.04.2026 11:08:60", aciklama:"yağ", tutar:410},
+    {tarih:"02.04.2026 12:27:60", aciklama:"hayrettın ayran", tutar:3500},
+    {tarih:"02.04.2026 12:27:60", aciklama:"eski alınan kırıntı parası", tutar:11200},
+    {tarih:"03.04.2026 15:58:60", aciklama:"kömürcü", tutar:8000},
+    {tarih:"03.04.2026 15:58:60", aciklama:"et kredi kart", tutar:10000},
+    {tarih:"04.04.2026 13:03:00", aciklama:"ayran", tutar:9350},
+    {tarih:"04.04.2026 14:37:00", aciklama:"uncu kart ile", tutar:20000},
+    {tarih:"07.04.2026 11:08:60", aciklama:"kaşarcı", tutar:4000},
+    {tarih:"07.04.2026 11:08:60", aciklama:"motorun sigortası", tutar:5710},
+    {tarih:"07.04.2026 11:08:60", aciklama:"alparslan eft", tutar:14000},
+    {tarih:"07.04.2026 11:19:00", aciklama:"yılmaz pazar et eft", tutar:9000},
+    {tarih:"08.04.2026 12:51:00", aciklama:"et eft", tutar:9600},
+    {tarih:"09.04.2026 13:16:00", aciklama:"kolacı", tutar:2910},
+    {tarih:"10.04.2026 12:42:60", aciklama:"tavukçu eft", tutar:4000},
+    {tarih:"10.04.2026 12:42:60", aciklama:"yağ kart ile", tutar:410},
+    {tarih:"10.04.2026 20:46:60", aciklama:"sogan", tutar:1000},
+    {tarih:"11.04.2026 12:31:60", aciklama:"et eft", tutar:8950},
+    {tarih:"14.04.2026 11:12:60", aciklama:"pazarcı maşo eft", tutar:17000},
+    {tarih:"15.04.2026 11:28:60", aciklama:"tavukçu ömer eft", tutar:6000},
+    {tarih:"16.04.2026 12:04:00", aciklama:"et kart ile", tutar:8965},
+    {tarih:"16.04.2026 12:04:60", aciklama:"alparslan eft", tutar:10750},
+    {tarih:"16.04.2026 12:56:00", aciklama:"pazar eft", tutar:7400},
+    {tarih:"16.04.2026 14:37:60", aciklama:"baharatçı eft", tutar:4000},
+    {tarih:"17.04.2026 10:03:00", aciklama:"kaşarcı eft", tutar:4000},
+    {tarih:"17.04.2026 13:09:60", aciklama:"tavukçu eft", tutar:5000},
+    {tarih:"17.04.2026 13:11:00", aciklama:"yılmaz kartından ödenen doğalgaz", tutar:10000},
+    {tarih:"18.04.2026 12:06:60", aciklama:"ambalaj eft", tutar:8000},
+    {tarih:"18.04.2026 12:22:60", aciklama:"AYRAN EFT", tutar:9760},
+    {tarih:"18.04.2026 15:00:00", aciklama:"ET YILMAZ 1200 TL BORÇ", tutar:3685},
+    {tarih:"19.04.2026 09:31:00", aciklama:"et eft", tutar:13340},
+    {tarih:"21.04.2026 09:38:60", aciklama:"alparslan eft", tutar:11000},
+    {tarih:"21.04.2026 14:28:60", aciklama:"kolacı yavuz kart ile", tutar:7000},
+    {tarih:"23.04.2026 11:24:60", aciklama:"alparslan eft", tutar:3000},
+    {tarih:"23.04.2026 12:51:00", aciklama:"HAK TAVUKÇU EFT", tutar:3680},
+    {tarih:"23.04.2026 13:38:00", aciklama:"pepsi kola eft", tutar:1470},
+    {tarih:"24.04.2026 10:48:00", aciklama:"kaşarci eft", tutar:4000},
+    {tarih:"25.04.2026 11:48:00", aciklama:"silikon", tutar:150},
+    {tarih:"25.04.2026 14:26:00", aciklama:"uncu kart ile", tutar:18000},
+    {tarih:"28.04.2026 13:29:00", aciklama:"yılmaz karttından eski ödenen doğalgaz", tutar:30000},
+    {tarih:"28.04.2026 13:29:00", aciklama:"alparslan eft", tutar:10000},
+    {tarih:"30.04.2026 12:47:60", aciklama:"agadan alınan et eft", tutar:17900},
+    {tarih:"30.04.2026 12:49:00", aciklama:"alparlan eft", tutar:4000},
+    {tarih:"30.04.2026 12:49:00", aciklama:"alparlan eft", tutar:1000}
+];
+
+let total = 0;
+const tbody = document.getElementById("krediTable");
+krediGiderler.forEach(g => {
+    total += g.tutar;
+    const row = `<tr><td>${g.tarih}</td><td>${g.aciklama}</td><td class="amount">${g.tutar.toLocaleString('tr-TR')},00 ₺</td></tr>`;
+    tbody.innerHTML += row;
+});
+document.getElementById("totalKredi").innerText = total.toLocaleString('tr-TR') + ",00";
+</script>
+</body>
+</html>

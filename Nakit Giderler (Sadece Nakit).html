@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Öz Urfa Kebap - Nakit Giderler (Nisan 2026)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0fdf4;
+            margin: 0;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+        h1 {
+            color: #15803d;
+            border-left: 6px solid #22c55e;
+            padding-left: 20px;
+        }
+        .total-box {
+            background: #dcfce7;
+            padding: 16px 24px;
+            border-radius: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #166534;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #bbf7d0;
+        }
+        .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💰 Nakit Giderler</h1>
+    <p>01 Nisan 2026 - 30 Nisan 2026 | Öz Urfa Kebap</p>
+
+    <div class="total-box">
+        🧾 Toplam Nakit Gider: <span id="totalNakit">0,00</span> ₺
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Tarih & Saat</th><th>Açıklama</th><th>Tutar (₺)</th></tr>
+        </thead>
+        <tbody id="nakitTable"></tbody>
+    </table>
+</div>
+
+<script>
+const nakitGiderler = [
+    {tarih:"01.04.2026 14:12:60", aciklama:"biber", tutar:170},
+    {tarih:"01.04.2026 18:06:00", aciklama:"market", tutar:300},
+    {tarih:"01.04.2026 20:28:60", aciklama:"pazar yılmaz", tutar:1650},
+    {tarih:"01.04.2026 20:46:00", aciklama:"sogan", tutar:3000},
+    {tarih:"01.04.2026 20:50:00", aciklama:"tornavıta", tutar:100},
+    {tarih:"02.04.2026 13:07:00", aciklama:"ilaçlama", tutar:2000},
+    {tarih:"02.04.2026 20:03:60", aciklama:"market", tutar:1000},
+    {tarih:"02.04.2026 20:03:60", aciklama:"pazar yılmaz", tutar:1550},
+    {tarih:"03.04.2026 12:13:60", aciklama:"maya", tutar:450},
+    {tarih:"03.04.2026 18:45:60", aciklama:"yag", tutar:410},
+    {tarih:"04.04.2026 20:26:60", aciklama:"Pazar", tutar:1300},
+    {tarih:"05.04.2026 13:29:00", aciklama:"yag", tutar:410},
+    {tarih:"05.04.2026 13:29:00", aciklama:"bulgur", tutar:200},
+    {tarih:"05.04.2026 14:44:60", aciklama:"şeker", tutar:105},
+    {tarih:"07.04.2026 11:24:00", aciklama:"yağ", tutar:410},
+    {tarih:"07.04.2026 11:46:60", aciklama:"yumurta", tutar:100},
+    {tarih:"07.04.2026 17:28:60", aciklama:"kunefe", tutar:1000},
+    {tarih:"07.04.2026 20:53:60", aciklama:"pazar yılmaz", tutar:2000},
+    {tarih:"08.04.2026 14:48:00", aciklama:"çay", tutar:220},
+    {tarih:"08.04.2026 15:33:00", aciklama:"yağ", tutar:410},
+    {tarih:"08.04.2026 16:30:60", aciklama:"zınpara", tutar:65},
+    {tarih:"08.04.2026 18:29:00", aciklama:"sogan", tutar:2000},
+    {tarih:"09.04.2026 11:48:00", aciklama:"market", tutar:250},
+    {tarih:"09.04.2026 16:03:60", aciklama:"yogurt", tutar:110},
+    {tarih:"09.04.2026 18:29:00", aciklama:"salça", tutar:100},
+    {tarih:"09.04.2026 20:48:00", aciklama:"pazar yılmaz", tutar:1900},
+    {tarih:"10.04.2026 18:06:60", aciklama:"kunefe", tutar:500},
+    {tarih:"10.04.2026 20:53:00", aciklama:"market yılmaz", tutar:300},
+    {tarih:"11.04.2026 19:18:00", aciklama:"pazar yılmaz", tutar:1100},
+    {tarih:"11.04.2026 19:18:00", aciklama:"makbul", tutar:200},
+    {tarih:"12.04.2026 20:51:00", aciklama:"sogan", tutar:1500},
+    {tarih:"14.04.2026 14:30:00", aciklama:"domates", tutar:1200},
+    {tarih:"14.04.2026 15:51:60", aciklama:"künefe", tutar:800},
+    {tarih:"14.04.2026 20:51:00", aciklama:"pazar yılmaz", tutar:1500},
+    {tarih:"15.04.2026 17:30:60", aciklama:"çig köfte", tutar:700},
+    {tarih:"15.04.2026 20:24:00", aciklama:"yag", tutar:410},
+    {tarih:"15.04.2026 20:24:00", aciklama:"market", tutar:380},
+    {tarih:"16.04.2026 19:43:00", aciklama:"sogan", tutar:5300},
+    {tarih:"16.04.2026 20:28:00", aciklama:"pazar yılmaz", tutar:950},
+    {tarih:"17.04.2026 13:39:60", aciklama:"yağ", tutar:410},
+    {tarih:"18.04.2026 14:44:60", aciklama:"yağ", tutar:410},
+    {tarih:"19.04.2026 17:59:00", aciklama:"deterjan", tutar:150},
+    {tarih:"19.04.2026 20:53:00", aciklama:"pazar yılmaz", tutar:1650},
+    {tarih:"21.04.2026 12:09:60", aciklama:"yağ", tutar:410},
+    {tarih:"21.04.2026 18:29:00", aciklama:"yılmaz Pazar", tutar:2130},
+    {tarih:"22.04.2026 17:17:60", aciklama:"yag", tutar:410},
+    {tarih:"22.04.2026 18:44:00", aciklama:"şeker", tutar:50},
+    {tarih:"23.04.2026 11:24:60", aciklama:"detarjan", tutar:80},
+    {tarih:"23.04.2026 12:36:60", aciklama:"mARKET", tutar:110},
+    {tarih:"23.04.2026 18:15:00", aciklama:"sogan", tutar:1500},
+    {tarih:"23.04.2026 20:46:00", aciklama:"pazar yılmaz", tutar:1650},
+    {tarih:"24.04.2026 10:48:00", aciklama:"market", tutar:810},
+    {tarih:"24.04.2026 15:11:60", aciklama:"tolga kuyruk", tutar:25000},
+    {tarih:"24.04.2026 16:39:60", aciklama:"kunefe", tutar:800},
+    {tarih:"24.04.2026 19:48:00", aciklama:"market", tutar:200},
+    {tarih:"25.04.2026 17:19:60", aciklama:"yag şeker", tutar:520},
+    {tarih:"25.04.2026 20:26:60", aciklama:"pazar yılmaz", tutar:1050},
+    {tarih:"26.04.2026 22:34:60", aciklama:"sogan", tutar:3500},
+    {tarih:"28.04.2026 16:02:00", aciklama:"künefe", tutar:1000},
+    {tarih:"28.04.2026 21:08:00", aciklama:"pazar yılmaz", tutar:1150}
+];
+
+let total = 0;
+const tbody = document.getElementById("nakitTable");
+nakitGiderler.forEach(g => {
+    total += g.tutar;
+    const row = `<tr><td>${g.tarih}</td><td>${g.aciklama}</td><td class="amount">${g.tutar.toLocaleString('tr-TR')},00 ₺</td></tr>`;
+    tbody.innerHTML += row;
+});
+document.getElementById("totalNakit").innerText = total.toLocaleString('tr-TR') + ",00";
+</script>
+</body>
+</html>
