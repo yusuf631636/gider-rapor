@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Öz Urfa Kebap | Anlık Rapor Sistemi</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -99,7 +98,7 @@
     <div class="api-bar">
         <div class="api-input">
             <span>🌐 API Adresi:</span>
-            <input type="text" id="apiUrl" placeholder="https://xxxx.ngrok.io" value="https://dde7-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app">
+            <input type="text" id="apiUrl" placeholder="https://xxxx.ngrok-free.app" value="https://be4f-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app">
             <button class="btn btn-primary btn-sm" onclick="apiUrlKaydet()">Kaydet</button>
         </div>
         <div>
@@ -141,8 +140,8 @@
     <div class="card">
         <div class="card-header">📋 Gider Listesi <button class="btn btn-outline btn-sm" onclick="manuelGiderleriGoster()">🔄 Yenile</button></div>
         <div class="card-body">
-            <div class="table-wrapper" id="manuelListeContainer">
-                <table id="manuelTablo">
+            <div class="table-wrapper">
+                <table>
                     <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th><th></th></tr></thead>
                     <tbody id="manuelTbody"></tbody>
                 </table>
@@ -157,7 +156,7 @@
 
 <script>
     // ========== DEĞİŞKENLER ==========
-    let apiBase = localStorage.getItem('apiBase') || 'https://dde7-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app';
+    let apiBase = localStorage.getItem('apiBase') || 'https://be4f-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app';
     let raporTipi = 'gunluk';
     let ay = 5;
     let yil = 2026;
@@ -170,14 +169,17 @@
         verileriGuncelle();
     }
 
-    // ========== API'den Veri Çek ==========
+    // ========== API'den Veri Çek (ngrok uyarısını atlar) ==========
     async function verileriGuncelle() {
-        document.getElementById('apiUrl').value = apiBase;
-        
         let url = raporTipi === 'gunluk' ? `${apiBase}/api/gunluk` : `${apiBase}/api/aylik?ay=${ay}&yil=${yil}`;
         
         try {
-            let response = await fetch(url);
+            // ngrok uyarı sayfasını atlamak için özel başlık
+            let response = await fetch(url, {
+                headers: {
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
             let data = await response.json();
             
             document.getElementById('toplamCiro').innerText = (data.ToplamCiro || 0).toLocaleString('tr-TR') + ' ₺';
@@ -233,26 +235,15 @@
             return;
         }
         
-        let toplamNakit = 0, toplamKredi = 0;
-        tbody.innerHTML = giderler.map((g, idx) => {
-            if (g.tur === 'Nakit') toplamNakit += g.tutar;
-            else toplamKredi += g.tutar;
-            return `
-                <tr>
-                    <td>${g.tarih}</td>
-                    <td>${g.aciklama}</td>
-                    <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
-                    <td><span class="${g.tur === 'Nakit' ? 'badge-nakit' : 'badge-kredi'}">${g.tur}</span></td>
-                    <td><button class="btn-outline btn-sm" onclick="manuelGiderSil(${idx})">🗑️</button></td>
-                </tr>
-            `;
-        }).join('');
-        
-        let ozetHtml = `<div style="margin-top:12px; padding:8px; background:#f1f5f9; border-radius:12px;">
-            <strong>💰 Manuel Nakit Toplam:</strong> ${toplamNakit.toLocaleString('tr-TR')} ₺ &nbsp;|&nbsp;
-            <strong>💳 Manuel Kredi Toplam:</strong> ${toplamKredi.toLocaleString('tr-TR')} ₺
-        </div>`;
-        document.getElementById('manuelListeContainer').insertAdjacentHTML('beforeend', ozetHtml);
+        tbody.innerHTML = giderler.map((g, idx) => `
+            <tr>
+                <td>${g.tarih}</td>
+                <td>${g.aciklama}</td>
+                <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
+                <td><span class="${g.tur === 'Nakit' ? 'badge-nakit' : 'badge-kredi'}">${g.tur}</span></td>
+                <td><button class="btn-outline btn-sm" onclick="manuelGiderSil(${idx})">🗑️</button></td>
+            </tr>
+        `).join('');
     }
     
     function manuelGiderSil(index) {
@@ -282,7 +273,7 @@
     verileriGuncelle();
     
     // Filtre butonlarını aktifleştir
-    document.querySelectorAll('.filter-btn').forEach((btn, idx) => {
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
