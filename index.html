@@ -66,6 +66,7 @@
         .stat-card h4 { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 10px; }
         .stat-number { font-size: 1.8rem; font-weight: 800; color: white; }
         .profit { color: #10b981; }
+        .loss { color: #ef4444; }
         
         .card {
             background: rgba(255,255,255,0.05);
@@ -109,13 +110,14 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Rapor ve Gider Takip</h1>
-        <div class="sub">📡 SambaPOS SQL Bağlantılı | Giderler kalem kalem | Tarih/Ay filtresi</div>
+        <div class="sub">📡 SambaPOS SQL Bağlantılı | Giderler kalem kalem | Günlük/Aylık/Yıllık Ciro</div>
     </div>
 
     <div class="filter-bar">
-        <span>📅 Rapor Tipi:</span>
-        <button class="btn-secondary" id="btnGunluk" onclick="raporTip='gunluk'; filtreGoster(); tumVerileriGuncelle()">📆 Günlük</button>
-        <button class="btn-secondary" id="btnAylik" onclick="raporTip='aylik'; filtreGoster(); tumVerileriGuncelle()">📅 Aylık</button>
+        <button class="btn-secondary" id="btnGunluk" onclick="aktifMod='gunluk'; filtreGoster(); tumVerileriGuncelle()">📆 Günlük</button>
+        <button class="btn-secondary" id="btnAylik" onclick="aktifMod='aylik'; filtreGoster(); tumVerileriGuncelle()">📅 Aylık</button>
+        <button class="btn-secondary" id="btnYillik" onclick="aktifMod='yillik'; filtreGoster(); yillikCiroGetir()">📊 Yıllık Ciro</button>
+        <button class="btn-secondary" id="btnKarsilastirma" onclick="aktifMod='karsilastirma'; filtreGoster(); yillarKarsilastirma()">📈 Yıl Karşılaştır</button>
         
         <div id="gunlukFilter" style="display:flex; gap:10px;">
             <span>Tarih:</span>
@@ -133,11 +135,22 @@
                 <option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
             </select>
         </div>
+        <div id="yillikFilter" style="display:none; gap:10px;">
+            <select id="yillikYilSec" onchange="yillikCiroGetir()">
+                <option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
+            </select>
+        </div>
+        <div id="karsilastirmaFilter" style="display:none; gap:10px;">
+            <select id="yil1Sec"><option value="2024">2024</option><option value="2025" selected>2025</option><option value="2026">2026</option></select>
+            <span>vs</span>
+            <select id="yil2Sec"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select>
+            <button class="btn-primary" onclick="yillarKarsilastirma()">Karşılaştır</button>
+        </div>
         <button class="btn-primary" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
     </div>
 
     <!-- Özet Kartlar -->
-    <div class="stats-grid">
+    <div class="stats-grid" id="ozetKartlar">
         <div class="stat-card"><h4>💰 Nakit Gelir</h4><div class="stat-number" id="nakitGelir">0 ₺</div></div>
         <div class="stat-card"><h4>💳 Kredi Kartı Gelir</h4><div class="stat-number" id="krediGelir">0 ₺</div></div>
         <div class="stat-card"><h4>📊 Toplam Gelir</h4><div class="stat-number" id="toplamGelir">0 ₺</div></div>
@@ -145,8 +158,29 @@
         <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number profit" id="netKar">0 ₺</div></div>
     </div>
 
-    <!-- Gider Detay Listesi (KALEM KALEM SQL'den) -->
-    <div class="card">
+    <!-- Yıllık Ciro Tablosu -->
+    <div id="yillikTablo" class="card" style="display:none;">
+        <div class="card-header">📊 Yıllık Ciro Tablosu</div>
+        <div class="card-body">
+            <div class="table-wrapper">
+                <table id="yillikCiroTablo">
+                    <thead><tr><th>Ay</th><th>Nakit</th><th>Kredi Kartı</th><th>Toplam</th></tr></thead>
+                    <tbody id="yillikCiroTbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yıllar Arası Karşılaştırma -->
+    <div id="karsilastirmaTablo" class="card" style="display:none;">
+        <div class="card-header">📈 Yıllar Arası Karşılaştırma</div>
+        <div class="card-body">
+            <div class="stats-grid" id="karsilastirmaKartlari"></div>
+        </div>
+    </div>
+
+    <!-- Gider Detay Listesi -->
+    <div id="giderDetayKart" class="card">
         <div class="card-header">
             📋 Giderler (Kalem Kalem - SQL)
             <button class="btn-outline" onclick="giderDetaylariniGetir()">🔄 Yenile</button>
@@ -155,7 +189,7 @@
             <div class="table-wrapper">
                 <table id="giderDetayTablo">
                     <thead><tr><th>Tarih</th><th>Gider Türü</th><th>Açıklama</th><th>Tutar (TL)</th></tr></thead>
-                    <tbody id="giderDetayTbody"><tr><td colspan="4">Yükleniyor...</td></tr></tbody>
+                    <tbody id="giderDetayTbody"><tr><td colspan="4">Yükleniyor...</tbody>
                 </table>
             </div>
         </div>
@@ -180,66 +214,79 @@
         <div class="card-header">✏️ Manuel Gider Listesi <button class="btn-outline" onclick="manuelListeyiGoster()">🔄 Yenile</button></div>
         <div class="card-body">
             <div class="table-wrapper">
-                <table id="manuelTablo"><thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th><th></th></tr></thead><tbody id="manuelTbody"></tbody></table>
+                <table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th><th></th></tr></thead><tbody id="manuelTbody"></tbody></table>
             </div>
         </div>
     </div>
 
-    <div class="footer">⚡ SambaPOS SQL | Giderler otomatik kalem kalem | Tarih/Ay filtresi</div>
+    <div class="footer">⚡ SambaPOS SQL | Giderler otomatik kalem kalem | Günlük/Aylık/Yıllık Ciro</div>
 </div>
 
 <script>
-    // API adresi GİZLİ - sadece siz biliyorsunuz
     const API_BASE = 'https://be4f-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app';
-    let raporTip = 'gunluk';
+    let aktifMod = 'gunluk';
     let sqlGelirler = { Nakit: 0, KrediKarti: 0, Toplam: 0 };
     let sqlGiderToplam = 0;
 
     function filtreGoster() {
-        document.getElementById('gunlukFilter').style.display = raporTip === 'gunluk' ? 'flex' : 'none';
-        document.getElementById('aylikFilter').style.display = raporTip === 'aylik' ? 'flex' : 'none';
-        document.getElementById('btnGunluk').style.background = raporTip === 'gunluk' ? '#f97316' : '#334155';
-        document.getElementById('btnAylik').style.background = raporTip === 'aylik' ? '#f97316' : '#334155';
+        document.getElementById('gunlukFilter').style.display = aktifMod === 'gunluk' ? 'flex' : 'none';
+        document.getElementById('aylikFilter').style.display = aktifMod === 'aylik' ? 'flex' : 'none';
+        document.getElementById('yillikFilter').style.display = aktifMod === 'yillik' ? 'flex' : 'none';
+        document.getElementById('karsilastirmaFilter').style.display = aktifMod === 'karsilastirma' ? 'flex' : 'none';
+        document.getElementById('yillikTablo').style.display = aktifMod === 'yillik' ? 'block' : 'none';
+        document.getElementById('karsilastirmaTablo').style.display = aktifMod === 'karsilastirma' ? 'block' : 'none';
+        document.getElementById('giderDetayKart').style.display = aktifMod === 'gunluk' || aktifMod === 'aylik' ? 'block' : 'none';
+        
+        document.getElementById('btnGunluk').style.background = aktifMod === 'gunluk' ? '#f97316' : '#334155';
+        document.getElementById('btnAylik').style.background = aktifMod === 'aylik' ? '#f97316' : '#334155';
+        document.getElementById('btnYillik').style.background = aktifMod === 'yillik' ? '#f97316' : '#334155';
+        document.getElementById('btnKarsilastirma').style.background = aktifMod === 'karsilastirma' ? '#f97316' : '#334155';
     }
 
     async function tumVerileriGuncelle() {
-        let url;
-        if (raporTip === 'gunluk') {
-            let tarih = document.getElementById('tarihSec').value;
-            url = `${API_BASE}/api/rapor?tarih=${tarih}`;
-        } else {
-            let ay = document.getElementById('aySec').value;
-            let yil = document.getElementById('yilSec').value;
-            url = `${API_BASE}/api/aylik?ay=${ay}&yil=${yil}`;
+        if (aktifMod === 'gunluk') {
+            await gunlukVerileriGetir();
+            await giderDetaylariniGetir();
+        } else if (aktifMod === 'aylik') {
+            await aylikVerileriGetir();
+            await giderDetaylariniGetir();
         }
-        
+    }
+
+    async function gunlukVerileriGetir() {
+        let tarih = document.getElementById('tarihSec').value;
+        let url = `${API_BASE}/api/rapor?tarih=${tarih}`;
         try {
             let response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let data = await response.json();
-            
-            if (raporTip === 'gunluk') {
-                sqlGelirler = data.Gelirler;
-                sqlGiderToplam = data.Giderler.Toplam || 0;
-                document.getElementById('nakitGelir').innerHTML = (sqlGelirler.Nakit || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('krediGelir').innerHTML = (sqlGelirler.KrediKarti || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('toplamGelir').innerHTML = (sqlGelirler.Toplam || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('netKar').innerHTML = (data.NetKar || 0).toLocaleString('tr-TR') + ' ₺';
-            } else {
-                sqlGelirler = { Nakit: data.NakitToplam || 0, KrediKarti: data.KrediToplam || 0, Toplam: data.ToplamCiro || 0 };
-                document.getElementById('nakitGelir').innerHTML = (data.NakitToplam || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('krediGelir').innerHTML = (data.KrediToplam || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('toplamGelir').innerHTML = (data.ToplamCiro || 0).toLocaleString('tr-TR') + ' ₺';
-                sqlGiderToplam = 0;
-            }
-            
-            await giderDetaylariniGetir();
-            toplamlariHesapla();
+            sqlGelirler = data.Gelirler;
+            sqlGiderToplam = data.Giderler.Toplam || 0;
+            document.getElementById('nakitGelir').innerHTML = (sqlGelirler.Nakit || 0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('krediGelir').innerHTML = (sqlGelirler.KrediKarti || 0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('toplamGelir').innerHTML = (sqlGelirler.Toplam || 0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('toplamGider').innerHTML = sqlGiderToplam.toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('netKar').innerHTML = (data.NetKar || 0).toLocaleString('tr-TR') + ' ₺';
+            if (data.NetKar >= 0) document.getElementById('netKar').className = 'stat-number profit';
+            else document.getElementById('netKar').className = 'stat-number loss';
+        } catch(err) { console.error(err); }
+    }
+
+    async function aylikVerileriGetir() {
+        let ay = document.getElementById('aySec').value;
+        let yil = document.getElementById('yilSec').value;
+        let url = `${API_BASE}/api/aylik?ay=${ay}&yil=${yil}`;
+        try {
+            let response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await response.json();
+            document.getElementById('nakitGelir').innerHTML = (data.NakitToplam || 0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('krediGelir').innerHTML = (data.KrediToplam || 0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('toplamGelir').innerHTML = (data.ToplamCiro || 0).toLocaleString('tr-TR') + ' ₺';
         } catch(err) { console.error(err); }
     }
 
     async function giderDetaylariniGetir() {
         let url;
-        if (raporTip === 'gunluk') {
+        if (aktifMod === 'gunluk') {
             let tarih = document.getElementById('tarihSec').value;
             url = `${API_BASE}/api/giderDetay?tarih=${tarih}`;
         } else {
@@ -247,7 +294,6 @@
             let yil = document.getElementById('yilSec').value;
             url = `${API_BASE}/api/aylikGiderDetay?ay=${ay}&yil=${yil}`;
         }
-        
         try {
             let response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let giderler = await response.json();
@@ -263,11 +309,63 @@
                         <td class="amount-right">${Number(g.Tutar).toLocaleString('tr-TR')} ₺</td>
                     </tr>
                 `).join('');
-                // Toplam gideri güncelle
                 let toplam = giderler.reduce((s, g) => s + Number(g.Tutar), 0);
                 sqlGiderToplam = toplam;
                 document.getElementById('toplamGider').innerHTML = toplam.toLocaleString('tr-TR') + ' ₺';
+                if (aktifMod === 'gunluk') {
+                    let netKar = sqlGelirler.Toplam - toplam;
+                    document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
+                }
             }
+        } catch(err) { console.error(err); }
+    }
+
+    async function yillikCiroGetir() {
+        let yil = document.getElementById('yillikYilSec').value;
+        let url = `${API_BASE}/api/yillik?yil=${yil}`;
+        try {
+            let response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let aylar = await response.json();
+            let tbody = document.getElementById('yillikCiroTbody');
+            let aylarIsimleri = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+            let toplamNakit = 0, toplamKredi = 0, genelToplam = 0;
+            let rows = '';
+            for (let i = 1; i <= 12; i++) {
+                let ayVeri = aylar.find(a => a.Ay === i) || { Nakit: 0, Kredi: 0, Toplam: 0 };
+                rows += `<tr>
+                    <td>${aylarIsimleri[i-1]}</td>
+                    <td class="amount-right">${ayVeri.Nakit.toLocaleString('tr-TR')} ₺</td>
+                    <td class="amount-right">${ayVeri.Kredi.toLocaleString('tr-TR')} ₺</td>
+                    <td class="amount-right">${ayVeri.Toplam.toLocaleString('tr-TR')} ₺</td>
+                </tr>`;
+                toplamNakit += ayVeri.Nakit;
+                toplamKredi += ayVeri.Kredi;
+                genelToplam += ayVeri.Toplam;
+            }
+            rows += `<tr style="background:rgba(255,255,255,0.1); font-weight:bold;">
+                <td><strong>YIL TOPLAMI</strong></td>
+                <td class="amount-right"><strong>${toplamNakit.toLocaleString('tr-TR')} ₺</strong></td>
+                <td class="amount-right"><strong>${toplamKredi.toLocaleString('tr-TR')} ₺</strong></td>
+                <td class="amount-right"><strong>${genelToplam.toLocaleString('tr-TR')} ₺</strong></td>
+            </tr>`;
+            tbody.innerHTML = rows;
+        } catch(err) { console.error(err); }
+    }
+
+    async function yillarKarsilastirma() {
+        let yil1 = document.getElementById('yil1Sec').value;
+        let yil2 = document.getElementById('yil2Sec').value;
+        let url = `${API_BASE}/api/yillarKarsilastirma?yil1=${yil1}&yil2=${yil2}`;
+        try {
+            let response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await response.json();
+            let farkYuzde = ((data.Fark / data.Yil1.Toplam) * 100).toFixed(2);
+            document.getElementById('karsilastirmaKartlari').innerHTML = `
+                <div class="stat-card"><h4>${data.Yil1.Yil} Toplam Ciro</h4><div class="stat-number">${data.Yil1.Toplam.toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>${data.Yil2.Yil} Toplam Ciro</h4><div class="stat-number">${data.Yil2.Toplam.toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>Fark</h4><div class="stat-number ${data.Fark >= 0 ? 'profit' : 'loss'}">${data.Fark >= 0 ? '▲' : '▼'} ${Math.abs(data.Fark).toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>Değişim</h4><div class="stat-number ${data.Fark >= 0 ? 'profit' : 'loss'}">${data.Fark >= 0 ? '▲' : '▼'} %${Math.abs(farkYuzde)}</div></div>
+            `;
         } catch(err) { console.error(err); }
     }
 
@@ -283,7 +381,6 @@
         document.getElementById('manuelAciklama').value = '';
         document.getElementById('manuelTutar').value = '';
         manuelListeyiGoster();
-        toplamlariHesapla();
     }
 
     function manuelGiderSil(idx) {
@@ -291,7 +388,6 @@
         giderler.splice(idx, 1);
         localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
         manuelListeyiGoster();
-        toplamlariHesapla();
     }
 
     function manuelListeyiGoster() {
@@ -300,21 +396,13 @@
         if (giderler.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Henüz manuel gider yok</td></tr>'; return; }
         tbody.innerHTML = giderler.map((g, idx) => `
             <tr>
-                <td>${g.tarih}</td><td>${g.aciklama}</td>
+                <td>${g.tarih}</td>
+                <td>${g.aciklama}</td>
                 <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
                 <td><span class="badge-gider">${g.tur}</span></td>
                 <td><button class="btn-outline" onclick="manuelGiderSil(${idx})">Sil</button></td>
             </tr>
         `).join('');
-    }
-
-    function toplamlariHesapla() {
-        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        let manuelToplam = manuel.reduce((s,g) => s + g.tutar, 0);
-        let toplamGider = sqlGiderToplam + manuelToplam;
-        let netKar = (sqlGelirler.Toplam || 0) - toplamGider;
-        document.getElementById('toplamGider').innerHTML = toplamGider.toLocaleString('tr-TR') + ' ₺';
-        document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
     }
 
     filtreGoster();
