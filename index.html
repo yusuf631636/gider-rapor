@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Öz Urfa Kebap | Anlık Rapor Sistemi</title>
+    <title>Öz Urfa Kebap | Gider ve Rapor Sistemi</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -76,6 +76,7 @@
         
         .badge-nakit { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 30px; display: inline-block; font-size: 0.6rem; font-weight: 600; }
         .badge-kredi { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 30px; display: inline-block; font-size: 0.6rem; font-weight: 600; }
+        .badge-sql { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 30px; display: inline-block; font-size: 0.6rem; font-weight: 600; }
         
         .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
         .form-field { flex: 1; min-width: 100px; }
@@ -90,8 +91,8 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>🧾 ÖZ URFA KEBAP <span>Anlık Rapor Sistemi</span></h1>
-        <p>📡 SambaPOS SQL | 🔄 Otomatik Güncelleme | 📊 Nakit/Kredi Ayrımı | 🌍 Her Yerden Erişim</p>
+        <h1>🧾 ÖZ URFA KEBAP <span>Gider ve Rapor Sistemi</span></h1>
+        <p>📡 SambaPOS SQL | 💰 Nakit/Kredi Ayrımı | 📊 Raporlama | 🌍 Her Yerden Erişim</p>
     </div>
 
     <!-- API Bağlantı Çubuğu -->
@@ -102,27 +103,28 @@
             <button class="btn btn-primary btn-sm" onclick="apiUrlKaydet()">Kaydet</button>
         </div>
         <div>
-            <button class="btn btn-outline btn-sm" onclick="verileriGuncelle()">🔄 Verileri Güncelle</button>
-            <button class="btn btn-green btn-sm" onclick="raporPdfIndir()">📄 PDF İndir</button>
+            <button class="btn btn-outline btn-sm" onclick="tumVerileriGuncelle()">🔄 Tümünü Güncelle</button>
+            <button class="btn btn-green btn-sm" onclick="raporPdfIndir()">📄 Rapor İndir (PDF)</button>
+            <button class="btn btn-secondary btn-sm" onclick="excelIndir()">📊 Excel İndir</button>
         </div>
     </div>
 
     <!-- Özet Kartlar -->
     <div class="stats-grid" id="ozetKartlar">
-        <div class="stat-card"><h4>📀 Toplam Ciro</h4><div class="stat-number" id="toplamCiro">0 ₺</div></div>
-        <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number" id="nakitToplam">0 ₺</div></div>
-        <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number" id="krediToplam">0 ₺</div></div>
+        <div class="stat-card"><h4>💰 Nakit (SQL)</h4><div class="stat-number" id="sqlNakit">0 ₺</div></div>
+        <div class="stat-card"><h4>💳 Kredi Kartı (SQL)</h4><div class="stat-number" id="sqlKredi">0 ₺</div></div>
+        <div class="stat-card"><h4>📝 Toplam Gider</h4><div class="stat-number" id="toplamGider">0 ₺</div></div>
         <div class="stat-card profit"><h4>📈 Net Kâr</h4><div class="stat-number" id="netKar">0 ₺</div></div>
     </div>
 
     <!-- Filtre Butonları -->
     <div class="filter-buttons">
-        <button class="filter-btn active" onclick="raporTipi='gunluk'; verileriGuncelle()">📅 Günlük Rapor</button>
-        <button class="filter-btn" onclick="raporTipi='aylik'; ay=5; yil=2026; verileriGuncelle()">📆 Mayıs 2026</button>
-        <button class="filter-btn" onclick="raporTipi='aylik'; ay=4; yil=2026; verileriGuncelle()">📆 Nisan 2026</button>
+        <button class="filter-btn active" onclick="raporTipi='gunluk'; tumVerileriGuncelle()">📅 Bugünün Giderleri</button>
+        <button class="filter-btn" onclick="raporTipi='aylik'; ay=5; yil=2026; tumVerileriGuncelle()">📆 Mayıs 2026</button>
+        <button class="filter-btn" onclick="raporTipi='aylik'; ay=4; yil=2026; tumVerileriGuncelle()">📆 Nisan 2026</button>
     </div>
 
-    <!-- Manuel Gider Bölümü -->
+    <!-- Manuel Gider Ekleme -->
     <div class="card">
         <div class="card-header">➕ Manuel Gider Ekle</div>
         <div class="card-body">
@@ -130,27 +132,39 @@
                 <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih"></div>
                 <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Tamir, Kırtasiye..."></div>
                 <div class="form-field"><label>Tutar (TL)</label><input type="number" id="manuelTutar" step="0.01"></div>
-                <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">Nakit</option><option value="Kredi">Kredi Kartı</option></select></div>
+                <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">💰 Nakit</option><option value="Kredi">💳 Kredi Kartı</option></select></div>
                 <div><button class="btn btn-primary btn-sm" onclick="manuelGiderEkle()">Ekle</button></div>
             </div>
         </div>
     </div>
 
-    <!-- Gider Listesi -->
+    <!-- Gider Listesi (SQL + Manuel birleşik) -->
     <div class="card">
-        <div class="card-header">📋 Gider Listesi <button class="btn btn-outline btn-sm" onclick="manuelGiderleriGoster()">🔄 Yenile</button></div>
+        <div class="card-header">
+            📋 Gider Listesi (SQL + Manuel)
+            <button class="btn btn-outline btn-sm" onclick="giderListesiniGoster()">🔄 Yenile</button>
+        </div>
         <div class="card-body">
             <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th><th></th></tr></thead>
-                    <tbody id="manuelTbody"></tbody>
+                <table id="giderTablo">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Açıklama</th>
+                            <th>Tutar (TL)</th>
+                            <th>Tür</th>
+                            <th>Kaynak</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="giderTbody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Anlık Raporlama | Her Yerden Erişim
+        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Giderler otomatik + manuel | Rapor alabilirsiniz
     </div>
 </div>
 
@@ -160,46 +174,41 @@
     let raporTipi = 'gunluk';
     let ay = 5;
     let yil = 2026;
+    
+    // SQL'den gelen veriler
+    let sqlNakit = 0;
+    let sqlKredi = 0;
 
     // ========== API URL ==========
     function apiUrlKaydet() {
         apiBase = document.getElementById('apiUrl').value;
         localStorage.setItem('apiBase', apiBase);
         alert('API adresi kaydedildi');
-        verileriGuncelle();
+        tumVerileriGuncelle();
     }
 
-    // ========== API'den Veri Çek (ngrok uyarısını atlar) ==========
-    async function verileriGuncelle() {
+    // ========== SQL'den Veri Çek ==========
+    async function sqlVeriCek() {
         let url = raporTipi === 'gunluk' ? `${apiBase}/api/gunluk` : `${apiBase}/api/aylik?ay=${ay}&yil=${yil}`;
         
         try {
-            // ngrok uyarı sayfasını atlamak için özel başlık
             let response = await fetch(url, {
-                headers: {
-                    'ngrok-skip-browser-warning': 'true'
-                }
+                headers: { 'ngrok-skip-browser-warning': 'true' }
             });
             let data = await response.json();
             
-            document.getElementById('toplamCiro').innerText = (data.ToplamCiro || 0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('nakitToplam').innerText = (data.NakitToplam || 0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('krediToplam').innerText = (data.KrediToplam || 0).toLocaleString('tr-TR') + ' ₺';
+            sqlNakit = data.NakitToplam || 0;
+            sqlKredi = data.KrediToplam || 0;
             
-            // Manuel giderleri al
-            let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-            let manuelNakit = manuelGiderler.filter(g => g.tur === 'Nakit').reduce((s,g) => s + g.tutar, 0);
-            let manuelKredi = manuelGiderler.filter(g => g.tur === 'Kredi').reduce((s,g) => s + g.tutar, 0);
+            document.getElementById('sqlNakit').innerText = sqlNakit.toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('sqlKredi').innerText = sqlKredi.toLocaleString('tr-TR') + ' ₺';
             
-            let toplamGider = (data.NakitToplam || 0) + (data.KrediToplam || 0) + manuelNakit + manuelKredi;
-            let netKar = (data.ToplamCiro || 0) - toplamGider;
-            document.getElementById('netKar').innerText = netKar.toLocaleString('tr-TR') + ' ₺';
-            
+            return true;
         } catch (err) {
-            console.error('API hatası:', err);
-            document.getElementById('toplamCiro').innerText = 'Bağlantı Hatası';
-            document.getElementById('nakitToplam').innerText = 'API kapalı mı?';
-            document.getElementById('krediToplam').innerText = 'ngrok açık mı?';
+            console.error('SQL hatası:', err);
+            document.getElementById('sqlNakit').innerText = 'Hata';
+            document.getElementById('sqlKredi').innerText = 'Hata';
+            return false;
         }
     }
 
@@ -222,41 +231,106 @@
         document.getElementById('manuelAciklama').value = '';
         document.getElementById('manuelTutar').value = '';
         
-        manuelGiderleriGoster();
-        verileriGuncelle();
-    }
-    
-    function manuelGiderleriGoster() {
-        let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        let tbody = document.getElementById('manuelTbody');
-        
-        if (giderler.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Henüz manuel gider yok</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = giderler.map((g, idx) => `
-            <tr>
-                <td>${g.tarih}</td>
-                <td>${g.aciklama}</td>
-                <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
-                <td><span class="${g.tur === 'Nakit' ? 'badge-nakit' : 'badge-kredi'}">${g.tur}</span></td>
-                <td><button class="btn-outline btn-sm" onclick="manuelGiderSil(${idx})">🗑️</button></td>
-            </tr>
-        `).join('');
+        giderListesiniGoster();
+        toplamlariHesapla();
     }
     
     function manuelGiderSil(index) {
         let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
         giderler.splice(index, 1);
         localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
-        manuelGiderleriGoster();
-        verileriGuncelle();
+        giderListesiniGoster();
+        toplamlariHesapla();
+    }
+    
+    // ========== GİDER LİSTESİNİ GÖSTER (SQL + Manuel) ==========
+    function giderListesiniGoster() {
+        let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        
+        // Manuel giderleri tablo için hazırla
+        let manuelItems = manuelGiderler.map((g, idx) => ({
+            tarih: g.tarih,
+            aciklama: g.aciklama,
+            tutar: g.tutar,
+            tur: g.tur,
+            kaynak: 'Manuel',
+            idx: idx
+        }));
+        
+        // SQL giderlerini tablo için hazırla (bugünün veya ayın)
+        let sqlItems = [];
+        if (raporTipi === 'gunluk') {
+            // Bugünün SQL giderlerini tek satır olarak göster
+            if (sqlNakit > 0 || sqlKredi > 0) {
+                if (sqlNakit > 0) sqlItems.push({ tarih: 'Bugün', aciklama: 'SQL - Nakit Giderler', tutar: sqlNakit, tur: 'Nakit', kaynak: 'SQL', idx: null });
+                if (sqlKredi > 0) sqlItems.push({ tarih: 'Bugün', aciklama: 'SQL - Kredi Kartı Giderler', tutar: sqlKredi, tur: 'Kredi', kaynak: 'SQL', idx: null });
+            }
+        } else {
+            // Aylık SQL giderlerini göster
+            if (sqlNakit > 0 || sqlKredi > 0) {
+                if (sqlNakit > 0) sqlItems.push({ tarih: `${ay}/${yil}`, aciklama: 'SQL - Nakit Giderler', tutar: sqlNakit, tur: 'Nakit', kaynak: 'SQL', idx: null });
+                if (sqlKredi > 0) sqlItems.push({ tarih: `${ay}/${yil}`, aciklama: 'SQL - Kredi Kartı Giderler', tutar: sqlKredi, tur: 'Kredi', kaynak: 'SQL', idx: null });
+            }
+        }
+        
+        // Tüm giderleri birleştir (önce SQL, sonra manuel)
+        let tumGiderler = [...sqlItems, ...manuelItems];
+        
+        let tbody = document.getElementById('giderTbody');
+        if (tumGiderler.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Henüz gider yok (SQL'de veri yoksa 0₺ görünür)</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = tumGiderler.map(g => {
+            let badgeClass = '';
+            let badgeText = '';
+            if (g.tur === 'Nakit') { badgeClass = 'badge-nakit'; badgeText = '💰 Nakit'; }
+            else { badgeClass = 'badge-kredi'; badgeText = '💳 Kredi Kartı'; }
+            
+            let kaynakClass = g.kaynak === 'SQL' ? 'badge-sql' : 'badge-nakit';
+            
+            return `
+                <tr>
+                    <td>${g.tarih}</td>
+                    <td>${g.aciklama}</td>
+                    <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
+                    <td><span class="${badgeClass}">${badgeText}</span></td>
+                    <td><span class="${kaynakClass}">📡 ${g.kaynak}</span></td>
+                    <td>${g.kaynak === 'Manuel' ? `<button class="btn-outline btn-sm" onclick="manuelGiderSil(${g.idx})">🗑️</button>` : '-'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // ========== TOPLAMLARI HESAPLA ==========
+    function toplamlariHesapla() {
+        let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        let manuelNakit = manuelGiderler.filter(g => g.tur === 'Nakit').reduce((s,g) => s + g.tutar, 0);
+        let manuelKredi = manuelGiderler.filter(g => g.tur === 'Kredi').reduce((s,g) => s + g.tutar, 0);
+        
+        let toplamGider = sqlNakit + sqlKredi + manuelNakit + manuelKredi;
+        let netKar = (sqlNakit + sqlKredi) - toplamGider; // Ciro - toplamGider
+        
+        document.getElementById('toplamGider').innerText = toplamGider.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('netKar').innerText = netKar.toLocaleString('tr-TR') + ' ₺';
+    }
+    
+    // ========== TÜM VERİLERİ GÜNCELLE ==========
+    async function tumVerileriGuncelle() {
+        document.getElementById('apiUrl').value = apiBase;
+        
+        // SQL'den veri çek
+        await sqlVeriCek();
+        
+        // Listeyi ve toplamları güncelle
+        giderListesiniGoster();
+        toplamlariHesapla();
     }
     
     // ========== PDF RAPOR İNDİR ==========
     function raporPdfIndir() {
-        const element = document.getElementById('ozetKartlar');
+        const element = document.querySelector('.stats-grid');
         const opt = {
             margin: [0.5, 0.5, 0.5, 0.5],
             filename: `oz_urfa_kebap_rapor.pdf`,
@@ -267,10 +341,36 @@
         html2pdf().set(opt).from(element).save();
     }
     
+    // ========== EXCEL İNDİR ==========
+    function excelIndir() {
+        let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        let data = [
+            ['ÖZ URFA KEBAP RAPORU', ''],
+            ['Tarih', raporTipi === 'gunluk' ? 'Bugün' : `${ay}/${yil}`],
+            ['', ''],
+            ['SQL - Nakit Gider', sqlNakit],
+            ['SQL - Kredi Kartı Gider', sqlKredi],
+            ['Manuel - Nakit Gider', manuelGiderler.filter(g => g.tur === 'Nakit').reduce((s,g) => s + g.tutar, 0)],
+            ['Manuel - Kredi Kartı Gider', manuelGiderler.filter(g => g.tur === 'Kredi').reduce((s,g) => s + g.tutar, 0)],
+            ['Toplam Gider', sqlNakit + sqlKredi + manuelGiderler.reduce((s,g) => s + g.tutar, 0)],
+            ['', ''],
+            ['MANUEL GİDER LİSTESİ', ''],
+            ['Tarih', 'Açıklama', 'Tutar', 'Tür']
+        ];
+        
+        manuelGiderler.forEach(g => {
+            data.push([g.tarih, g.aciklama, g.tutar, g.tur]);
+        });
+        
+        let ws = XLSX.utils.aoa_to_sheet(data);
+        let wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Rapor');
+        XLSX.writeFile(wb, `oz_urfa_kebap_rapor.xlsx`);
+    }
+    
     // ========== SAYFA AÇILINCA ==========
     document.getElementById('apiUrl').value = apiBase;
-    manuelGiderleriGoster();
-    verileriGuncelle();
+    tumVerileriGuncelle();
     
     // Filtre butonlarını aktifleştir
     document.querySelectorAll('.filter-btn').forEach((btn) => {
