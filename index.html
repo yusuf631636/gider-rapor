@@ -34,6 +34,20 @@
         .btn-outline { background: transparent; border: 1px solid #cbd5e1; color: #cbd5e1; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); }
         
+        .api-bar {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .api-input { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .api-input input { padding: 8px 15px; border-radius: 30px; border: 1px solid #334155; background: #1e293b; color: white; width: 350px; }
+        
         .filter-bar {
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
@@ -113,6 +127,16 @@
         <div class="sub">📡 SambaPOS SQL Bağlantılı | Giderler kalem kalem | Günlük/Aylık/Yıllık Ciro</div>
     </div>
 
+    <!-- API Adresi Çubuğu (Kullanıcı görecek) -->
+    <div class="api-bar">
+        <div class="api-input">
+            <span>🌐 API Adresi:</span>
+            <input type="text" id="apiUrl" placeholder="https://xxxx.ngrok-free.app" value="https://055b-2a00-1d35-a45b-500-c1c8-ee1f-296a-6bdc.ngrok-free.app">
+            <button class="btn-primary" onclick="apiUrlKaydet()">Kaydet</button>
+        </div>
+        <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
+    </div>
+
     <div class="filter-bar">
         <button class="btn-secondary" id="btnGunluk" onclick="aktifMod='gunluk'; filtreGoster(); tumVerileriGuncelle()">📆 Günlük</button>
         <button class="btn-secondary" id="btnAylik" onclick="aktifMod='aylik'; filtreGoster(); tumVerileriGuncelle()">📅 Aylık</button>
@@ -146,7 +170,6 @@
             <select id="yil2Sec"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select>
             <button class="btn-primary" onclick="yillarKarsilastirma()">Karşılaştır</button>
         </div>
-        <button class="btn-primary" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
     </div>
 
     <!-- Özet Kartlar -->
@@ -223,10 +246,19 @@
 </div>
 
 <script>
-    const API_BASE = 'https://42a4-2a00-1d35-a45b-500-7150-e82-1e2-32bd.ngrok-free.app ';
+    let API_BASE = localStorage.getItem('apiBase') || 'https://055b-2a00-1d35-a45b-500-c1c8-ee1f-296a-6bdc.ngrok-free.app';
     let aktifMod = 'gunluk';
     let sqlGelirler = { Nakit: 0, KrediKarti: 0, Toplam: 0 };
     let sqlGiderToplam = 0;
+
+    document.getElementById('apiUrl').value = API_BASE;
+
+    function apiUrlKaydet() {
+        API_BASE = document.getElementById('apiUrl').value;
+        localStorage.setItem('apiBase', API_BASE);
+        alert('API adresi kaydedildi');
+        tumVerileriGuncelle();
+    }
 
     function filtreGoster() {
         document.getElementById('gunlukFilter').style.display = aktifMod === 'gunluk' ? 'flex' : 'none';
@@ -299,7 +331,7 @@
             let giderler = await response.json();
             let tbody = document.getElementById('giderDetayTbody');
             if (giderler.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4">Bu tarihte gider bulunamadı</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4">Bu tarihte gider bulunamadı</tr>';
             } else {
                 tbody.innerHTML = giderler.map(g => `
                     <tr>
@@ -381,6 +413,7 @@
         document.getElementById('manuelAciklama').value = '';
         document.getElementById('manuelTutar').value = '';
         manuelListeyiGoster();
+        toplamlariHesapla();
     }
 
     function manuelGiderSil(idx) {
@@ -388,6 +421,7 @@
         giderler.splice(idx, 1);
         localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
         manuelListeyiGoster();
+        toplamlariHesapla();
     }
 
     function manuelListeyiGoster() {
@@ -403,6 +437,15 @@
                 <td><button class="btn-outline" onclick="manuelGiderSil(${idx})">Sil</button></td>
             </tr>
         `).join('');
+    }
+
+    function toplamlariHesapla() {
+        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        let manuelToplam = manuel.reduce((s,g) => s + g.tutar, 0);
+        let toplamGider = sqlGiderToplam + manuelToplam;
+        let netKar = sqlGelirler.Toplam - toplamGider;
+        document.getElementById('toplamGider').innerHTML = toplamGider.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
     }
 
     filtreGoster();
