@@ -2,383 +2,203 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Öz Urfa Kebap | Gider ve Rapor Sistemi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öz Urfa Kebap | Rapor Sistemi</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
             padding: 20px;
-            color: #1e293b;
-            min-height: 100vh;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        
-        .header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 28px;
-            padding: 20px 28px;
-            margin-bottom: 24px;
-            color: white;
-        }
-        .header h1 { font-size: 1.5rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .header h1 span { background: #f97316; padding: 4px 14px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
-        .header p { color: #94a3b8; margin-top: 6px; font-size: 0.75rem; }
-        
-        .btn { padding: 8px 18px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-primary { background: #f97316; color: white; }
-        .btn-primary:hover { background: #ea580c; transform: translateY(-2px); }
-        .btn-secondary { background: #64748b; color: white; }
-        .btn-secondary:hover { background: #475569; }
-        .btn-outline { background: white; border: 1px solid #cbd5e1; color: #334155; }
-        .btn-outline:hover { background: #f1f5f9; }
-        .btn-sm { padding: 4px 12px; font-size: 0.65rem; }
-        .btn-green { background: #10b981; color: white; }
-        .btn-red { background: #dc2626; color: white; }
-        
-        .api-bar {
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .api-input { flex: 2; min-width: 200px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .api-input input { flex: 1; padding: 8px 12px; border-radius: 30px; border: 1px solid #cbd5e1; font-size: 0.75rem; }
-        
-        .stats-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
-        .stat-card { flex: 1; min-width: 140px; background: white; border-radius: 24px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .stat-card h4 { font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
-        .stat-number { font-size: 1.6rem; font-weight: 800; color: #1e293b; }
-        .profit { color: #10b981; }
-        
-        .filter-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .filter-btn { background: #f1f5f9; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+        .container { max-width: 1200px; margin: auto; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #b45309; margin-bottom: 10px; }
+        .api-box { background: #f1f5f9; padding: 12px; border-radius: 16px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .api-box input { flex: 2; padding: 8px; border-radius: 30px; border: 1px solid #cbd5e1; }
+        .btn { background: #f97316; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background: #ea580c; }
+        .btn-outline { background: white; border: 1px solid #cbd5e1; color: #333; }
+        .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .card { flex: 1; background: #f8fafc; padding: 15px; border-radius: 16px; text-align: center; }
+        .card h3 { font-size: 12px; color: #64748b; }
+        .card .value { font-size: 24px; font-weight: bold; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { background: #e2e8f0; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; }
         .filter-btn.active { background: #f97316; color: white; }
-        
-        .card { background: white; border-radius: 24px; margin-bottom: 24px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-header { background: #fef9e8; padding: 14px 20px; border-bottom: 2px solid #ffedd5; font-weight: 700; font-size: 1rem; color: #9b4a06; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; }
-        .card-body { padding: 20px; }
-        
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th { background: #f8fafc; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 8px; border-bottom: 1px solid #f1f5f9; }
-        .amount-right { text-align: right; font-weight: 600; }
-        
-        .badge-nakit { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 30px; display: inline-block; font-size: 0.6rem; font-weight: 600; }
-        .badge-kredi { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 30px; display: inline-block; font-size: 0.6rem; font-weight: 600; }
-        .badge-sql { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 30px; display: inline-block; font-size: 0.6rem; font-weight: 600; }
-        
-        .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
-        .form-field { flex: 1; min-width: 100px; }
-        .form-field label { font-size: 0.65rem; font-weight: 600; color: #5a6e8a; display: block; margin-bottom: 4px; }
-        .form-field input, .form-field select { width: 100%; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 16px; font-size: 0.75rem; }
-        
-        .footer { text-align: center; font-size: 0.65rem; color: #64748b; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
-        
-        @media (max-width: 700px) { .stat-number { font-size: 1.2rem; } .btn { padding: 6px 12px; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .badge-nakit { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 30px; font-size: 12px; }
+        .badge-kredi { background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 30px; font-size: 12px; }
+        .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; align-items: flex-end; }
+        .form-field { flex: 1; min-width: 120px; }
+        .form-field label { display: block; font-size: 12px; margin-bottom: 4px; }
+        .form-field input, .form-field select { width: 100%; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; }
+        .footer { text-align: center; font-size: 11px; color: #64748b; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
+        @media (max-width: 700px) { .card .value { font-size: 18px; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>🧾 ÖZ URFA KEBAP <span>Gider ve Rapor Sistemi</span></h1>
-        <p>📡 SambaPOS SQL | 💰 Nakit/Kredi Ayrımı | 📊 Raporlama | 🌍 Her Yerden Erişim</p>
+    <h1>🧾 ÖZ URFA KEBAP - Rapor Sistemi</h1>
+    
+    <div class="api-box">
+        <span>🌐 API Adresi:</span>
+        <input type="text" id="apiUrl" value="https://be4f-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app">
+        <button class="btn" onclick="kaydetVeGuncelle()">Kaydet</button>
+        <button class="btn-outline" onclick="verileriGuncelle()">🔄 Güncelle</button>
     </div>
 
-    <!-- API Bağlantı Çubuğu -->
-    <div class="api-bar">
-        <div class="api-input">
-            <span>🌐 API Adresi:</span>
-            <input type="text" id="apiUrl" placeholder="https://xxxx.ngrok-free.app" value="https://be4f-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app">
-            <button class="btn btn-primary btn-sm" onclick="apiUrlKaydet()">Kaydet</button>
-        </div>
-        <div>
-            <button class="btn btn-outline btn-sm" onclick="tumVerileriGuncelle()">🔄 Tümünü Güncelle</button>
-            <button class="btn btn-green btn-sm" onclick="raporPdfIndir()">📄 Rapor İndir (PDF)</button>
-            <button class="btn btn-secondary btn-sm" onclick="excelIndir()">📊 Excel İndir</button>
-        </div>
+    <div class="stats" id="stats">
+        <div class="card"><h3>💰 Nakit (SQL)</h3><div class="value" id="nakit">0 ₺</div></div>
+        <div class="card"><h3>💳 Kredi Kartı (SQL)</h3><div class="value" id="kredi">0 ₺</div></div>
+        <div class="card"><h3>📝 Toplam Gider</h3><div class="value" id="toplam">0 ₺</div></div>
+        <div class="card"><h3>📈 Net Kâr</h3><div class="value" id="kar">0 ₺</div></div>
     </div>
 
-    <!-- Özet Kartlar -->
-    <div class="stats-grid" id="ozetKartlar">
-        <div class="stat-card"><h4>💰 Nakit (SQL)</h4><div class="stat-number" id="sqlNakit">0 ₺</div></div>
-        <div class="stat-card"><h4>💳 Kredi Kartı (SQL)</h4><div class="stat-number" id="sqlKredi">0 ₺</div></div>
-        <div class="stat-card"><h4>📝 Toplam Gider</h4><div class="stat-number" id="toplamGider">0 ₺</div></div>
-        <div class="stat-card profit"><h4>📈 Net Kâr</h4><div class="stat-number" id="netKar">0 ₺</div></div>
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="raporTip='gunluk'; verileriGuncelle()">📅 Bugün</button>
+        <button class="filter-btn" onclick="raporTip='aylik'; ay=5; yil=2026; verileriGuncelle()">📆 Mayıs 2026</button>
+        <button class="filter-btn" onclick="raporTip='aylik'; ay=4; yil=2026; verileriGuncelle()">📆 Nisan 2026</button>
     </div>
 
-    <!-- Filtre Butonları -->
-    <div class="filter-buttons">
-        <button class="filter-btn active" onclick="raporTipi='gunluk'; tumVerileriGuncelle()">📅 Bugünün Giderleri</button>
-        <button class="filter-btn" onclick="raporTipi='aylik'; ay=5; yil=2026; tumVerileriGuncelle()">📆 Mayıs 2026</button>
-        <button class="filter-btn" onclick="raporTipi='aylik'; ay=4; yil=2026; tumVerileriGuncelle()">📆 Nisan 2026</button>
+    <div class="form-row">
+        <div class="form-field"><label>Tarih</label><input type="date" id="mTarih"></div>
+        <div class="form-field"><label>Açıklama</label><input type="text" id="mAciklama" placeholder="Örn: Tamir"></div>
+        <div class="form-field"><label>Tutar</label><input type="number" id="mTutar" step="0.01"></div>
+        <div class="form-field"><label>Tür</label><select id="mTur"><option value="Nakit">Nakit</option><option value="Kredi">Kredi Kartı</option></select></div>
+        <div><button class="btn" onclick="manuelEkle()">➕ Ekle</button></div>
     </div>
 
-    <!-- Manuel Gider Ekleme -->
-    <div class="card">
-        <div class="card-header">➕ Manuel Gider Ekle</div>
-        <div class="card-body">
-            <div class="form-row">
-                <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih"></div>
-                <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Tamir, Kırtasiye..."></div>
-                <div class="form-field"><label>Tutar (TL)</label><input type="number" id="manuelTutar" step="0.01"></div>
-                <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">💰 Nakit</option><option value="Kredi">💳 Kredi Kartı</option></select></div>
-                <div><button class="btn btn-primary btn-sm" onclick="manuelGiderEkle()">Ekle</button></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gider Listesi (SQL + Manuel birleşik) -->
-    <div class="card">
-        <div class="card-header">
-            📋 Gider Listesi (SQL + Manuel)
-            <button class="btn btn-outline btn-sm" onclick="giderListesiniGoster()">🔄 Yenile</button>
-        </div>
-        <div class="card-body">
-            <div class="table-wrapper">
-                <table id="giderTablo">
-                    <thead>
-                        <tr>
-                            <th>Tarih</th>
-                            <th>Açıklama</th>
-                            <th>Tutar (TL)</th>
-                            <th>Tür</th>
-                            <th>Kaynak</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="giderTbody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <table id="giderTablo">
+        <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th><th>Kaynak</th><th></th></tr></thead>
+        <tbody id="giderListe"></tbody>
+    </table>
 
     <div class="footer">
-        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Giderler otomatik + manuel | Rapor alabilirsiniz
+        ⚡ SambaPOS SQL Bağlantılı | API: <span id="apiDurum">Bağlantı kontrol ediliyor...</span>
     </div>
 </div>
 
 <script>
-    // ========== DEĞİŞKENLER ==========
     let apiBase = localStorage.getItem('apiBase') || 'https://be4f-2a00-1d35-a45b-500-3d72-8d7c-373d-17b1.ngrok-free.app';
-    let raporTipi = 'gunluk';
-    let ay = 5;
-    let yil = 2026;
-    
-    // SQL'den gelen veriler
-    let sqlNakit = 0;
-    let sqlKredi = 0;
+    let raporTip = 'gunluk';
+    let ay = 5, yil = 2026;
+    let sqlNakit = 0, sqlKredi = 0;
 
-    // ========== API URL ==========
-    function apiUrlKaydet() {
+    document.getElementById('apiUrl').value = apiBase;
+
+    function kaydetVeGuncelle() {
         apiBase = document.getElementById('apiUrl').value;
         localStorage.setItem('apiBase', apiBase);
         alert('API adresi kaydedildi');
-        tumVerileriGuncelle();
+        verileriGuncelle();
     }
 
-    // ========== SQL'den Veri Çek ==========
-    async function sqlVeriCek() {
-        let url = raporTipi === 'gunluk' ? `${apiBase}/api/gunluk` : `${apiBase}/api/aylik?ay=${ay}&yil=${yil}`;
+    async function verileriGuncelle() {
+        let url = raporTip === 'gunluk' ? `${apiBase}/api/gunluk` : `${apiBase}/api/aylik?ay=${ay}&yil=${yil}`;
         
         try {
-            let response = await fetch(url, {
-                headers: { 'ngrok-skip-browser-warning': 'true' }
-            });
+            let response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let data = await response.json();
             
             sqlNakit = data.NakitToplam || 0;
             sqlKredi = data.KrediToplam || 0;
             
-            document.getElementById('sqlNakit').innerText = sqlNakit.toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('sqlKredi').innerText = sqlKredi.toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('nakit').innerHTML = sqlNakit.toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('kredi').innerHTML = sqlKredi.toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('apiDurum').innerHTML = '✅ Bağlantı var';
             
-            return true;
+            toplamlariHesapla();
+            listeyiGoster();
         } catch (err) {
-            console.error('SQL hatası:', err);
-            document.getElementById('sqlNakit').innerText = 'Hata';
-            document.getElementById('sqlKredi').innerText = 'Hata';
-            return false;
+            document.getElementById('nakit').innerHTML = 'Hata';
+            document.getElementById('kredi').innerHTML = 'Hata';
+            document.getElementById('apiDurum').innerHTML = '❌ Bağlantı yok: ' + err.message;
         }
     }
 
-    // ========== MANUEL GİDERLER ==========
-    function manuelGiderEkle() {
-        let tarih = document.getElementById('manuelTarih').value || new Date().toISOString().slice(0,10);
-        let aciklama = document.getElementById('manuelAciklama').value;
-        let tutar = parseFloat(document.getElementById('manuelTutar').value);
-        let tur = document.getElementById('manuelTur').value;
+    function manuelEkle() {
+        let tarih = document.getElementById('mTarih').value || new Date().toISOString().slice(0,10);
+        let aciklama = document.getElementById('mAciklama').value;
+        let tutar = parseFloat(document.getElementById('mTutar').value);
+        let tur = document.getElementById('mTur').value;
         
         if (!aciklama || isNaN(tutar) || tutar <= 0) {
-            alert('Lütfen tüm alanları doldurun');
+            alert('Lütfen açıklama ve tutar girin');
             return;
         }
         
-        let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        giderler.push({ tarih, aciklama, tutar, tur });
-        localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
+        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        manuel.push({ tarih, aciklama, tutar, tur });
+        localStorage.setItem('manuelGiderler', JSON.stringify(manuel));
         
-        document.getElementById('manuelAciklama').value = '';
-        document.getElementById('manuelTutar').value = '';
+        document.getElementById('mAciklama').value = '';
+        document.getElementById('mTutar').value = '';
         
-        giderListesiniGoster();
+        listeyiGoster();
         toplamlariHesapla();
     }
-    
-    function manuelGiderSil(index) {
-        let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        giderler.splice(index, 1);
-        localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
-        giderListesiniGoster();
+
+    function manuelSil(idx) {
+        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        manuel.splice(idx, 1);
+        localStorage.setItem('manuelGiderler', JSON.stringify(manuel));
+        listeyiGoster();
         toplamlariHesapla();
     }
-    
-    // ========== GİDER LİSTESİNİ GÖSTER (SQL + Manuel) ==========
-    function giderListesiniGoster() {
-        let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+
+    function listeyiGoster() {
+        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        let tbody = document.getElementById('giderListe');
         
-        // Manuel giderleri tablo için hazırla
-        let manuelItems = manuelGiderler.map((g, idx) => ({
-            tarih: g.tarih,
-            aciklama: g.aciklama,
-            tutar: g.tutar,
-            tur: g.tur,
-            kaynak: 'Manuel',
-            idx: idx
-        }));
-        
-        // SQL giderlerini tablo için hazırla (bugünün veya ayın)
         let sqlItems = [];
-        if (raporTipi === 'gunluk') {
-            // Bugünün SQL giderlerini tek satır olarak göster
-            if (sqlNakit > 0 || sqlKredi > 0) {
-                if (sqlNakit > 0) sqlItems.push({ tarih: 'Bugün', aciklama: 'SQL - Nakit Giderler', tutar: sqlNakit, tur: 'Nakit', kaynak: 'SQL', idx: null });
-                if (sqlKredi > 0) sqlItems.push({ tarih: 'Bugün', aciklama: 'SQL - Kredi Kartı Giderler', tutar: sqlKredi, tur: 'Kredi', kaynak: 'SQL', idx: null });
-            }
+        if (raporTip === 'gunluk') {
+            if (sqlNakit > 0) sqlItems.push({ tarih: 'Bugün', aciklama: 'SQL - Nakit Gider', tutar: sqlNakit, tur: 'Nakit', kaynak: 'SQL' });
+            if (sqlKredi > 0) sqlItems.push({ tarih: 'Bugün', aciklama: 'SQL - Kredi Kartı Gider', tutar: sqlKredi, tur: 'Kredi', kaynak: 'SQL' });
         } else {
-            // Aylık SQL giderlerini göster
-            if (sqlNakit > 0 || sqlKredi > 0) {
-                if (sqlNakit > 0) sqlItems.push({ tarih: `${ay}/${yil}`, aciklama: 'SQL - Nakit Giderler', tutar: sqlNakit, tur: 'Nakit', kaynak: 'SQL', idx: null });
-                if (sqlKredi > 0) sqlItems.push({ tarih: `${ay}/${yil}`, aciklama: 'SQL - Kredi Kartı Giderler', tutar: sqlKredi, tur: 'Kredi', kaynak: 'SQL', idx: null });
-            }
+            if (sqlNakit > 0) sqlItems.push({ tarih: `${ay}/${yil}`, aciklama: 'SQL - Nakit Gider', tutar: sqlNakit, tur: 'Nakit', kaynak: 'SQL' });
+            if (sqlKredi > 0) sqlItems.push({ tarih: `${ay}/${yil}`, aciklama: 'SQL - Kredi Kartı Gider', tutar: sqlKredi, tur: 'Kredi', kaynak: 'SQL' });
         }
         
-        // Tüm giderleri birleştir (önce SQL, sonra manuel)
-        let tumGiderler = [...sqlItems, ...manuelItems];
+        let manuelItems = manuel.map((g, idx) => ({ ...g, kaynak: 'Manuel', idx: idx }));
+        let hepsi = [...sqlItems, ...manuelItems];
         
-        let tbody = document.getElementById('giderTbody');
-        if (tumGiderler.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Henüz gider yok (SQL'de veri yoksa 0₺ görünür)</td></tr>';
+        if (hepsi.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">Henüz gider yok. SQL\'den veri gelmiyorsa 0₺ görünür.</td></tr>';
             return;
         }
         
-        tbody.innerHTML = tumGiderler.map(g => {
-            let badgeClass = '';
-            let badgeText = '';
-            if (g.tur === 'Nakit') { badgeClass = 'badge-nakit'; badgeText = '💰 Nakit'; }
-            else { badgeClass = 'badge-kredi'; badgeText = '💳 Kredi Kartı'; }
-            
-            let kaynakClass = g.kaynak === 'SQL' ? 'badge-sql' : 'badge-nakit';
-            
-            return `
-                <tr>
-                    <td>${g.tarih}</td>
-                    <td>${g.aciklama}</td>
-                    <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
-                    <td><span class="${badgeClass}">${badgeText}</span></td>
-                    <td><span class="${kaynakClass}">📡 ${g.kaynak}</span></td>
-                    <td>${g.kaynak === 'Manuel' ? `<button class="btn-outline btn-sm" onclick="manuelGiderSil(${g.idx})">🗑️</button>` : '-'}</td>
-                </tr>
-            `;
-        }).join('');
+        tbody.innerHTML = hepsi.map(g => `
+            <tr>
+                <td>${g.tarih}</td>
+                <td>${g.aciklama}</td>
+                <td>${g.tutar.toLocaleString('tr-TR')} ₺</td>
+                <td><span class="${g.tur === 'Nakit' ? 'badge-nakit' : 'badge-kredi'}">${g.tur === 'Nakit' ? '💰 Nakit' : '💳 Kredi'}</span></td>
+                <td>${g.kaynak === 'SQL' ? '📡 SQL' : '✏️ Manuel'}</td>
+                <td>${g.kaynak === 'Manuel' ? `<button class="btn-outline" style="padding:4px 8px;" onclick="manuelSil(${g.idx})">Sil</button>` : '-'}</td>
+            </tr>
+        `).join('');
     }
-    
-    // ========== TOPLAMLARI HESAPLA ==========
+
     function toplamlariHesapla() {
-        let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        let manuelNakit = manuelGiderler.filter(g => g.tur === 'Nakit').reduce((s,g) => s + g.tutar, 0);
-        let manuelKredi = manuelGiderler.filter(g => g.tur === 'Kredi').reduce((s,g) => s + g.tutar, 0);
+        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
+        let manuelToplam = manuel.reduce((s, g) => s + g.tutar, 0);
+        let toplamGider = sqlNakit + sqlKredi + manuelToplam;
+        let netKar = (sqlNakit + sqlKredi) - toplamGider;
         
-        let toplamGider = sqlNakit + sqlKredi + manuelNakit + manuelKredi;
-        let netKar = (sqlNakit + sqlKredi) - toplamGider; // Ciro - toplamGider
-        
-        document.getElementById('toplamGider').innerText = toplamGider.toLocaleString('tr-TR') + ' ₺';
-        document.getElementById('netKar').innerText = netKar.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('toplam').innerHTML = toplamGider.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('kar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
     }
-    
-    // ========== TÜM VERİLERİ GÜNCELLE ==========
-    async function tumVerileriGuncelle() {
-        document.getElementById('apiUrl').value = apiBase;
-        
-        // SQL'den veri çek
-        await sqlVeriCek();
-        
-        // Listeyi ve toplamları güncelle
-        giderListesiniGoster();
-        toplamlariHesapla();
-    }
-    
-    // ========== PDF RAPOR İNDİR ==========
-    function raporPdfIndir() {
-        const element = document.querySelector('.stats-grid');
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: `oz_urfa_kebap_rapor.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
-    
-    // ========== EXCEL İNDİR ==========
-    function excelIndir() {
-        let manuelGiderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        let data = [
-            ['ÖZ URFA KEBAP RAPORU', ''],
-            ['Tarih', raporTipi === 'gunluk' ? 'Bugün' : `${ay}/${yil}`],
-            ['', ''],
-            ['SQL - Nakit Gider', sqlNakit],
-            ['SQL - Kredi Kartı Gider', sqlKredi],
-            ['Manuel - Nakit Gider', manuelGiderler.filter(g => g.tur === 'Nakit').reduce((s,g) => s + g.tutar, 0)],
-            ['Manuel - Kredi Kartı Gider', manuelGiderler.filter(g => g.tur === 'Kredi').reduce((s,g) => s + g.tutar, 0)],
-            ['Toplam Gider', sqlNakit + sqlKredi + manuelGiderler.reduce((s,g) => s + g.tutar, 0)],
-            ['', ''],
-            ['MANUEL GİDER LİSTESİ', ''],
-            ['Tarih', 'Açıklama', 'Tutar', 'Tür']
-        ];
-        
-        manuelGiderler.forEach(g => {
-            data.push([g.tarih, g.aciklama, g.tutar, g.tur]);
-        });
-        
-        let ws = XLSX.utils.aoa_to_sheet(data);
-        let wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Rapor');
-        XLSX.writeFile(wb, `oz_urfa_kebap_rapor.xlsx`);
-    }
-    
-    // ========== SAYFA AÇILINCA ==========
-    document.getElementById('apiUrl').value = apiBase;
-    tumVerileriGuncelle();
-    
-    // Filtre butonlarını aktifleştir
-    document.querySelectorAll('.filter-btn').forEach((btn) => {
-        btn.addEventListener('click', function() {
+
+    // Filtre butonlarını aktif yap
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.onclick = function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-        });
+        };
     });
+
+    verileriGuncelle();
 </script>
 </body>
 </html>
