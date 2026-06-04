@@ -124,14 +124,13 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Rapor ve Gider Takip</h1>
-        <div class="sub">📡 SambaPOS SQL Bağlantılı | Giderler kalem kalem | Günlük/Aylık/Yıllık Ciro</div>
+        <div class="sub">📡 SambaPOS SQL Bağlantılı | Giderler kalem kalem | Manuel giderler SQL'e kaydedilir</div>
     </div>
 
-    <!-- API Adresi Çubuğu (Kullanıcı görecek) -->
     <div class="api-bar">
         <div class="api-input">
             <span>🌐 API Adresi:</span>
-            <input type="text" id="apiUrl" placeholder="https://xxxx.ngrok-free.app" value="https://055b-2a00-1d35-a45b-500-c1c8-ee1f-296a-6bdc.ngrok-free.app">
+            <input type="text" id="apiUrl" placeholder="https://xxxx.ngrok-free.app" value="https://YENI-ADRES.ngrok-free.app">
             <button class="btn-primary" onclick="apiUrlKaydet()">Kaydet</button>
         </div>
         <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
@@ -145,7 +144,7 @@
         
         <div id="gunlukFilter" style="display:flex; gap:10px;">
             <span>Tarih:</span>
-            <input type="date" id="tarihSec" value="2026-06-02" onchange="tumVerileriGuncelle()">
+            <input type="date" id="tarihSec" value="2026-06-03" onchange="tumVerileriGuncelle()">
         </div>
         <div id="aylikFilter" style="display:none; gap:10px;">
             <select id="aySec" onchange="tumVerileriGuncelle()">
@@ -172,8 +171,7 @@
         </div>
     </div>
 
-    <!-- Özet Kartlar -->
-    <div class="stats-grid" id="ozetKartlar">
+    <div class="stats-grid">
         <div class="stat-card"><h4>💰 Nakit Gelir</h4><div class="stat-number" id="nakitGelir">0 ₺</div></div>
         <div class="stat-card"><h4>💳 Kredi Kartı Gelir</h4><div class="stat-number" id="krediGelir">0 ₺</div></div>
         <div class="stat-card"><h4>📊 Toplam Gelir</h4><div class="stat-number" id="toplamGelir">0 ₺</div></div>
@@ -181,72 +179,45 @@
         <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number profit" id="netKar">0 ₺</div></div>
     </div>
 
-    <!-- Yıllık Ciro Tablosu -->
     <div id="yillikTablo" class="card" style="display:none;">
         <div class="card-header">📊 Yıllık Ciro Tablosu</div>
         <div class="card-body">
-            <div class="table-wrapper">
-                <table id="yillikCiroTablo">
-                    <thead><tr><th>Ay</th><th>Nakit</th><th>Kredi Kartı</th><th>Toplam</th></tr></thead>
-                    <tbody id="yillikCiroTbody"></tbody>
-                </table>
-            </div>
+            <div class="table-wrapper"><table id="yillikCiroTablo"><thead><tr><th>Ay</th><th>Nakit</th><th>Kredi Kartı</th><th>Toplam</th></tr></thead><tbody id="yillikCiroTbody"></tbody></table></div>
         </div>
     </div>
 
-    <!-- Yıllar Arası Karşılaştırma -->
     <div id="karsilastirmaTablo" class="card" style="display:none;">
         <div class="card-header">📈 Yıllar Arası Karşılaştırma</div>
-        <div class="card-body">
-            <div class="stats-grid" id="karsilastirmaKartlari"></div>
-        </div>
+        <div class="card-body"><div class="stats-grid" id="karsilastirmaKartlari"></div></div>
     </div>
 
-    <!-- Gider Detay Listesi -->
     <div id="giderDetayKart" class="card">
-        <div class="card-header">
-            📋 Giderler (Kalem Kalem - SQL)
-            <button class="btn-outline" onclick="giderDetaylariniGetir()">🔄 Yenile</button>
-        </div>
+        <div class="card-header">📋 Giderler (Kalem Kalem - SQL) <button class="btn-outline" onclick="giderDetaylariniGetir()">🔄 Yenile</button></div>
         <div class="card-body">
-            <div class="table-wrapper">
-                <table id="giderDetayTablo">
-                    <thead><tr><th>Tarih</th><th>Gider Türü</th><th>Açıklama</th><th>Tutar (TL)</th></tr></thead>
-                    <tbody id="giderDetayTbody"><tr><td colspan="4">Yükleniyor...</tbody>
-                </table>
-            </div>
+            <div class="table-wrapper"><table id="giderDetayTablo"><thead><tr><th>Tarih</th><th>Gider Türü</th><th>Açıklama</th><th>Tutar (TL)</th></tr></thead><tbody id="giderDetayTbody"><tr><td colspan="4">Yükleniyor...</tbody></table></div>
         </div>
     </div>
 
-    <!-- Manuel Gider Ekleme -->
+    <!-- Manuel Gider Ekleme (SQL'E KAYDEDİLECEK) -->
     <div class="card">
-        <div class="card-header">➕ Manuel Gider Ekle</div>
+        <div class="card-header">➕ Manuel Gider Ekle (SQL'e kaydedilir)</div>
         <div class="card-body">
             <div class="form-row">
                 <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih"></div>
-                <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Tamir"></div>
+                <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Tamir, Kırtasiye"></div>
                 <div class="form-field"><label>Tutar (TL)</label><input type="number" id="manuelTutar" step="0.01"></div>
                 <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">Nakit</option><option value="Kredi">Kredi Kartı</option></select></div>
-                <div><button class="btn-primary" onclick="manuelGiderEkle()">Ekle</button></div>
+                <div><button class="btn-primary" onclick="manuelGiderEkleSQL()">💾 SQL'e Kaydet</button></div>
             </div>
+            <div id="manuelSonuc" style="margin-top:10px; font-size:0.7rem;"></div>
         </div>
     </div>
 
-    <!-- Manuel Gider Listesi -->
-    <div class="card">
-        <div class="card-header">✏️ Manuel Gider Listesi <button class="btn-outline" onclick="manuelListeyiGoster()">🔄 Yenile</button></div>
-        <div class="card-body">
-            <div class="table-wrapper">
-                <table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th><th></th></tr></thead><tbody id="manuelTbody"></tbody></table>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">⚡ SambaPOS SQL | Giderler otomatik kalem kalem | Günlük/Aylık/Yıllık Ciro</div>
+    <div class="footer">⚡ SambaPOS SQL | Giderler otomatik + manuel (SQL'e kaydedilir) | Günlük/Aylık/Yıllık Ciro</div>
 </div>
 
 <script>
-    let API_BASE = localStorage.getItem('apiBase') || 'https://055b-2a00-1d35-a45b-500-c1c8-ee1f-296a-6bdc.ngrok-free.app';
+    let API_BASE = localStorage.getItem('apiBase') || 'https://YENI-ADRES.ngrok-free.app';
     let aktifMod = 'gunluk';
     let sqlGelirler = { Nakit: 0, KrediKarti: 0, Toplam: 0 };
     let sqlGiderToplam = 0;
@@ -331,16 +302,9 @@
             let giderler = await response.json();
             let tbody = document.getElementById('giderDetayTbody');
             if (giderler.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4">Bu tarihte gider bulunamadı</tr>';
+                tbody.innerHTML = '<tr><td colspan="4">Bu tarihte gider bulunamadı</td></tr>';
             } else {
-                tbody.innerHTML = giderler.map(g => `
-                    <tr>
-                        <td>${g.Tarih}</td>
-                        <td><span class="badge-gider">${g.GiderTuru}</span></td>
-                        <td>${g.Aciklama || '-'}</td>
-                        <td class="amount-right">${Number(g.Tutar).toLocaleString('tr-TR')} ₺</td>
-                    </tr>
-                `).join('');
+                tbody.innerHTML = giderler.map(g => `<tr><td>${g.Tarih}</td><td><span class="badge-gider">${g.GiderTuru}</span></td><td>${g.Aciklama || '-'}</td><td class="amount-right">${Number(g.Tutar).toLocaleString('tr-TR')} ₺</td></tr>`).join('');
                 let toplam = giderler.reduce((s, g) => s + Number(g.Tutar), 0);
                 sqlGiderToplam = toplam;
                 document.getElementById('toplamGider').innerHTML = toplam.toLocaleString('tr-TR') + ' ₺';
@@ -350,6 +314,45 @@
                 }
             }
         } catch(err) { console.error(err); }
+    }
+
+    // MANUEL GİDER - SQL'E KAYDEDER
+    async function manuelGiderEkleSQL() {
+        let tarih = document.getElementById('manuelTarih').value;
+        let aciklama = document.getElementById('manuelAciklama').value;
+        let tutar = parseFloat(document.getElementById('manuelTutar').value);
+        let tur = document.getElementById('manuelTur').value;
+        
+        if (!tarih || !aciklama || isNaN(tutar) || tutar <= 0) {
+            alert('Lütfen tüm alanları doldurun');
+            return;
+        }
+        
+        let sonucDiv = document.getElementById('manuelSonuc');
+        sonucDiv.innerHTML = '<span style="color:orange;">Gider SQL\'e kaydediliyor...</span>';
+        
+        try {
+            let response = await fetch(`${API_BASE}/api/manuelGider`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify({ tarih, aciklama, tutar, tur })
+            });
+            
+            let data = await response.json();
+            if (data.success) {
+                sonucDiv.innerHTML = '<span style="color:green;">✅ Gider SQL\'e kaydedildi!</span>';
+                document.getElementById('manuelAciklama').value = '';
+                document.getElementById('manuelTutar').value = '';
+                tumVerileriGuncelle();
+            } else {
+                sonucDiv.innerHTML = `<span style="color:red;">❌ Hata: ${data.error}</span>`;
+            }
+        } catch(err) {
+            sonucDiv.innerHTML = `<span style="color:red;">❌ Bağlantı hatası: ${err.message}</span>`;
+        }
     }
 
     async function yillikCiroGetir() {
@@ -364,22 +367,10 @@
             let rows = '';
             for (let i = 1; i <= 12; i++) {
                 let ayVeri = aylar.find(a => a.Ay === i) || { Nakit: 0, Kredi: 0, Toplam: 0 };
-                rows += `<tr>
-                    <td>${aylarIsimleri[i-1]}</td>
-                    <td class="amount-right">${ayVeri.Nakit.toLocaleString('tr-TR')} ₺</td>
-                    <td class="amount-right">${ayVeri.Kredi.toLocaleString('tr-TR')} ₺</td>
-                    <td class="amount-right">${ayVeri.Toplam.toLocaleString('tr-TR')} ₺</td>
-                </tr>`;
-                toplamNakit += ayVeri.Nakit;
-                toplamKredi += ayVeri.Kredi;
-                genelToplam += ayVeri.Toplam;
+                rows += `<tr><td>${aylarIsimleri[i-1]}</td><td class="amount-right">${ayVeri.Nakit.toLocaleString('tr-TR')} ₺</td><td class="amount-right">${ayVeri.Kredi.toLocaleString('tr-TR')} ₺</td><td class="amount-right">${ayVeri.Toplam.toLocaleString('tr-TR')} ₺</td></tr>`;
+                toplamNakit += ayVeri.Nakit; toplamKredi += ayVeri.Kredi; genelToplam += ayVeri.Toplam;
             }
-            rows += `<tr style="background:rgba(255,255,255,0.1); font-weight:bold;">
-                <td><strong>YIL TOPLAMI</strong></td>
-                <td class="amount-right"><strong>${toplamNakit.toLocaleString('tr-TR')} ₺</strong></td>
-                <td class="amount-right"><strong>${toplamKredi.toLocaleString('tr-TR')} ₺</strong></td>
-                <td class="amount-right"><strong>${genelToplam.toLocaleString('tr-TR')} ₺</strong></td>
-            </tr>`;
+            rows += `<tr style="background:rgba(255,255,255,0.1); font-weight:bold;"><td><strong>YIL TOPLAMI</strong></td><td class="amount-right"><strong>${toplamNakit.toLocaleString('tr-TR')} ₺</strong></td><td class="amount-right"><strong>${toplamKredi.toLocaleString('tr-TR')} ₺</strong></td><td class="amount-right"><strong>${genelToplam.toLocaleString('tr-TR')} ₺</strong></td></tr>`;
             tbody.innerHTML = rows;
         } catch(err) { console.error(err); }
     }
@@ -401,55 +392,7 @@
         } catch(err) { console.error(err); }
     }
 
-    function manuelGiderEkle() {
-        let tarih = document.getElementById('manuelTarih').value || new Date().toISOString().slice(0,10);
-        let aciklama = document.getElementById('manuelAciklama').value;
-        let tutar = parseFloat(document.getElementById('manuelTutar').value);
-        let tur = document.getElementById('manuelTur').value;
-        if (!aciklama || isNaN(tutar)) { alert('Eksik bilgi'); return; }
-        let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        giderler.push({ tarih, aciklama, tutar, tur });
-        localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
-        document.getElementById('manuelAciklama').value = '';
-        document.getElementById('manuelTutar').value = '';
-        manuelListeyiGoster();
-        toplamlariHesapla();
-    }
-
-    function manuelGiderSil(idx) {
-        let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        giderler.splice(idx, 1);
-        localStorage.setItem('manuelGiderler', JSON.stringify(giderler));
-        manuelListeyiGoster();
-        toplamlariHesapla();
-    }
-
-    function manuelListeyiGoster() {
-        let giderler = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        let tbody = document.getElementById('manuelTbody');
-        if (giderler.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Henüz manuel gider yok</td></tr>'; return; }
-        tbody.innerHTML = giderler.map((g, idx) => `
-            <tr>
-                <td>${g.tarih}</td>
-                <td>${g.aciklama}</td>
-                <td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td>
-                <td><span class="badge-gider">${g.tur}</span></td>
-                <td><button class="btn-outline" onclick="manuelGiderSil(${idx})">Sil</button></td>
-            </tr>
-        `).join('');
-    }
-
-    function toplamlariHesapla() {
-        let manuel = JSON.parse(localStorage.getItem('manuelGiderler') || '[]');
-        let manuelToplam = manuel.reduce((s,g) => s + g.tutar, 0);
-        let toplamGider = sqlGiderToplam + manuelToplam;
-        let netKar = sqlGelirler.Toplam - toplamGider;
-        document.getElementById('toplamGider').innerHTML = toplamGider.toLocaleString('tr-TR') + ' ₺';
-        document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
-    }
-
     filtreGoster();
-    manuelListeyiGoster();
     tumVerileriGuncelle();
 </script>
 </body>
