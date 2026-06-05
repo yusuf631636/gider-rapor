@@ -112,6 +112,9 @@
         td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .amount-right { text-align: right; font-weight: 600; }
         
+        .gider-table { width: 100%; }
+        .gider-table th, .gider-table td { padding: 10px 8px; }
+        
         .modul-list { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
         .modul-btn { background: #1e293b; border: 1px solid #334155; border-radius: 40px; padding: 8px 20px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
         .modul-btn:hover { background: #f97316; border-color: #f97316; color: white; }
@@ -127,6 +130,9 @@
             border: 1px solid #334155;
             display: none;
         }
+        
+        .two-col { display: flex; flex-wrap: wrap; gap: 24px; }
+        .two-col > div { flex: 1; min-width: 280px; }
         
         .footer { text-align: center; font-size: 0.65rem; color: #5b6e8c; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
         
@@ -165,23 +171,34 @@
         <div class="card-body">
             <div class="stats-grid" id="ozetKartlar"></div>
             <div class="stats-grid">
-                <div class="stat-card"><h4>💰 Kasa (Toplam)</h4><div class="stat-number ciro" id="kasaToplam">0 ₺</div></div>
+                <div class="stat-card"><h4>💰 Kasa (Bugün)</h4><div class="stat-number ciro" id="kasaToplam">0 ₺</div></div>
                 <div class="stat-card"><h4>📆 Bugünkü Satış</h4><div class="stat-number ciro" id="gunlukSatisOzet">0 ₺</div></div>
                 <div class="stat-card"><h4>📝 Ödenmeyen Adisyonlar</h4><div class="stat-number loss" id="odenmeyenOzet">0 ₺</div></div>
             </div>
         </div>
     </div>
 
-    <!-- GİDERLER TAB -->
+    <!-- GİDERLER TAB (Düzenli tablo) -->
     <div id="giderlerTab" class="card">
         <div class="card-header">📝 Giderler — Kalem Kalem</div>
         <div class="card-body" id="giderListesi">Yükleniyor...</div>
     </div>
 
-    <!-- AÇIK MASALAR TAB (Paket Servis / Fiziki Masa Ayrı) -->
+    <!-- AÇIK MASALAR TAB (Paket Servis ve Fiziki Masa ayrı) -->
     <div id="masalarTab" class="card">
         <div class="card-header">🪑 Açık Masalar & Paket Servis</div>
-        <div class="card-body" id="masaListesi">Yükleniyor...</div>
+        <div class="card-body">
+            <div class="two-col">
+                <div>
+                    <h4 style="color:#f97316; margin-bottom:12px;">🏪 Fiziki Masalar</h4>
+                    <div id="fizikiMasaListesi">Yükleniyor...</div>
+                </div>
+                <div>
+                    <h4 style="color:#f97316; margin-bottom:12px;">📦 Paket Servis</h4>
+                    <div id="paketServisListesi">Yükleniyor...</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- CİRO KARŞILAŞTIRMA TAB -->
@@ -257,42 +274,52 @@
             document.getElementById('odenmeyenOzet').innerHTML = (odenmeyen).toLocaleString('tr-TR') + ' ₺';
         } catch(e){}
         
-        // Kasa + Günlük Satış
-        try {
-            let k = await fetch(`${API_BASE}/api/kasaDurumu`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            document.getElementById('kasaToplam').innerHTML = (k.Toplam||0).toLocaleString('tr-TR') + ' ₺';
-        } catch(e){}
+        // Kasa (bugünün toplamı için gunlukSatis çağrısı)
         try {
             let gs = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
             document.getElementById('gunlukSatisOzet').innerHTML = (gs.BrutSatis||0).toLocaleString('tr-TR') + ' ₺';
         } catch(e){}
         
-        // Giderler
+        // Kasa toplamı (tüm zamanlar değil, bugün için Payments toplamı)
+        try {
+            let kasa = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            document.getElementById('kasaToplam').innerHTML = (kasa.BrutSatis||0).toLocaleString('tr-TR') + ' ₺';
+        } catch(e){}
+        
+        // Giderler (düzenli tablo)
         try {
             let g = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
             if(g.giderler?.length){
-                let html = '<div class="table-wrapper"><td><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
-                g.giderler.forEach(i=> html += `<tr><td style="font-weight:500;">${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td>${i.Tarih||'-'}</td></tr>`);
-                html += `<tr style="background:#f9731610;"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${(g.toplam||0).toLocaleString('tr-TR')} ₺</strong></td><td></td></tr></tbody></table></div>`;
+                let html = '<table class="gider-table"><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
+                g.giderler.forEach(i=> html += `<tr><td style="font-weight:500;">${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${i.Tarih||'-'}</td></tr>`);
+                html += `<tr style="background:#f9731610; font-weight:bold;"><td>TOPLAM</td><td class="amount-right">${(g.toplam||0).toLocaleString('tr-TR')} ₺</td><td></td></tr>`;
+                html += '</tbody></table>';
                 document.getElementById('giderListesi').innerHTML = html;
             } else document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider yok</div>';
         } catch(e){ document.getElementById('giderListesi').innerHTML = '<div>Gider alınamadı</div>'; }
         
-        // Açık Masalar (Paket Servis / Masa ayrımı yapmadan direkt göster, masa adı zaten var)
+        // Açık Masalar (Fiziki Masa ve Paket Servis ayrı)
         try {
             let m = await fetch(`${API_BASE}/api/acikMasalar`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            if(m.length){
-                let html = '<div class="table-wrapper"><table><thead><tr><th>Masa / Müşteri</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
-                m.forEach(t=> html += `<tr><td style="font-weight:500;">${t.Masa||'-'}</td><td>${t.TicketNumber||'-'}</td><td>${t.Saat||'-'}</td><td class="amount-right">${t.UrunAdet||0}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-                html += '</tbody></table></div>';
-                document.getElementById('masaListesi').innerHTML = html;
-            } else document.getElementById('masaListesi').innerHTML = '<div>Açık masa / paket servis yok</div>';
-        } catch(e){ document.getElementById('masaListesi').innerHTML = '<div>Masa alınamadı</div>'; }
+            let fiziki = m.filter(x => !x.Masa?.toLowerCase().includes('paket'));
+            let paket = m.filter(x => x.Masa?.toLowerCase().includes('paket'));
+            
+            let fizikiHtml = '<div class="table-wrapper"><table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
+            fiziki.forEach(t=> fizikiHtml += `<tr><td>${t.Masa||'-'}</td><td>${t.TicketNumber||'-'}</td><td>${t.Saat||'-'}</td><td class="amount-right">${t.UrunAdet||0}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`);
+            fizikiHtml += '</tbody></table></div>';
+            
+            let paketHtml = '<div class="table-wrapper"><table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
+            paket.forEach(t=> paketHtml += `<tr><td>${t.Masa||'-'}</td><td>${t.TicketNumber||'-'}</td><td>${t.Saat||'-'}</td><td class="amount-right">${t.UrunAdet||0}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`);
+            paketHtml += '</tbody></table></div>';
+            
+            document.getElementById('fizikiMasaListesi').innerHTML = fizikiHtml || '<div>Fiziki masa yok</div>';
+            document.getElementById('paketServisListesi').innerHTML = paketHtml || '<div>Paket servis yok</div>';
+        } catch(e){ document.getElementById('fizikiMasaListesi').innerHTML = '<div>Masa alınamadı</div>'; }
         
-        // Ciro Karşılaştırma (aylık + yıllık + günlük ortalama)
+        // Ciro Karşılaştırma
         try {
             let c = await fetch(`${API_BASE}/api/ciroKarsilastirma`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            let html = '<div class="table-wrapper">展览<thead><tr><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></tr></thead><tbody>';
+            let html = '<div class="table-wrapper"><table class="gider-table"><thead></td><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></tr></thead><tbody>';
             if(c.aylik?.length){
                 c.aylik.forEach(a => {
                     let gunSayisi = new Date(parseInt(a.Ay.split('-')[0]), parseInt(a.Ay.split('-')[1]), 0).getDate();
@@ -300,7 +327,7 @@
                     html += `<tr><td>${a.Ay}</td><td class="amount-right">${(a.Ciro||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${parseFloat(gunluk).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
             }
-            html += '</tbody></table></div><div class="table-wrapper" style="margin-top:20px;">能<table><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
+            html += '</tbody></table></div><div class="table-wrapper" style="margin-top:20px;"><table class="gider-table"><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
             if(c.yillik?.length) c.yillik.forEach(y=> html += `<tr><td>${y.Yil}</td><td class="amount-right">${(y.Ciro||0).toLocaleString('tr-TR')} ₺</td></tr>`);
             html += '</tbody></table></div>';
             document.getElementById('ciroKarsilastirma').innerHTML = html;
