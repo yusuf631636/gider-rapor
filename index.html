@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Öz Urfa Kebap | Executive Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -48,22 +47,38 @@
         }
         .api-input input { padding: 8px 15px; border-radius: 30px; border: 1px solid #334155; background: #1e293b; color: white; width: 380px; }
         
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #f97316;
-            margin: 20px 0 15px 0;
-            padding-left: 15px;
-            border-left: 4px solid #f97316;
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+        .section-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #94a3b8;
+        }
+        .section-btn.active {
+            background: #f97316;
+            color: white;
+            border-color: #f97316;
         }
         
         .stats-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
         .stat-card {
             flex: 1; min-width: 150px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 24px;
-            padding: 20px;
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 18px;
             text-align: center;
+            border: 1px solid #334155;
         }
         .stat-card h4 { font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; }
         .stat-number { font-size: 1.6rem; font-weight: 800; }
@@ -71,18 +86,19 @@
         .stat-number.kredi { color: #3b82f6; }
         .stat-number.ciro { color: #fbbf24; }
         .stat-number.gider { color: #f97316; }
-        .stat-number.kar { color: #10b981; }
         .loss { color: #ef4444; }
         
         .card {
-            background: rgba(255,255,255,0.03);
-            border-radius: 24px;
+            background: #1e293b;
+            border-radius: 20px;
             margin-bottom: 24px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid #334155;
+            display: none;
         }
+        .card.active-card { display: block; }
         .card-header {
             padding: 14px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid #334155;
             font-weight: 700;
             color: #f97316;
             display: flex;
@@ -93,31 +109,29 @@
         
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th { background: rgba(255,255,255,0.05); padding: 10px; text-align: left; color: #94a3b8; }
-        td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { background: #0f172a; padding: 10px; text-align: left; color: #94a3b8; border-bottom: 1px solid #334155; }
+        td { padding: 8px 10px; border-bottom: 1px solid #1e293b; }
         .amount-right { text-align: right; }
         
         .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
         .form-field { flex: 1; min-width: 100px; }
         .form-field label { display: block; font-size: 0.65rem; color: #94a3b8; margin-bottom: 4px; }
-        .form-field input, .form-field select { width: 100%; padding: 8px; border-radius: 16px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 0.75rem; }
+        .form-field input, .form-field select { width: 100%; padding: 8px; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; }
         
-        .badge-acik { background: rgba(239,68,68,0.2); color: #f87171; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
-        .badge-modul { background: rgba(139,92,246,0.2); color: #a78bfa; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
+        .category-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .category-btn { background: #334155; border: none; padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; color: #cbd5e1; }
+        .category-btn.active { background: #f97316; color: white; }
         
-        .two-columns { display: flex; flex-wrap: wrap; gap: 20px; }
-        .column { flex: 1; min-width: 280px; }
+        .footer { text-align: center; font-size: 0.65rem; color: #64748b; margin-top: 20px; }
         
-        .footer { text-align: center; font-size: 0.65rem; color: #475569; margin-top: 20px; }
-        
-        @media (max-width: 700px) { .stat-number { font-size: 1.2rem; } .api-input input { width: 200px; } .two-columns { flex-direction: column; } }
+        @media (max-width: 700px) { .stat-number { font-size: 1.2rem; } .section-btn { padding: 6px 14px; font-size: 0.7rem; } }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Gelir/Gider | Fiyat Yönetimi | Modüler Sistem</p>
+        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Fiyat Yönetimi | Kategori Bazlı</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -127,101 +141,101 @@
             <input type="text" id="apiUrl" value="http://100.97.45.8:3001">
             <button class="btn-primary" onclick="apiUrlKaydet()">Kaydet</button>
         </div>
-        <div>
-            <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Tümünü Güncelle</button>
-            <button class="btn-outline" onclick="pdfIndir()">📄 PDF Rapor</button>
-        </div>
+        <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Tümünü Güncelle</button>
     </div>
 
-    <!-- KPI Kartları -->
-    <div class="stats-grid">
-        <div class="stat-card"><h4>💰 Nakit Gelir</h4><div class="stat-number nakit" id="nakitGelir">0 ₺</div></div>
-        <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi" id="krediGelir">0 ₺</div></div>
-        <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro" id="toplamCiro">0 ₺</div></div>
-        <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider" id="toplamGider">0 ₺</div></div>
-        <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number kar" id="netKar">0 ₺</div></div>
-        <div class="stat-card"><h4>📊 Kâr Marjı</h4><div class="stat-number" id="karMarji">0%</div></div>
+    <!-- Buton Grubu -->
+    <div class="button-group">
+        <button class="section-btn active" data-section="ozet">🏠 Özet</button>
+        <button class="section-btn" data-section="giderler">📝 Giderler</button>
+        <button class="section-btn" data-section="masalar">🪑 Açık Masalar</button>
+        <button class="section-btn" data-section="adisyonlar">📋 Adisyonlar</button>
+        <button class="section-btn" data-section="kasa">💰 Kasa & Satış</button>
+        <button class="section-btn" data-section="fiyatlar">💲 Fiyat Listesi</button>
+        <button class="section-btn" data-section="manuel">✏️ Manuel Gider</button>
+        <button class="section-btn" data-section="moduller">🧩 Modüller</button>
     </div>
 
-    <!-- Gider Detayları -->
-    <div class="card">
-        <div class="card-header">📝 Giderler Detayı (Kalem Kalem)</div>
+    <!-- Özet Bölümü -->
+    <div id="ozetSection" class="card active-card">
+        <div class="card-header">📊 Günlük Özet (<span id="ozetTarih"></span>)</div>
         <div class="card-body">
-            <div id="giderDetay">Yükleniyor...</div>
-        </div>
-    </div>
-
-    <!-- İki Sütunlu Alan -->
-    <div class="two-columns">
-        <!-- Sol: Açık Masalar -->
-        <div class="column">
-            <div class="card">
-                <div class="card-header">🪑 Açık Masalar</div>
-                <div class="card-body">
-                    <div id="acikMasalar">Yükleniyor...</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sağ: Adisyonlar -->
-        <div class="column">
-            <div class="card">
-                <div class="card-header">📋 Açık Adisyonlar</div>
-                <div class="card-body">
-                    <div id="adisyonlar">Yükleniyor...</div>
-                </div>
+            <div class="stats-grid">
+                <div class="stat-card"><h4>💰 Nakit Gelir</h4><div class="stat-number nakit" id="nakitGelir">0 ₺</div></div>
+                <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi" id="krediGelir">0 ₺</div></div>
+                <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro" id="toplamCiro">0 ₺</div></div>
+                <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider" id="toplamGider">0 ₺</div></div>
+                <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number" id="netKar">0 ₺</div></div>
+                <div class="stat-card"><h4>📝 Ödenmeyen</h4><div class="stat-number loss" id="odenmeyen">0 ₺</div></div>
             </div>
         </div>
     </div>
 
-    <!-- Kasa Durumu ve Günlük Satış -->
-    <div class="two-columns">
-        <div class="column">
-            <div class="card">
-                <div class="card-header">💰 Kasa Durumu</div>
-                <div class="card-body">
-                    <div id="kasaDurumu">Yükleniyor...</div>
-                </div>
-            </div>
-        </div>
-        <div class="column">
-            <div class="card">
-                <div class="card-header">📊 Günlük Satış Raporu</div>
-                <div class="card-body">
-                    <div id="gunlukSatis">Yükleniyor...</div>
-                </div>
-            </div>
+    <!-- Giderler Bölümü -->
+    <div id="giderlerSection" class="card">
+        <div class="card-header">📝 Giderler (Kalem Kalem)</div>
+        <div class="card-body">
+            <div id="giderListesi">Yükleniyor...</div>
         </div>
     </div>
 
-    <!-- Fiyat Listesi -->
-    <div class="card">
+    <!-- Açık Masalar Bölümü -->
+    <div id="masalarSection" class="card">
+        <div class="card-header">🪑 Açık Masalar</div>
+        <div class="card-body">
+            <div id="masaListesi">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Adisyonlar Bölümü -->
+    <div id="adisyonlarSection" class="card">
+        <div class="card-header">📋 Açık Adisyonlar</div>
+        <div class="card-body">
+            <div id="adisyonListesi">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Kasa & Satış Bölümü -->
+    <div id="kasaSection" class="card">
+        <div class="card-header">💰 Kasa Durumu (Anlık)</div>
+        <div class="card-body">
+            <div id="kasaBilgi">Yükleniyor...</div>
+        </div>
+        <div class="card-header">📊 Günlük Satış Raporu (<span id="satisTarih"></span>)</div>
+        <div class="card-body">
+            <div id="satisBilgi">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Fiyat Listesi Bölümü (Kategori Bazlı) -->
+    <div id="fiyatlarSection" class="card">
         <div class="card-header">💲 Fiyat Listesi (Değiştir → SambaPOS'a yansır)</div>
         <div class="card-body">
+            <div class="category-filter" id="kategoriFilter"></div>
             <div id="fiyatListesi">Yükleniyor...</div>
         </div>
     </div>
 
-    <!-- Modüller -->
-    <div class="card">
-        <div class="card-header">🧩 Modüller</div>
-        <div class="card-body">
-            <div id="moduller">Yükleniyor...</div>
-        </div>
-    </div>
-
-    <!-- Manuel Gider Ekleme -->
-    <div class="card">
-        <div class="card-header">➕ Manuel Gider Ekle (SQL'e kaydedilir)</div>
+    <!-- Manuel Gider Bölümü -->
+    <div id="manuelSection" class="card">
+        <div class="card-header">✏️ Manuel Gider Ekle (SQL'e kaydedilir)</div>
         <div class="card-body">
             <div class="form-row">
                 <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih" value="2026-06-05"></div>
                 <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Maya, Kaşar"></div>
                 <div class="form-field"><label>Tutar (TL)</label><input type="number" id="manuelTutar" step="0.01"></div>
                 <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">Nakit</option><option value="Kredi">Kredi Kartı</option></select></div>
-                <div><button class="btn-success" onclick="manuelGiderEkle()">💾 SQL'e Kaydet</button></div>
+                <div><button class="btn-success" onclick="manuelGiderEkle()">💾 Kaydet</button></div>
             </div>
-            <div id="manuelSonuc" style="margin-top:8px; font-size:0.65rem;"></div>
+            <div id="manuelSonuc" style="margin-top:8px; font-size:0.7rem;"></div>
+        </div>
+    </div>
+
+    <!-- Modüller Bölümü -->
+    <div id="modullerSection" class="card">
+        <div class="card-header">🧩 Modüller</div>
+        <div class="card-body">
+            <div id="modulListesi">Yükleniyor...</div>
         </div>
     </div>
 
@@ -232,7 +246,22 @@
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
+    let tumKategoriler = [];
+    let aktifKategori = 'Tümü';
+    
     document.getElementById('apiUrl').value = API_BASE;
+    
+    // Sekme Değişimi
+    document.querySelectorAll('.section-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const section = btn.getAttribute('data-section');
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
+            document.getElementById(section + 'Section').classList.add('active-card');
+            if (section === 'fiyatlar') fiyatListesiGetir();
+        });
+    });
     
     setInterval(() => {
         document.getElementById('dateTime').innerHTML = `📅 ${new Date().toLocaleDateString('tr-TR')} - 🕐 ${new Date().toLocaleTimeString('tr-TR')}`;
@@ -247,8 +276,10 @@
 
     async function tumVerileriGuncelle() {
         let tarih = new Date().toISOString().slice(0,10);
+        document.getElementById('ozetTarih').innerHTML = tarih;
+        document.getElementById('satisTarih').innerHTML = tarih;
         
-        // Ana Panel
+        // Özet
         try {
             let anaRes = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let ana = await anaRes.json();
@@ -258,14 +289,11 @@
             document.getElementById('toplamGider').innerHTML = (ana.ToplamGider || 0).toLocaleString('tr-TR') + ' ₺';
             let netKar = (ana.ToplamCiro || 0) - (ana.ToplamGider || 0);
             document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
-            let karMarji = ana.ToplamCiro > 0 ? ((netKar / ana.ToplamCiro) * 100).toFixed(1) : 0;
-            document.getElementById('karMarji').innerHTML = karMarji + '%';
-            if (netKar >= 0) document.getElementById('netKar').className = 'stat-number nakit';
-            else document.getElementById('netKar').className = 'stat-number loss';
+            document.getElementById('odenmeyen').innerHTML = (ana.Odenmeyenler || 0).toLocaleString('tr-TR') + ' ₺';
         } catch(err) { console.error(err); }
         
-        // Gider Detayları
-        await giderDetayGetir(tarih);
+        // Giderler
+        await giderlerGetir(tarih);
         
         // Açık Masalar
         await acikMasalarGetir();
@@ -273,7 +301,7 @@
         // Adisyonlar
         await adisyonlarGetir(tarih);
         
-        // Kasa Durumu
+        // Kasa Durumu (Anlık)
         await kasaDurumuGetir();
         
         // Günlük Satış
@@ -286,113 +314,125 @@
         await modulListesiGetir();
     }
     
-    async function giderDetayGetir(tarih) {
+    async function giderlerGetir(tarih) {
         try {
-            let giderRes = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await giderRes.json();
-            
+            let res = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await res.json();
             if (data.giderler && data.giderler.length > 0) {
-                let html = '<tr><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
+                let html = '<table><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
                 data.giderler.forEach(g => {
                     html += `<tr><td>${g.GiderAdi || '-'}</td><td class="amount-right">${(g.Tutar || 0).toLocaleString('tr-TR')} ₺</td><td>${g.Tarih || '-'}</td></tr>`;
                 });
-                html += `<tr style="background:rgba(255,255,255,0.1);"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${(data.toplam || 0).toLocaleString('tr-TR')} ₺</strong></td><td></td></tr>`;
+                html += `<tr style="background:#334155;"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${(data.toplam || 0).toLocaleString('tr-TR')} ₺</strong></td><td></td></tr>`;
                 html += '</tbody></table>';
-                document.getElementById('giderDetay').innerHTML = html;
+                document.getElementById('giderListesi').innerHTML = html;
             } else {
-                document.getElementById('giderDetay').innerHTML = '<div>Bugün için gider bulunamadı</div>';
+                document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider bulunamadı</div>';
             }
-        } catch(err) {
-            document.getElementById('giderDetay').innerHTML = '<div>Giderler alınamadı</div>';
-        }
+        } catch(err) { document.getElementById('giderListesi').innerHTML = '<div>Giderler alınamadı</div>'; }
     }
     
     async function acikMasalarGetir() {
         try {
-            let masaRes = await fetch(`${API_BASE}/api/acikMasalar`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let masalar = await masaRes.json();
+            let res = await fetch(`${API_BASE}/api/acikMasalar`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let masalar = await res.json();
             if (masalar.length === 0) {
-                document.getElementById('acikMasalar').innerHTML = '<div>Açık masa bulunamadı</div>';
+                document.getElementById('masaListesi').innerHTML = '<div>Açık masa bulunamadı</div>';
             } else {
-                let html = '<table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
+                let html = '<table><thead></tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></thead><tbody>';
                 masalar.forEach(m => {
                     html += `<tr><td>${m.Masa || '-'}</td><td>${m.TicketNumber || '-'}</td><td>${m.Saat || '-'}</td><td class="amount-right">${m.UrunAdet || 0}</td><td class="amount-right">${(m.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
                 html += '</tbody></table>';
-                document.getElementById('acikMasalar').innerHTML = html;
+                document.getElementById('masaListesi').innerHTML = html;
             }
-        } catch(err) {
-            document.getElementById('acikMasalar').innerHTML = '<div>Açık masalar alınamadı</div>';
-        }
+        } catch(err) { document.getElementById('masaListesi').innerHTML = '<div>Açık masalar alınamadı</div>'; }
     }
     
     async function adisyonlarGetir(tarih) {
         try {
-            let adisyonRes = await fetch(`${API_BASE}/api/adisyonlar?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let adisyonlar = await adisyonRes.json();
+            let res = await fetch(`${API_BASE}/api/adisyonlar?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let adisyonlar = await res.json();
             let acikAdisyonlar = adisyonlar.filter(a => a.Durum === 'Açık');
             if (acikAdisyonlar.length === 0) {
-                document.getElementById('adisyonlar').innerHTML = '<div>Açık adisyon bulunamadı</div>';
+                document.getElementById('adisyonListesi').innerHTML = '<div>Açık adisyon bulunamadı</div>';
             } else {
-                let html = '<table><thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Toplam</th></tr></thead><tbody>';
+                let html = '<table><thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Toplam</th></thead><tbody>';
                 acikAdisyonlar.forEach(a => {
-                    html += `<td><td>${a.AdisyonNo || '-'}</td><td>${a.Saat || '-'}</td><td>${a.Kullanici || '-'}</td><td>${a.Masa || '-'}</td><td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
+                    html += `<tr><td>${a.AdisyonNo || '-'}</td><td>${a.Saat || '-'}</td><td>${a.Kullanici || '-'}</td><td>${a.Masa || '-'}</td><td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
                 html += '</tbody></table>';
-                document.getElementById('adisyonlar').innerHTML = html;
+                document.getElementById('adisyonListesi').innerHTML = html;
             }
-        } catch(err) {
-            document.getElementById('adisyonlar').innerHTML = '<div>Adisyonlar alınamadı</div>';
-        }
+        } catch(err) { document.getElementById('adisyonListesi').innerHTML = '<div>Adisyonlar alınamadı</div>'; }
     }
     
     async function kasaDurumuGetir() {
         try {
-            let kasaRes = await fetch(`${API_BASE}/api/kasaDurumu`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let kasa = await kasaRes.json();
-            document.getElementById('kasaDurumu').innerHTML = `
-                <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                    <div style="flex:1; text-align:center;"><h4 style="color:#10b981;">💰 Nakit</h4><div style="font-size:1.4rem;">${(kasa.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="flex:1; text-align:center;"><h4 style="color:#3b82f6;">💳 Kredi Kartı</h4><div style="font-size:1.4rem;">${(kasa.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="flex:1; text-align:center;"><h4 style="color:#fbbf24;">📊 Toplam</h4><div style="font-size:1.4rem;">${(kasa.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
+            let res = await fetch(`${API_BASE}/api/kasaDurumu`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let kasa = await res.json();
+            document.getElementById('kasaBilgi').innerHTML = `
+                <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+                    <div style="text-align:center; flex:1;"><h4 style="color:#10b981;">💰 Nakit</h4><div style="font-size:1.8rem;">${(kasa.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    <div style="text-align:center; flex:1;"><h4 style="color:#3b82f6;">💳 Kredi Kartı</h4><div style="font-size:1.8rem;">${(kasa.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    <div style="text-align:center; flex:1;"><h4 style="color:#fbbf24;">📊 Toplam</h4><div style="font-size:1.8rem;">${(kasa.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
                 </div>
             `;
-        } catch(err) {
-            document.getElementById('kasaDurumu').innerHTML = '<div>Kasa durumu alınamadı</div>';
-        }
+        } catch(err) { document.getElementById('kasaBilgi').innerHTML = '<div>Kasa durumu alınamadı</div>'; }
     }
     
     async function gunlukSatisGetir(tarih) {
         try {
-            let satisRes = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let satis = await satisRes.json();
-            document.getElementById('gunlukSatis').innerHTML = `
-                <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                    <div style="flex:1; text-align:center;"><h4>📋 Adisyon Sayısı</h4><div style="font-size:1.4rem;">${satis.AdisyonSayisi || 0}</div></div>
-                    <div style="flex:1; text-align:center;"><h4>💰 Brut Satış</h4><div style="font-size:1.4rem;">${(satis.BrutSatis || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="flex:1; text-align:center;"><h4>💰 Nakit</h4><div style="font-size:1.4rem; color:#10b981;">${(satis.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="flex:1; text-align:center;"><h4>💳 Kredi</h4><div style="font-size:1.4rem; color:#3b82f6;">${(satis.Kredi || 0).toLocaleString('tr-TR')} ₺</div></div>
+            let res = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let satis = await res.json();
+            document.getElementById('satisBilgi').innerHTML = `
+                <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+                    <div style="text-align:center; flex:1;"><h4>📋 Adisyon Sayısı</h4><div style="font-size:1.5rem;">${satis.AdisyonSayisi || 0}</div></div>
+                    <div style="text-align:center; flex:1;"><h4>💰 Brut Satış</h4><div style="font-size:1.5rem;">${(satis.BrutSatis || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    <div style="text-align:center; flex:1;"><h4 style="color:#10b981;">💰 Nakit</h4><div style="font-size:1.5rem;">${(satis.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    <div style="text-align:center; flex:1;"><h4 style="color:#3b82f6;">💳 Kredi</h4><div style="font-size:1.5rem;">${(satis.Kredi || 0).toLocaleString('tr-TR')} ₺</div></div>
                 </div>
             `;
-        } catch(err) {
-            document.getElementById('gunlukSatis').innerHTML = '<div>Satış raporu alınamadı</div>';
-        }
+        } catch(err) { document.getElementById('satisBilgi').innerHTML = '<div>Satış raporu alınamadı</div>'; }
     }
     
     async function fiyatListesiGetir() {
         try {
-            let fiyatRes = await fetch(`${API_BASE}/api/fiyatListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let urunler = await fiyatRes.json();
-            if (urunler.length === 0) {
+            let res = await fetch(`${API_BASE}/api/fiyatListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let urunler = await res.json();
+            
+            // Kategorileri topla
+            let kategoriler = ['Tümü'];
+            urunler.forEach(u => {
+                if (u.Kategori && u.Kategori !== '-' && !kategoriler.includes(u.Kategori)) {
+                    kategoriler.push(u.Kategori);
+                }
+            });
+            tumKategoriler = kategoriler;
+            
+            // Kategori filtre butonlarını oluştur
+            let filterHtml = '';
+            kategoriler.forEach(kat => {
+                filterHtml += `<button class="category-btn ${kat === aktifKategori ? 'active' : ''}" onclick="kategoriSec('${kat}')">${kat}</button>`;
+            });
+            document.getElementById('kategoriFilter').innerHTML = filterHtml;
+            
+            // Ürünleri filtrele
+            let filtrelenmisUrunler = urunler;
+            if (aktifKategori !== 'Tümü') {
+                filtrelenmisUrunler = urunler.filter(u => u.Kategori === aktifKategori);
+            }
+            
+            if (filtrelenmisUrunler.length === 0) {
                 document.getElementById('fiyatListesi').innerHTML = '<div>Ürün bulunamadı</div>';
             } else {
                 let html = '<div class="table-wrapper"><table><thead><tr><th>Kategori</th><th>Ürün</th><th>Porsiyon</th><th>Fiyat (TL)</th><th>Barkod</th><th></th></tr></thead><tbody>';
-                urunler.forEach(u => {
+                filtrelenmisUrunler.forEach(u => {
                     html += `<tr>
                         <td>${u.Kategori || '-'}</td>
                         <td>${u.Urun || '-'}</td>
                         <td>${u.Porsiyon || '-'}</td>
-                        <td><input type="number" id="fiyat_${u.PorsiyonId}" value="${u.Fiyat}" step="0.01" style="width:80px; padding:4px; border-radius:8px; background:#1e293b; color:white; border:1px solid #334155;"></td>
+                        <td><input type="number" id="fiyat_${u.PorsiyonId}" value="${u.Fiyat}" step="0.01" style="width:90px; padding:6px; border-radius:8px; background:#0f172a; color:white; border:1px solid #334155;"> ₺</td>
                         <td>${u.Barkod || '-'}</td>
                         <td><button class="btn-success" onclick="fiyatGuncelle(${u.PorsiyonId})">Kaydet</button></td>
                     </tr>`;
@@ -400,9 +440,12 @@
                 html += '</tbody></table></div>';
                 document.getElementById('fiyatListesi').innerHTML = html;
             }
-        } catch(err) {
-            document.getElementById('fiyatListesi').innerHTML = '<div>Fiyat listesi alınamadı</div>';
-        }
+        } catch(err) { document.getElementById('fiyatListesi').innerHTML = '<div>Fiyat listesi alınamadı</div>'; }
+    }
+    
+    function kategoriSec(kategori) {
+        aktifKategori = kategori;
+        fiyatListesiGetir();
     }
     
     async function fiyatGuncelle(porsiyonId) {
@@ -419,25 +462,6 @@
                 fiyatListesiGetir();
             } else { alert('Hata: ' + data.error); }
         } catch(err) { alert('Bağlantı hatası'); }
-    }
-    
-    async function modulListesiGetir() {
-        try {
-            let modulRes = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await modulRes.json();
-            if (data.moduller && data.moduller.length > 0) {
-                let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
-                data.moduller.forEach(m => {
-                    html += `<button class="btn-outline" onclick="moduluAc('${m.path}')">🧩 ${m.adi}</button>`;
-                });
-                html += '</div>';
-                document.getElementById('moduller').innerHTML = html;
-            } else {
-                document.getElementById('moduller').innerHTML = '<div>Henüz modül bulunamadı</div>';
-            }
-        } catch(err) {
-            document.getElementById('moduller').innerHTML = '<div>Modüller alınamadı</div>';
-        }
     }
     
     async function manuelGiderEkle() {
@@ -463,11 +487,22 @@
         } catch(err) { sonucDiv.innerHTML = `<span style="color:#ef4444;">❌ Bağlantı hatası</span>`; }
     }
     
-    function moduluAc(path) {
-        window.open(`${API_BASE}${path}`, '_blank');
+    async function modulListesiGetir() {
+        try {
+            let res = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await res.json();
+            if (data.moduller && data.moduller.length > 0) {
+                let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
+                data.moduller.forEach(m => {
+                    html += `<button class="btn-outline" onclick="window.open('${API_BASE}${m.path}', '_blank')">🧩 ${m.adi}</button>`;
+                });
+                html += '</div>';
+                document.getElementById('modulListesi').innerHTML = html;
+            } else {
+                document.getElementById('modulListesi').innerHTML = '<div>Henüz modül bulunamadı</div>';
+            }
+        } catch(err) { document.getElementById('modulListesi').innerHTML = '<div>Modüller alınamadı</div>'; }
     }
-    
-    function pdfIndir() { window.print(); }
 
     tumVerileriGuncelle();
 </script>
