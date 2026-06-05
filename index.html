@@ -147,6 +147,7 @@
         .rapor-tablo th, .rapor-tablo td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; }
         .rapor-tablo th { background: #1e293b; color: #f97316; font-weight: 600; }
         .rapor-toplam { background: #1e293b; padding: 12px; border-radius: 12px; margin-top: 16px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
+        .karsilastirma-karti { background: #0f172a; border-radius: 16px; padding: 16px; margin-top: 16px; text-align: center; }
         
         .footer { text-align: center; font-size: 0.65rem; color: #64748b; margin-top: 20px; }
         
@@ -157,7 +158,7 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Fiyat Yönetimi | Gider Takibi</p>
+        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Ciro Karşılaştırma | Gider Takibi</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -174,11 +175,8 @@
         <button class="section-btn active" data-section="ozet">🏠 Özet</button>
         <button class="section-btn" data-section="giderler">📝 Giderler</button>
         <button class="section-btn" data-section="masalar">🪑 Açık Masalar</button>
-        <button class="section-btn" data-section="adisyonlar">📋 Adisyonlar</button>
-        <button class="section-btn" data-section="kasa">💰 Kasa & Satış</button>
-        <button class="section-btn" data-section="fiyatlar">💲 Fiyat Listesi</button>
+        <button class="section-btn" data-section="karsilastirma">📊 Ciro Karşılaştırma</button>
         <button class="section-btn" data-section="manuel">✏️ Manuel Gider</button>
-        <button class="section-btn" data-section="gunlukSatis">📅 Günlük Satış</button>
         <button class="section-btn" data-section="moduller">🧩 Modüller</button>
     </div>
 
@@ -195,6 +193,14 @@
                 <div class="stat-card"><h4>📝 Ödenmeyen</h4><div class="stat-number loss" id="odenmeyen">0 ₺</div></div>
             </div>
             <div class="gider-ozet" id="giderOzet">📦 Giderler Toplamı: <span id="giderOzetTutar">0 ₺</span></div>
+            <div class="karsilastirma-karti" id="kasaOzet">
+                <h4 style="color:#f97316;">💰 Kasa Durumu (Tüm Zamanlar)</h4>
+                <div id="kasaBilgi">Yükleniyor...</div>
+            </div>
+            <div class="karsilastirma-karti" id="gunlukSatisOzet">
+                <h4 style="color:#f97316;">📊 Günlük Satış Raporu (<span id="satisTarih"></span>)</h4>
+                <div id="satisBilgi">Yükleniyor...</div>
+            </div>
         </div>
     </div>
 
@@ -210,26 +216,11 @@
         <div class="card-body"><div id="masaListesi">Yükleniyor...</div></div>
     </div>
 
-    <!-- Adisyonlar Bölümü -->
-    <div id="adisyonlarSection" class="card">
-        <div class="card-header">📋 Açık Adisyonlar</div>
-        <div class="card-body"><div id="adisyonListesi">Yükleniyor...</div></div>
-    </div>
-
-    <!-- Kasa & Satış Bölümü -->
-    <div id="kasaSection" class="card">
-        <div class="card-header">💰 Kasa Durumu (Tüm Zamanlar)</div>
-        <div class="card-body"><div id="kasaBilgi">Yükleniyor...</div></div>
-        <div class="card-header">📊 Günlük Satış Raporu (<span id="satisTarih"></span>)</div>
-        <div class="card-body"><div id="satisBilgi">Yükleniyor...</div></div>
-    </div>
-
-    <!-- Fiyat Listesi Bölümü -->
-    <div id="fiyatlarSection" class="card">
-        <div class="card-header">💲 Fiyat Listesi (Değiştir → SambaPOS'a yansır)</div>
+    <!-- Ciro Karşılaştırma Bölümü -->
+    <div id="karsilastirmaSection" class="card">
+        <div class="card-header">📊 Aylık ve Yıllık Ciro Karşılaştırma</div>
         <div class="card-body">
-            <div class="category-filter" id="kategoriFilter"></div>
-            <div id="fiyatListesi">Yükleniyor...</div>
+            <div id="ciroKarsilastirma">Yükleniyor...</div>
         </div>
     </div>
 
@@ -248,19 +239,6 @@
         </div>
     </div>
 
-    <!-- Günlük Satış Raporu Modülü -->
-    <div id="gunlukSatisSection" class="card">
-        <div class="card-header">📅 Günlük Satış Raporu (Tarih Aralığı Seçiniz)</div>
-        <div class="card-body">
-            <div class="form-row">
-                <div class="form-field"><label>Başlangıç</label><input type="date" id="raporBaslangic" value="2026-06-01"></div>
-                <div class="form-field"><label>Bitiş</label><input type="date" id="raporBitis" value="2026-06-05"></div>
-                <div><button class="btn-primary" onclick="gunlukSatisRaporuGetir()">Rapor Al</button></div>
-            </div>
-            <div id="gunlukSatisRaporuIcerik" class="rapor-container">Rapor almak için tarih seçin...</div>
-        </div>
-    </div>
-
     <!-- Modüller Bölümü -->
     <div id="modullerSection" class="card">
         <div class="card-header">🧩 Modüller</div>
@@ -275,9 +253,6 @@
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
-    let tumKategoriler = [];
-    let aktifKategori = 'Tümü';
-    
     document.getElementById('apiUrl').value = API_BASE;
     
     document.querySelectorAll('.section-btn').forEach(btn => {
@@ -287,7 +262,6 @@
             const section = btn.getAttribute('data-section');
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
             document.getElementById(section + 'Section').classList.add('active-card');
-            if (section === 'fiyatlar') fiyatListesiGetir();
             if (section === 'moduller') modulListesiGetir();
         });
     });
@@ -308,6 +282,7 @@
         document.getElementById('ozetTarih').innerHTML = tarih;
         document.getElementById('satisTarih').innerHTML = tarih;
         
+        // Ana Panel
         try {
             let anaRes = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let ana = await anaRes.json();
@@ -321,12 +296,22 @@
             document.getElementById('giderOzetTutar').innerHTML = (ana.ToplamGider || 0).toLocaleString('tr-TR') + ' ₺';
         } catch(err) { console.error(err); }
         
+        // Giderler
         await giderlerGetir(tarih);
+        
+        // Açık Masalar
         await acikMasalarGetir();
-        await adisyonlarGetir(tarih);
+        
+        // Kasa Durumu
         await kasaDurumuGetir();
+        
+        // Günlük Satış
         await gunlukSatisGetir(tarih);
-        await fiyatListesiGetir();
+        
+        // Ciro Karşılaştırma
+        await ciroKarsilastirmaGetir();
+        
+        // Modüller
         await modulListesiGetir();
     }
     
@@ -335,12 +320,12 @@
             let res = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let data = await res.json();
             if (data.giderler && data.giderler.length > 0) {
-                let html = '<table class="rapor-tablo"><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
+                let html = '<table class="rapor-tablo"><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></table></thead><tbody>';
                 data.giderler.forEach(g => {
-                    html += `<tr><td>${g.GiderAdi || '-'}</td><td class="amount-right">${(g.Tutar || 0).toLocaleString('tr-TR')} ₺</td><td>${g.Tarih || '-'}</td></tr>`;
+                    html += `<tr><td style="font-weight:500;">${g.GiderAdi || '-'}</td><td class="amount-right">${(g.Tutar || 0).toLocaleString('tr-TR')} ₺</td><td>${g.Tarih || '-'}</td></tr>`;
                 });
                 html += `<tr style="background:#334155;"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${(data.toplam || 0).toLocaleString('tr-TR')} ₺</strong></td><td></td></tr>`;
-                html += '</tbody></tr>';
+                html += '</tbody></table>';
                 document.getElementById('giderListesi').innerHTML = html;
             } else {
                 document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider bulunamadı</div>';
@@ -355,7 +340,7 @@
             if (masalar.length === 0) {
                 document.getElementById('masaListesi').innerHTML = '<div>Açık masa bulunamadı</div>';
             } else {
-                let html = '<table class="rapor-tablo"><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
+                let html = '<table class="rapor-tablo"><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th><tr></thead><tbody>';
                 masalar.forEach(m => {
                     html += `<tr><td>${m.Masa || '-'}</td><td>${m.TicketNumber || '-'}</td><td>${m.Saat || '-'}</td><td class="amount-right">${m.UrunAdet || 0}</td><td class="amount-right">${(m.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
@@ -365,33 +350,15 @@
         } catch(err) { document.getElementById('masaListesi').innerHTML = '<div>Açık masalar alınamadı</div>'; }
     }
     
-    async function adisyonlarGetir(tarih) {
-        try {
-            let res = await fetch(`${API_BASE}/api/adisyonlar?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let adisyonlar = await res.json();
-            let acikAdisyonlar = adisyonlar.filter(a => a.Durum === 'Açık');
-            if (acikAdisyonlar.length === 0) {
-                document.getElementById('adisyonListesi').innerHTML = '<div>Açık adisyon bulunamadı</div>';
-            } else {
-                let html = '<table class="rapor-tablo"><thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Toplam</th></tr></thead><tbody>';
-                acikAdisyonlar.forEach(a => {
-                    html += `<tr><td>${a.AdisyonNo || '-'}</td><td>${a.Saat || '-'}</td><td>${a.Kullanici || '-'}</td><td>${a.Masa || '-'}</td><td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
-                });
-                html += '</tbody></table>';
-                document.getElementById('adisyonListesi').innerHTML = html;
-            }
-        } catch(err) { document.getElementById('adisyonListesi').innerHTML = '<div>Adisyonlar alınamadı</div>'; }
-    }
-    
     async function kasaDurumuGetir() {
         try {
             let res = await fetch(`${API_BASE}/api/kasaDurumu`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let kasa = await res.json();
             document.getElementById('kasaBilgi').innerHTML = `
                 <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
-                    <div style="text-align:center; flex:1;"><h4 style="color:#10b981;">💰 Nakit</h4><div style="font-size:1.8rem;">${(kasa.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="text-align:center; flex:1;"><h4 style="color:#3b82f6;">💳 Kredi Kartı</h4><div style="font-size:1.8rem;">${(kasa.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="text-align:center; flex:1;"><h4 style="color:#fbbf24;">📊 Toplam</h4><div style="font-size:1.8rem;">${(kasa.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    <div><span style="color:#10b981;">💰 Nakit:</span> <strong>${(kasa.Nakit || 0).toLocaleString('tr-TR')} ₺</strong></div>
+                    <div><span style="color:#3b82f6;">💳 Kredi Kartı:</span> <strong>${(kasa.KrediKarti || 0).toLocaleString('tr-TR')} ₺</strong></div>
+                    <div><span style="color:#fbbf24;">📊 Toplam:</span> <strong>${(kasa.Toplam || 0).toLocaleString('tr-TR')} ₺</strong></div>
                 </div>
             `;
         } catch(err) { document.getElementById('kasaBilgi').innerHTML = '<div>Kasa durumu alınamadı</div>'; }
@@ -403,109 +370,46 @@
             let satis = await res.json();
             document.getElementById('satisBilgi').innerHTML = `
                 <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
-                    <div style="text-align:center; flex:1;"><h4>📋 Adisyon Sayısı</h4><div style="font-size:1.5rem;">${satis.AdisyonSayisi || 0}</div></div>
-                    <div style="text-align:center; flex:1;"><h4>💰 Brut Satış</h4><div style="font-size:1.5rem;">${(satis.BrutSatis || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="text-align:center; flex:1;"><h4 style="color:#10b981;">💰 Nakit</h4><div style="font-size:1.5rem;">${(satis.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                    <div style="text-align:center; flex:1;"><h4 style="color:#3b82f6;">💳 Kredi</h4><div style="font-size:1.5rem;">${(satis.Kredi || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    <div>📋 Adisyon Sayısı: <strong>${satis.AdisyonSayisi || 0}</strong></div>
+                    <div>💰 Brut Satış: <strong>${(satis.BrutSatis || 0).toLocaleString('tr-TR')} ₺</strong></div>
+                    <div>💰 Nakit: <strong style="color:#10b981;">${(satis.Nakit || 0).toLocaleString('tr-TR')} ₺</strong></div>
+                    <div>💳 Kredi: <strong style="color:#3b82f6;">${(satis.Kredi || 0).toLocaleString('tr-TR')} ₺</strong></div>
                 </div>
             `;
         } catch(err) { document.getElementById('satisBilgi').innerHTML = '<div>Satış raporu alınamadı</div>'; }
     }
     
-    async function gunlukSatisRaporuGetir() {
-        let start = document.getElementById('raporBaslangic').value;
-        let end = document.getElementById('raporBitis').value;
-        let url = `${API_BASE}/api/gunlukSatisRaporu?start=${start}&end=${end}`;
+    async function ciroKarsilastirmaGetir() {
         try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let res = await fetch(`${API_BASE}/api/ciroKarsilastirma`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let data = await res.json();
-            if (data.rapor && data.rapor.length > 0) {
-                let html = '<table class="rapor-tablo"><thead><tr><th>Tarih</th><th>Brüt Satış</th><th>Nakit</th><th>Kredi Kartı</th><th>Müşteri Hesabı</th><th>Adisyon Sayısı</th></tr></thead><tbody>';
-                data.rapor.forEach(r => {
-                    html += `<tr>
-                        <td>${r.Tarih}</td>
-                        <td class="amount-right">${r.BrutSatis.toLocaleString('tr-TR')} ₺</td>
-                        <td class="amount-right" style="color:#10b981;">${r.Nakit.toLocaleString('tr-TR')} ₺</td>
-                        <td class="amount-right" style="color:#3b82f6;">${r.Kredi.toLocaleString('tr-TR')} ₺</td>
-                        <td class="amount-right">${r.MusteriHesabi.toLocaleString('tr-TR')} ₺</td>
-                        <td class="amount-right">${r.AdisyonSayisi}</td>
-                    </tr>`;
+            
+            let html = '<h4 style="color:#f97316; margin-bottom:16px;">📆 Aylık Ciro (Son 12 Ay)</h4>';
+            html += '<table class="rapor-tablo"><thead><tr><th>Ay</th><th>Ciro</th></tr></thead><tbody>';
+            if (data.aylik && data.aylik.length > 0) {
+                data.aylik.forEach(a => {
+                    html += `<tr><td>${a.Ay}</td><td class="amount-right">${(a.Ciro || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
-                html += '</tbody></table>';
-                html += `<div class="rapor-toplam">
-                    <div><strong>📊 TOPLAM Brut Satış:</strong> ${data.toplam.brutSatis.toLocaleString('tr-TR')} ₺</div>
-                    <div><strong>💰 TOPLAM Nakit:</strong> ${data.toplam.nakit.toLocaleString('tr-TR')} ₺</div>
-                    <div><strong>💳 TOPLAM Kredi:</strong> ${data.toplam.kredi.toLocaleString('tr-TR')} ₺</div>
-                    <div><strong>📋 TOPLAM Adisyon:</strong> ${data.toplam.adisyonSayisi}</div>
-                </div>`;
-                document.getElementById('gunlukSatisRaporuIcerik').innerHTML = html;
             } else {
-                document.getElementById('gunlukSatisRaporuIcerik').innerHTML = '<div>Seçilen tarih aralığında veri bulunamadı</div>';
+                html += '<table><td colspan="2">Veri bulunamadı</td></td>';
             }
+            html += '</tbody></tr>';
+            
+            html += '<h4 style="color:#f97316; margin:24px 0 16px 0;">📈 Yıllık Ciro</h4>';
+            html += '<table class="rapor-tablo"><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
+            if (data.yillik && data.yillik.length > 0) {
+                data.yillik.forEach(y => {
+                    html += `<tr><td>${y.Yil}</td><td class="amount-right">${(y.Ciro || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
+                });
+            } else {
+                html += '<tr><td colspan="2">Veri bulunamadı</td></tr>';
+            }
+            html += '</tbody></table>';
+            
+            document.getElementById('ciroKarsilastirma').innerHTML = html;
         } catch(err) {
-            document.getElementById('gunlukSatisRaporuIcerik').innerHTML = '<div style="color:#ef4444;">Rapor alınamadı</div>';
+            document.getElementById('ciroKarsilastirma').innerHTML = '<div>Ciro verileri alınamadı</div>';
         }
-    }
-    
-    async function fiyatListesiGetir() {
-        try {
-            let res = await fetch(`${API_BASE}/api/fiyatListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let urunler = await res.json();
-            let kategoriler = ['Tümü'];
-            urunler.forEach(u => {
-                if (u.Kategori && u.Kategori !== '-' && !kategoriler.includes(u.Kategori)) {
-                    kategoriler.push(u.Kategori);
-                }
-            });
-            tumKategoriler = kategoriler;
-            let filterHtml = '';
-            kategoriler.forEach(kat => {
-                filterHtml += `<button class="category-btn ${kat === aktifKategori ? 'active' : ''}" onclick="kategoriSec('${kat}')">${kat}</button>`;
-            });
-            document.getElementById('kategoriFilter').innerHTML = filterHtml;
-            let filtrelenmisUrunler = urunler;
-            if (aktifKategori !== 'Tümü') {
-                filtrelenmisUrunler = urunler.filter(u => u.Kategori === aktifKategori);
-            }
-            if (filtrelenmisUrunler.length === 0) {
-                document.getElementById('fiyatListesi').innerHTML = '<div>Ürün bulunamadı</div>';
-            } else {
-                let html = '<div class="table-wrapper"><table class="rapor-tablo"><thead><tr><th>Kategori</th><th>Ürün</th><th>Porsiyon</th><th>Fiyat (TL)</th><th>Barkod</th><th></th></tr></thead><tbody>';
-                filtrelenmisUrunler.forEach(u => {
-                    html += `<tr>
-                        <td>${u.Kategori || '-'}</td>
-                        <td>${u.Urun || '-'}</td>
-                        <td>${u.Porsiyon || '-'}</td>
-                        <td><input type="number" id="fiyat_${u.PorsiyonId}" value="${u.Fiyat}" step="0.01" style="width:90px; padding:6px; border-radius:8px; background:#0f172a; color:white; border:1px solid #334155;"> ₺</td>
-                        <td>${u.Barkod || '-'}</td>
-                        <td><button class="btn-success" onclick="fiyatGuncelle(${u.PorsiyonId})">Kaydet</button></td>
-                    </tr>`;
-                });
-                html += '</tbody>}</div>';
-                document.getElementById('fiyatListesi').innerHTML = html;
-            }
-        } catch(err) { document.getElementById('fiyatListesi').innerHTML = '<div>Fiyat listesi alınamadı</div>'; }
-    }
-    
-    function kategoriSec(kategori) {
-        aktifKategori = kategori;
-        fiyatListesiGetir();
-    }
-    
-    async function fiyatGuncelle(porsiyonId) {
-        let yeniFiyat = parseFloat(document.getElementById(`fiyat_${porsiyonId}`).value);
-        if (isNaN(yeniFiyat)) { alert('Geçerli fiyat girin'); return; }
-        try {
-            let response = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-                body: JSON.stringify({ porsiyonId, yeniFiyat })
-            });
-            let data = await response.json();
-            if (data.success) {
-                alert('Fiyat güncellendi! SambaPOS\'a yansıdı.');
-                fiyatListesiGetir();
-            } else { alert('Hata: ' + data.error); }
-        } catch(err) { alert('Bağlantı hatası'); }
     }
     
     async function manuelGiderEkle() {
