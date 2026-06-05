@@ -73,7 +73,7 @@
         
         .stats-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
         .stat-card {
-            flex: 1; min-width: 150px;
+            flex: 1; min-width: 160px;
             background: #1e293b;
             border-radius: 20px;
             padding: 18px;
@@ -81,11 +81,12 @@
             border: 1px solid #334155;
         }
         .stat-card h4 { font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; }
-        .stat-number { font-size: 1.6rem; font-weight: 800; }
+        .stat-number { font-size: 1.5rem; font-weight: 800; }
         .stat-number.nakit { color: #10b981; }
         .stat-number.kredi { color: #3b82f6; }
         .stat-number.ciro { color: #fbbf24; }
         .stat-number.gider { color: #f97316; }
+        .stat-number.kar { color: #10b981; }
         .loss { color: #ef4444; }
         
         .card {
@@ -122,6 +123,21 @@
         .category-btn { background: #334155; border: none; padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; color: #cbd5e1; }
         .category-btn.active { background: #f97316; color: white; }
         
+        .gider-ozet { background: #0f172a; border-radius: 16px; padding: 12px; margin-bottom: 20px; text-align: center; }
+        .gider-ozet span { color: #f97316; font-weight: bold; }
+        
+        .modul-icerik {
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid #334155;
+        }
+        
         .footer { text-align: center; font-size: 0.65rem; color: #64748b; margin-top: 20px; }
         
         @media (max-width: 700px) { .stat-number { font-size: 1.2rem; } .section-btn { padding: 6px 14px; font-size: 0.7rem; } }
@@ -131,7 +147,7 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Fiyat Yönetimi | Kategori Bazlı</p>
+        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Fiyat Yönetimi | Gider Takibi</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -165,8 +181,11 @@
                 <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi" id="krediGelir">0 ₺</div></div>
                 <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro" id="toplamCiro">0 ₺</div></div>
                 <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider" id="toplamGider">0 ₺</div></div>
-                <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number" id="netKar">0 ₺</div></div>
+                <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number kar" id="netKar">0 ₺</div></div>
                 <div class="stat-card"><h4>📝 Ödenmeyen</h4><div class="stat-number loss" id="odenmeyen">0 ₺</div></div>
+            </div>
+            <div class="gider-ozet" id="giderOzet">
+                📦 Giderler Toplamı: <span id="giderOzetTutar">0 ₺</span>
             </div>
         </div>
     </div>
@@ -207,7 +226,7 @@
         </div>
     </div>
 
-    <!-- Fiyat Listesi Bölümü (Kategori Bazlı) -->
+    <!-- Fiyat Listesi Bölümü -->
     <div id="fiyatlarSection" class="card">
         <div class="card-header">💲 Fiyat Listesi (Değiştir → SambaPOS'a yansır)</div>
         <div class="card-body">
@@ -231,11 +250,12 @@
         </div>
     </div>
 
-    <!-- Modüller Bölümü -->
+    <!-- Modüller Bölümü (Aynı Sekmede) -->
     <div id="modullerSection" class="card">
         <div class="card-header">🧩 Modüller</div>
         <div class="card-body">
             <div id="modulListesi">Yükleniyor...</div>
+            <div id="modulIcerik" class="modul-icerik" style="display:none;"></div>
         </div>
     </div>
 
@@ -260,6 +280,7 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
             document.getElementById(section + 'Section').classList.add('active-card');
             if (section === 'fiyatlar') fiyatListesiGetir();
+            if (section === 'moduller') modulListesiGetir();
         });
     });
     
@@ -290,6 +311,7 @@
             let netKar = (ana.ToplamCiro || 0) - (ana.ToplamGider || 0);
             document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
             document.getElementById('odenmeyen').innerHTML = (ana.Odenmeyenler || 0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('giderOzetTutar').innerHTML = (ana.ToplamGider || 0).toLocaleString('tr-TR') + ' ₺';
         } catch(err) { console.error(err); }
         
         // Giderler
@@ -301,7 +323,7 @@
         // Adisyonlar
         await adisyonlarGetir(tarih);
         
-        // Kasa Durumu (Anlık)
+        // Kasa Durumu
         await kasaDurumuGetir();
         
         // Günlük Satış
@@ -339,9 +361,9 @@
             if (masalar.length === 0) {
                 document.getElementById('masaListesi').innerHTML = '<div>Açık masa bulunamadı</div>';
             } else {
-                let html = '<table><thead></tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></thead><tbody>';
+                let html = '<table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
                 masalar.forEach(m => {
-                    html += `<tr><td>${m.Masa || '-'}</td><td>${m.TicketNumber || '-'}</td><td>${m.Saat || '-'}</td><td class="amount-right">${m.UrunAdet || 0}</td><td class="amount-right">${(m.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
+                    html += `<td><td>${m.Masa || '-'}</td><td>${m.TicketNumber || '-'}</td><td>${m.Saat || '-'}</td><td class="amount-right">${m.UrunAdet || 0}</td><td class="amount-right">${(m.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
                 html += '</tbody></table>';
                 document.getElementById('masaListesi').innerHTML = html;
@@ -357,7 +379,7 @@
             if (acikAdisyonlar.length === 0) {
                 document.getElementById('adisyonListesi').innerHTML = '<div>Açık adisyon bulunamadı</div>';
             } else {
-                let html = '<table><thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Toplam</th></thead><tbody>';
+                let html = '<table><thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Toplam</th></tr></thead><tbody>';
                 acikAdisyonlar.forEach(a => {
                     html += `<tr><td>${a.AdisyonNo || '-'}</td><td>${a.Saat || '-'}</td><td>${a.Kullanici || '-'}</td><td>${a.Masa || '-'}</td><td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
@@ -401,7 +423,6 @@
             let res = await fetch(`${API_BASE}/api/fiyatListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let urunler = await res.json();
             
-            // Kategorileri topla
             let kategoriler = ['Tümü'];
             urunler.forEach(u => {
                 if (u.Kategori && u.Kategori !== '-' && !kategoriler.includes(u.Kategori)) {
@@ -410,14 +431,12 @@
             });
             tumKategoriler = kategoriler;
             
-            // Kategori filtre butonlarını oluştur
             let filterHtml = '';
             kategoriler.forEach(kat => {
                 filterHtml += `<button class="category-btn ${kat === aktifKategori ? 'active' : ''}" onclick="kategoriSec('${kat}')">${kat}</button>`;
             });
             document.getElementById('kategoriFilter').innerHTML = filterHtml;
             
-            // Ürünleri filtrele
             let filtrelenmisUrunler = urunler;
             if (aktifKategori !== 'Tümü') {
                 filtrelenmisUrunler = urunler.filter(u => u.Kategori === aktifKategori);
@@ -437,7 +456,7 @@
                         <td><button class="btn-success" onclick="fiyatGuncelle(${u.PorsiyonId})">Kaydet</button></td>
                     </tr>`;
                 });
-                html += '</tbody></table></div>';
+                html += '</tbody></tr></div>';
                 document.getElementById('fiyatListesi').innerHTML = html;
             }
         } catch(err) { document.getElementById('fiyatListesi').innerHTML = '<div>Fiyat listesi alınamadı</div>'; }
@@ -494,7 +513,7 @@
             if (data.moduller && data.moduller.length > 0) {
                 let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
                 data.moduller.forEach(m => {
-                    html += `<button class="btn-outline" onclick="window.open('${API_BASE}${m.path}', '_blank')">🧩 ${m.adi}</button>`;
+                    html += `<button class="btn-outline" onclick="modulGoster('${m.path}', '${m.adi}')">🧩 ${m.adi}</button>`;
                 });
                 html += '</div>';
                 document.getElementById('modulListesi').innerHTML = html;
@@ -502,6 +521,19 @@
                 document.getElementById('modulListesi').innerHTML = '<div>Henüz modül bulunamadı</div>';
             }
         } catch(err) { document.getElementById('modulListesi').innerHTML = '<div>Modüller alınamadı</div>'; }
+    }
+    
+    async function modulGoster(path, adi) {
+        let icerikDiv = document.getElementById('modulIcerik');
+        icerikDiv.style.display = 'block';
+        icerikDiv.innerHTML = `<div style="color:#f97316;">🧩 ${adi} modülü yükleniyor...</div>`;
+        try {
+            let response = await fetch(`${API_BASE}${path}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await response.json();
+            icerikDiv.innerHTML = `<div style="color:#f97316; margin-bottom:8px;">📌 Modül: ${adi}</div><pre style="margin:0; font-family:monospace; font-size:0.7rem; white-space:pre-wrap;">${JSON.stringify(data, null, 2)}</pre>`;
+        } catch(err) {
+            icerikDiv.innerHTML = `<div style="color:#ef4444;">❌ Modül çalıştırılamadı: ${err.message}</div>`;
+        }
     }
 
     tumVerileriGuncelle();
