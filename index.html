@@ -177,7 +177,7 @@
     <div class="api-bar">
         <div class="api-input">
             <span>🌐 API Adresi:</span>
-            <input type="text" id="apiUrl" placeholder="http://localhost:3001 veya https://xxx.ngrok.io">
+            <input type="text" id="apiUrl" placeholder="http://localhost:3001 veya https://xxx.ngrok.io" value="http://100.97.45.8:3001">
             <button class="btn-primary btn-sm" onclick="apiUrlKaydet()">Kaydet</button>
         </div>
         <div>
@@ -211,9 +211,15 @@
             <div class="card-header">📅 Tarih Seçimi</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:0;">
-                    <input type="date" id="anaTarih" onchange="anaPaneliGuncelle()">
+                    <input type="date" id="anaTarih" value="2026-06-05" onchange="anaPaneliGuncelle()">
                     <button class="btn-primary btn-sm" onclick="anaPaneliGuncelle()">Göster</button>
                 </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">📊 Özet Rapor</div>
+            <div class="card-body" id="ozetRapor">
+                <div style="text-align:center; padding:20px;">Yükleniyor...</div>
             </div>
         </div>
     </div>
@@ -224,7 +230,7 @@
             <div class="card-header">📊 Gelirler</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:16px;">
-                    <input type="date" id="gelirTarih" onchange="gelirGiderGuncelle()">
+                    <input type="date" id="gelirTarih" value="2026-06-05" onchange="gelirGiderGuncelle()">
                 </div>
                 <div class="stats-grid" id="gelirKartlari"></div>
             </div>
@@ -239,7 +245,7 @@
             <div class="card-header">➕ Manuel Gider Ekle (SQL'e kaydedilir)</div>
             <div class="card-body">
                 <div class="form-row">
-                    <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih"></div>
+                    <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih" value="2026-06-05"></div>
                     <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Tamir, Kırtasiye"></div>
                     <div class="form-field"><label>Tutar (TL)</label><input type="number" id="manuelTutar" step="0.01"></div>
                     <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">Nakit</option><option value="Kredi">Kredi Kartı</option></select></div>
@@ -258,7 +264,7 @@
                 <div class="table-wrapper">
                     <table id="fiyatTablo">
                         <thead><tr><th>Kategori</th><th>Ürün</th><th>Porsiyon</th><th>Fiyat (TL)</th><th>Barkod</th><th></th></tr></thead>
-                        <tbody id="fiyatTbody"><tr><td colspan="6">Yükleniyor...</td></tr></tbody>
+                        <tbody id="fiyatTbody"><tr><td colspan="6">Yükleniyor...</tbody>
                     </table>
                 </div>
             </div>
@@ -271,14 +277,14 @@
             <div class="card-header">📊 Fiyat Değişim Raporu</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:16px;">
-                    <span>Başlangıç:</span><input type="date" id="degisimBaslangic">
-                    <span>Bitiş:</span><input type="date" id="degisimBitis">
+                    <span>Başlangıç:</span><input type="date" id="degisimBaslangic" value="2026-06-01">
+                    <span>Bitiş:</span><input type="date" id="degisimBitis" value="2026-06-05">
                     <button class="btn-primary btn-sm" onclick="fiyatDegisimRaporuGetir()">Getir</button>
                 </div>
                 <div class="table-wrapper">
                     <table id="degisimTablo">
                         <thead><tr><th>Adisyon No</th><th>Kullanıcı</th><th>Masa</th><th>Tarih</th><th>Saat</th><th>Ürün</th><th>Miktar</th><th>Menü Fiyatı</th><th>Satış Fiyatı</th><th>Değişim</th><th>Fark</th></tr></thead>
-                        <tbody id="degisimTbody"><tr><td colspan="11">Yükleniyor...</td></tr></tbody>
+                        <tbody id="degisimTbody"><tr><td colspan="11">Yükleniyor...</tbody>
                     </table>
                 </div>
             </div>
@@ -291,12 +297,12 @@
             <div class="card-header">📋 Adisyonlar</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:16px;">
-                    <input type="date" id="adisyonTarih" onchange="adisyonlariGetir()">
+                    <input type="date" id="adisyonTarih" value="2026-06-05" onchange="adisyonlariGetir()">
                 </div>
                 <div class="table-wrapper">
                     <table id="adisyonTablo">
                         <thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Müşteri</th><th>Toplam</th><th>Durum</th><th>Ödeme Tipi</th></tr></thead>
-                        <tbody id="adisyonTbody"><tr><td colspan="8">Yükleniyor...</td></tr></tbody>
+                        <tbody id="adisyonTbody"><tr><td colspan="8">Yükleniyor...</tbody>
                     </table>
                 </div>
             </div>
@@ -309,7 +315,7 @@
             <div class="card-header">🎁 İkram/İade/Zayi Raporu</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:16px;">
-                    <input type="date" id="ikramTarih" onchange="ikramlariGetir()">
+                    <input type="date" id="ikramTarih" value="2026-06-05" onchange="ikramlariGetir()">
                 </div>
                 <div class="stats-grid" id="ikramOzet"></div>
                 <div style="display:flex; gap:20px; flex-wrap:wrap;">
@@ -329,7 +335,7 @@
                 <div class="table-wrapper">
                     <table id="masaTablo">
                         <thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam Tutar</th></tr></thead>
-                        <tbody id="masaTbody"><tr><td colspan="5">Yükleniyor...</td></tr></tbody>
+                        <tbody id="masaTbody"><tr><td colspan="5">Yükleniyor...</tbody>
                     </table>
                 </div>
             </div>
@@ -348,7 +354,7 @@
             <div class="card-header">📊 Günlük Satış Raporu</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:16px;">
-                    <input type="date" id="gunlukSatisTarih" onchange="gunlukSatisGetir()">
+                    <input type="date" id="gunlukSatisTarih" value="2026-06-05" onchange="gunlukSatisGetir()">
                 </div>
                 <div class="stats-grid" id="gunlukSatisKartlari"></div>
             </div>
@@ -361,12 +367,12 @@
             <div class="card-header">📦 Ürün Bazlı Satış Raporu</div>
             <div class="card-body">
                 <div class="filter-bar" style="margin-bottom:16px;">
-                    <input type="date" id="urunSatisTarih" onchange="urunSatisGetir()">
+                    <input type="date" id="urunSatisTarih" value="2026-06-05" onchange="urunSatisGetir()">
                 </div>
                 <div class="table-wrapper">
                     <table id="urunSatisTablo">
                         <thead><tr><th>Ürün Adı</th><th>Satış Adedi</th><th>Toplam Tutar</th></tr></thead>
-                        <tbody id="urunSatisTbody"><td><td colspan="3">Yükleniyor...</td></tr></tbody>
+                        <tbody id="urunSatisTbody"><tr><td colspan="3">Yükleniyor...</tbody>
                     </table>
                 </div>
             </div>
@@ -383,14 +389,6 @@
     let aktifTab = 'ana';
     
     document.getElementById('apiUrl').value = API_BASE;
-    document.getElementById('anaTarih').value = new Date().toISOString().slice(0,10);
-    document.getElementById('gelirTarih').value = new Date().toISOString().slice(0,10);
-    document.getElementById('adisyonTarih').value = new Date().toISOString().slice(0,10);
-    document.getElementById('ikramTarih').value = new Date().toISOString().slice(0,10);
-    document.getElementById('gunlukSatisTarih').value = new Date().toISOString().slice(0,10);
-    document.getElementById('urunSatisTarih').value = new Date().toISOString().slice(0,10);
-    document.getElementById('degisimBaslangic').value = new Date().toISOString().slice(0,10);
-    document.getElementById('degisimBitis').value = new Date().toISOString().slice(0,10);
     
     setInterval(() => {
         document.getElementById('dateTime').innerHTML = `📅 ${new Date().toLocaleDateString('tr-TR')} - 🕐 ${new Date().toLocaleTimeString('tr-TR')}`;
@@ -403,7 +401,6 @@
         tumVerileriGuncelle();
     }
 
-    // Tab Geçişleri
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -427,6 +424,7 @@
         if (aktifTab === 'ana') anaPaneliGuncelle();
         else if (aktifTab === 'gelirGider') gelirGiderGuncelle();
         else if (aktifTab === 'fiyatlar') fiyatListesiniGetir();
+        else if (aktifTab === 'fiyatDegisim') fiyatDegisimRaporuGetir();
         else if (aktifTab === 'adisyonlar') adisyonlariGetir();
         else if (aktifTab === 'ikramlar') ikramlariGetir();
         else if (aktifTab === 'masalar') acikMasalariGetir();
@@ -437,52 +435,56 @@
     // ========== ANA PANEL ==========
     async function anaPaneliGuncelle() {
         let tarih = document.getElementById('anaTarih').value;
-        await Promise.all([
-            gelirleriGetir(tarih).then(data => {
-                document.getElementById('nakitGelir').innerHTML = (data.Nakit || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('krediGelir').innerHTML = (data.KrediKarti || 0).toLocaleString('tr-TR') + ' ₺';
-                document.getElementById('toplamGelir').innerHTML = (data.Toplam || 0).toLocaleString('tr-TR') + ' ₺';
-            }),
-            giderleriGetir(tarih).then(data => {
-                document.getElementById('toplamGider').innerHTML = (data.Toplam || 0).toLocaleString('tr-TR') + ' ₺';
-                let netKar = (document.getElementById('toplamGelir').innerText.replace(' ₺', '').replace(/\./g, '').replace(',', '.') * 1) - (data.Toplam || 0);
-                document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
-                let karMarji = data.Toplam > 0 ? ((netKar / data.Toplam) * 100).toFixed(1) : 0;
-                document.getElementById('karMarji').innerHTML = karMarji + '%';
-            })
-        ]);
+        
+        // Gelirleri getir
+        let gelirRes = await fetch(`${API_BASE}/api/gelirler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        let gelir = await gelirRes.json();
+        
+        // Giderleri getir
+        let giderRes = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        let gider = await giderRes.json();
+        
+        document.getElementById('nakitGelir').innerHTML = (gelir.Nakit || 0).toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('krediGelir').innerHTML = (gelir.KrediKarti || 0).toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('toplamGelir').innerHTML = (gelir.Toplam || 0).toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('toplamGider').innerHTML = (gider.Toplam || 0).toLocaleString('tr-TR') + ' ₺';
+        
+        let netKar = (gelir.Toplam || 0) - (gider.Toplam || 0);
+        document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
+        let karMarji = gelir.Toplam > 0 ? ((netKar / gelir.Toplam) * 100).toFixed(1) : 0;
+        document.getElementById('karMarji').innerHTML = karMarji + '%';
+        
+        // Özet Rapor (SambaPOS formatında)
+        document.getElementById('ozetRapor').innerHTML = `
+            <div style="font-size: 1.2rem; font-weight: bold; color: #ef4444; text-align: center; margin-bottom: 20px;">📊 RAPORLAR</div>
+            <div style="margin-bottom: 10px;">📋 Adisyon Sayısı: ${gider.AdisyonSayisi || 0}</div>
+            <div style="margin-bottom: 10px;">📦 Sipariş Sayısı: ${gider.AdisyonSayisi || 0}</div>
+            <div style="margin-bottom: 15px; color: #fbbf24;">💰 Ödenmeyen: 0 TL</div>
+            <div style="font-size: 1.1rem; font-weight: bold; margin: 20px 0 15px 0; color: #fbbf24;">🏦 Kasa Durumu</div>
+            <div style="margin-bottom: 8px;"><span style="color: #10b981;">💵 Nakit:</span> ${(gelir.Nakit || 0).toLocaleString('tr-TR')} TL</div>
+            <div style="margin-bottom: 8px;"><span style="color: #ef4444;">💳 Kredi Kartı:</span> ${(gelir.KrediKarti || 0).toLocaleString('tr-TR')} TL</div>
+            <div style="margin-bottom: 8px; font-weight: bold;">💰 Toplam Ciro: ${(gelir.Toplam || 0).toLocaleString('tr-TR')} TL</div>
+        `;
     }
 
     // ========== GELİR & GİDER ==========
-    async function gelirleriGetir(tarih) {
-        let url = `${API_BASE}/api/gelirler?tarih=${tarih}`;
-        let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-        return await res.json();
-    }
-
-    async function giderleriGetir(tarih) {
-        let url = `${API_BASE}/api/giderler?tarih=${tarih}`;
-        let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-        return await res.json();
-    }
-
     async function gelirGiderGuncelle() {
         let tarih = document.getElementById('gelirTarih').value;
-        let gelir = await gelirleriGetir(tarih);
-        let gider = await giderleriGetir(tarih);
+        let gelirRes = await fetch(`${API_BASE}/api/gelirler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        let gelir = await gelirRes.json();
+        let giderRes = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        let gider = await giderRes.json();
         
         document.getElementById('gelirKartlari').innerHTML = `
-            <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number">${gelir.Nakit.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number">${gelir.KrediKarti.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>👤 Müşteri Hesabı</h4><div class="stat-number">${gelir.MusteriHesabi.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>📊 Toplam Gelir</h4><div class="stat-number profit">${gelir.Toplam.toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number">${(gelir.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number">${(gelir.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>📊 Toplam Gelir</h4><div class="stat-number profit">${(gelir.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
         `;
         
         document.getElementById('giderKartlari').innerHTML = `
-            <div class="stat-card"><h4>💰 Nakit Gider</h4><div class="stat-number loss">${gider.Nakit.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>📦 Muhtelif Gider</h4><div class="stat-number loss">${gider.Muhtelif.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>👥 Personel Gider</h4><div class="stat-number loss">${gider.Personel.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>📝 Toplam Gider</h4><div class="stat-number loss">${gider.Toplam.toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>📦 Muhtelif Gider</h4><div class="stat-number loss">${(gider.Muhtelif || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>👥 Personel Gider</h4><div class="stat-number loss">${(gider.Personel || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>📝 Toplam Gider</h4><div class="stat-number loss">${(gider.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
         `;
     }
 
@@ -492,7 +494,7 @@
         let aciklama = document.getElementById('manuelAciklama').value;
         let tutar = parseFloat(document.getElementById('manuelTutar').value);
         let tur = document.getElementById('manuelTur').value;
-        if (!tarih || !aciklama || isNaN(tutar) || tutar <= 0) { alert('Eksik bilgi'); return; }
+        if (!aciklama || isNaN(tutar) || tutar <= 0) { alert('Eksik bilgi'); return; }
         
         let sonucDiv = document.getElementById('manuelSonuc');
         sonucDiv.innerHTML = '<span style="color:#f97316;">Kaydediliyor...</span>';
@@ -517,7 +519,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('fiyatTbody');
-        if (data.length === 0) tbody.innerHTML = '<tr><td colspan="6">Veri bulunamadı</td></tr>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="6">Veri bulunamadı</tbody>';
         else {
             tbody.innerHTML = data.map(u => `
                 <tr>
@@ -527,7 +529,7 @@
                     <td><div class="price-edit"><input type="number" id="fiyat_${u.PorsiyonId}" value="${u.Fiyat}" step="0.01" class="price-input"> ₺</div></td>
                     <td>${u.Barkod || '-'}</td>
                     <td><button class="btn-success btn-sm" onclick="fiyatGuncelle(${u.PorsiyonId})">💾 Kaydet</button></td>
-                </td>
+                </tr>
             `).join('');
         }
     }
@@ -535,11 +537,9 @@
     async function fiyatGuncelle(porsiyonId) {
         let yeniFiyat = parseFloat(document.getElementById(`fiyat_${porsiyonId}`).value);
         if (isNaN(yeniFiyat)) { alert('Geçerli fiyat girin'); return; }
-        
         try {
             let response = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
                 body: JSON.stringify({ porsiyonId, yeniFiyat })
             });
             let data = await response.json();
@@ -558,7 +558,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('degisimTbody');
-        if (data.length === 0) tbody.innerHTML = '<td><td colspan="11">Veri bulunamadı</tr>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="11">Veri bulunamadı</tbody>';
         else {
             tbody.innerHTML = data.map(d => `
                 <tr>
@@ -585,7 +585,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('adisyonTbody');
-        if (data.length === 0) tbody.innerHTML = '<tr><td colspan="8">Veri bulunamadı</tr>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="8">Veri bulunamadı</tbody>';
         else {
             tbody.innerHTML = data.map(a => `
                 <tr>
@@ -619,9 +619,9 @@
             <div class="stat-card"><h4>📦 Zayi Toplam</h4><div class="stat-number loss">${zayiTop.toLocaleString('tr-TR')} ₺</div></div>
         `;
         
-        document.querySelector('#ikramTablo tbody').innerHTML = (data.Ikram || []).map(i => `<tr><td>${i.Urun}</td><td class="amount-right">${i.Adet}</td><td class="amount-right">${i.Toplam.toLocaleString('tr-TR')} ₺</tr>`).join('') || '<td><td colspan="3">Veri yok</tr>';
-        document.querySelector('#iadeTablo tbody').innerHTML = (data.Iade || []).map(i => `<tr><td>${i.Urun}</td><td class="amount-right">${i.Adet}</td><td class="amount-right">${i.Toplam.toLocaleString('tr-TR')} ₺</tr>`).join('') || '<tr><td colspan="3">Veri yok</tr>';
-        document.querySelector('#zayiTablo tbody').innerHTML = (data.Zayi || []).map(z => `<tr><td>${z.Urun}</td><td class="amount-right">${z.Adet}</td><td class="amount-right">${z.Toplam.toLocaleString('tr-TR')} ₺</tr>`).join('') || '<table><td colspan="3">Veri yok</tr>';
+        document.querySelector('#ikramTablo tbody').innerHTML = (data.Ikram || []).map(i => `<tr><td>${i.Urun}</td><td class="amount-right">${i.Adet}</td><td class="amount-right">${i.Toplam.toLocaleString('tr-TR')} ₺</td>`).join('') || '<table><td colspan="3">Veri yok</tr>';
+        document.querySelector('#iadeTablo tbody').innerHTML = (data.Iade || []).map(i => `<tr><td>${i.Urun}</td><td class="amount-right">${i.Adet}</td><td class="amount-right">${i.Toplam.toLocaleString('tr-TR')} ₺</td>`).join('') || '<tr><td colspan="3">Veri yok</tr>';
+        document.querySelector('#zayiTablo tbody').innerHTML = (data.Zayi || []).map(z => `<tr><td>${z.Urun}</td><td class="amount-right">${z.Adet}</td><td class="amount-right">${z.Toplam.toLocaleString('tr-TR')} ₺</td>`).join('') || '<tr><td colspan="3">Veri yok</tr>';
     }
 
     // ========== AÇIK MASALAR ==========
@@ -630,7 +630,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('masaTbody');
-        if (data.length === 0) tbody.innerHTML = '<tr><td colspan="5">Açık masa bulunamadı</tr>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="5">Açık masa bulunamadı</tr>';
         else {
             tbody.innerHTML = data.map(m => `
                 <tr>
@@ -650,10 +650,9 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         document.getElementById('kasaKartlari').innerHTML = `
-            <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number">${data.Nakit.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number">${data.KrediKarti.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>👤 Müşteri Hesabı</h4><div class="stat-number">${data.MusteriHesabi.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>📊 Toplam</h4><div class="stat-number profit">${data.Toplam.toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number">${(data.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number">${(data.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>📊 Toplam</h4><div class="stat-number profit">${(data.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
         `;
     }
 
@@ -681,7 +680,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('urunSatisTbody');
-        if (data.length === 0) tbody.innerHTML = '<tr><td colspan="3">Veri bulunamadı</tr>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="3">Veri bulunamadı</tr>';
         else {
             tbody.innerHTML = data.map(u => `
                 <tr>
