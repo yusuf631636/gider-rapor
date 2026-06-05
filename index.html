@@ -129,7 +129,7 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL Bağlantılı | Gelir/Gider | Fiyat Yönetimi | Adisyonlar | İkram/İade/Zayi | Kasa Durumu</p>
+        <p>📡 SambaPOS SQL Bağlantılı | Gelir/Gider | Fiyat Yönetimi | Adisyonlar | Açık Masalar | Kasa Durumu</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -148,7 +148,6 @@
         <button class="tab-btn" data-tab="fiyatlar">💲 Fiyat Listesi</button>
         <button class="tab-btn" data-tab="fiyatDegisim">📊 Fiyat Değişim</button>
         <button class="tab-btn" data-tab="adisyonlar">📋 Adisyonlar</button>
-        <button class="tab-btn" data-tab="ikramlar">🎁 İkram/İade/Zayi</button>
         <button class="tab-btn" data-tab="masalar">🪑 Açık Masalar</button>
         <button class="tab-btn" data-tab="kasa">💰 Kasa Durumu</button>
         <button class="tab-btn" data-tab="urunSatis">📦 Ürün Satış</button>
@@ -257,25 +256,9 @@
                 <div style="margin-bottom:16px;"><input type="date" id="adisyonTarih" value="2026-06-05" onchange="adisyonlariGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white;"></div>
                 <div class="table-wrapper">
                     <table id="adisyonTablo">
-                        <thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Müşteri</th><th>Toplam</th><th>Durum</th><th>Ödeme Tipi</th></tr></thead>
-                        <tbody id="adisyonTbody"><tr><td colspan="8">Yükleniyor...</tbody>
+                        <thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa</th><th>Müşteri</th><th>Toplam</th><th>Durum</th></tr></thead>
+                        <tbody id="adisyonTbody"><tr><td colspan="7">Yükleniyor...</tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== İKRAM/İADE/ZAYİ TAB ========== -->
-    <div id="ikramlarTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">🎁 İkram/İade/Zayi Raporu</div>
-            <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="ikramTarih" value="2026-06-05" onchange="ikramlariGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white;"></div>
-                <div class="stats-grid" id="ikramOzet"></div>
-                <div style="display:flex; gap:20px; flex-wrap:wrap;">
-                    <div style="flex:1;"><h4 style="color:#4ade80;">🎁 İkram</h4><div class="table-wrapper"><table id="ikramTablo"><thead><tr><th>Ürün</th><th>Adet</th><th>Toplam</th></tr></thead><tbody></tbody></table></div></div>
-                    <div style="flex:1;"><h4 style="color:#f87171;">🔄 İade</h4><div class="table-wrapper"><table id="iadeTablo"><thead><tr><th>Ürün</th><th>Adet</th><th>Toplam</th><tr></thead><tbody></tbody></table></div></div>
-                    <div style="flex:1;"><h4 style="color:#fbbf24;">📦 Zayi</h4><div class="table-wrapper"><table id="zayiTablo"><thead><tr><th>Ürün</th><th>Adet</th><th>Toplam</th></tr></thead><tbody></tbody></table></div></div>
                 </div>
             </div>
         </div>
@@ -330,7 +313,7 @@
     </div>
 
     <div class="footer">
-        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Fiyat değişiklikleri SambaPOS'a yansır | Gerçek Zamanlı
+        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Gerçek Zamanlı
     </div>
 </div>
 
@@ -364,7 +347,6 @@
             else if (aktifTab === 'fiyatlar') fiyatListesiniGetir();
             else if (aktifTab === 'fiyatDegisim') fiyatDegisimRaporuGetir();
             else if (aktifTab === 'adisyonlar') adisyonlariGetir();
-            else if (aktifTab === 'ikramlar') ikramlariGetir();
             else if (aktifTab === 'masalar') acikMasalariGetir();
             else if (aktifTab === 'kasa') { kasaDurumuGetir(); gunlukSatisGetir(); }
             else if (aktifTab === 'urunSatis') urunSatisGetir();
@@ -375,8 +357,8 @@
         if (aktifTab === 'ana') anaPaneliGuncelle();
         else if (aktifTab === 'gelirGider') gelirGiderGuncelle();
         else if (aktifTab === 'fiyatlar') fiyatListesiniGetir();
+        else if (aktifTab === 'fiyatDegisim') fiyatDegisimRaporuGetir();
         else if (aktifTab === 'adisyonlar') adisyonlariGetir();
-        else if (aktifTab === 'ikramlar') ikramlariGetir();
         else if (aktifTab === 'masalar') acikMasalariGetir();
         else if (aktifTab === 'kasa') { kasaDurumuGetir(); gunlukSatisGetir(); }
         else if (aktifTab === 'urunSatis') urunSatisGetir();
@@ -489,7 +471,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('degisimTbody');
-        if (!data.length) tbody.innerHTML = '</table><td colspan="11">Veri bulunamadı</tbody>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="11">Veri bulunamadı</tbody>';
         else {
             tbody.innerHTML = data.map(d => `
                 <tr>
@@ -516,7 +498,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('adisyonTbody');
-        if (!data.length) tbody.innerHTML = '<tr><td colspan="8">Veri bulunamadı</tbody>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="7">Veri bulunamadı</tbody>';
         else {
             tbody.innerHTML = data.map(a => `
                 <tr>
@@ -527,30 +509,9 @@
                     <td>${a.Musteri || '-'}</td>
                     <td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺</td>
                     <td><span class="${a.Durum === 'Açık' ? 'badge-gider' : 'badge-gelir'}">${a.Durum}</span></td>
-                    <td>${a.OdemeTipi || '-'}</td>
                 </tr>
             `).join('');
         }
-    }
-
-    // ========== İKRAM/İADE/ZAYİ ==========
-    async function ikramlariGetir() {
-        let tarih = document.getElementById('ikramTarih').value;
-        let url = `${API_BASE}/api/ikramlar?tarih=${tarih}`;
-        let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-        let data = await res.json();
-        
-        let ikramTop = (data.Ikram || []).reduce((s, i) => s + i.Toplam, 0);
-        let iadeTop = (data.Iade || []).reduce((s, i) => s + i.Toplam, 0);
-        let zayiTop = (data.Zayi || []).reduce((s, z) => s + z.Toplam, 0);
-        document.getElementById('ikramOzet').innerHTML = `
-            <div class="stat-card"><h4>🎁 İkram Toplam</h4><div class="stat-number">${ikramTop.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>🔄 İade Toplam</h4><div class="stat-number loss">${iadeTop.toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>📦 Zayi Toplam</h4><div class="stat-number loss">${zayiTop.toLocaleString('tr-TR')} ₺</div></div>
-        `;
-        document.querySelector('#ikramTablo tbody').innerHTML = (data.Ikram || []).map(i => `<tr><td>${i.Urun}</td><td class="amount-right">${i.Adet}</td><td class="amount-right">${i.Toplam.toLocaleString('tr-TR')} ₺</td></tr>`).join('') || '<tr><td colspan="3">Veri yok</td></tr>';
-        document.querySelector('#iadeTablo tbody').innerHTML = (data.Iade || []).map(i => `<tr><td>${i.Urun}</td><td class="amount-right">${i.Adet}</td><td class="amount-right">${i.Toplam.toLocaleString('tr-TR')} ₺</td></tr>`).join('') || '<tr><td colspan="3">Veri yok</td></tr>';
-        document.querySelector('#zayiTablo tbody').innerHTML = (data.Zayi || []).map(z => `<tr><td>${z.Urun}</td><td class="amount-right">${z.Adet}</td><td class="amount-right">${z.Toplam.toLocaleString('tr-TR')} ₺</td></tr>`).join('') || '<tr><td colspan="3">Veri yok</td></tr>';
     }
 
     // ========== AÇIK MASALAR ==========
@@ -594,9 +555,9 @@
         document.getElementById('gunlukSatisKartlari').innerHTML = `
             <div class="stat-card"><h4>📋 Adisyon Sayısı</h4><div class="stat-number">${data.AdisyonSayisi || 0}</div></div>
             <div class="stat-card"><h4>💰 Brut Satış</h4><div class="stat-number ciro">${(data.BrutSatis || 0).toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>🏷️ İskonto</h4><div class="stat-number gider">${(data.Iskonto || 0).toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>🔄 Yuvarlama</h4><div class="stat-number">${(data.Yuvarlama || 0).toLocaleString('tr-TR')} ₺</div></div>
-            <div class="stat-card"><h4>📊 KDV</h4><div class="stat-number">${(data.KDV || 0).toLocaleString('tr-TR')} ₺</div></div>
+            <div class="stat-card"><h4>🏷️ İskonto</h4><div class="stat-number">0 ₺</div></div>
+            <div class="stat-card"><h4>🔄 Yuvarlama</h4><div class="stat-number">0 ₺</div></div>
+            <div class="stat-card"><h4>📊 KDV</h4><div class="stat-number">0 ₺</div></div>
             <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number nakit">${(data.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
             <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(data.Kredi || 0).toLocaleString('tr-TR')} ₺</div></div>
         `;
@@ -609,7 +570,7 @@
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('urunSatisTbody');
-        if (!data.length) tbody.innerHTML = '<tr><td colspan="3">Veri bulunamadı</tbody>';
+        if (!data.length) tbody.innerHTML = '</tr><td colspan="3">Veri bulunamadı</tbody>';
         else {
             tbody.innerHTML = data.map(u => `
                 <tr>
