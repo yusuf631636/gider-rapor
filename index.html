@@ -218,7 +218,7 @@
 
     <!-- Kasa & Satış Bölümü -->
     <div id="kasaSection" class="card">
-        <div class="card-header">💰 Kasa Durumu (Anlık)</div>
+        <div class="card-header">💰 Kasa Durumu (Tüm Zamanlar)</div>
         <div class="card-body"><div id="kasaBilgi">Yükleniyor...</div></div>
         <div class="card-header">📊 Günlük Satış Raporu (<span id="satisTarih"></span>)</div>
         <div class="card-body"><div id="satisBilgi">Yükleniyor...</div></div>
@@ -248,13 +248,13 @@
         </div>
     </div>
 
-    <!-- Günlük Satış Raporu Modülü (Düzenli Görünüm) -->
+    <!-- Günlük Satış Raporu Modülü -->
     <div id="gunlukSatisSection" class="card">
         <div class="card-header">📅 Günlük Satış Raporu (Tarih Aralığı Seçiniz)</div>
         <div class="card-body">
             <div class="form-row">
-                <div class="form-field"><label>Başlangıç Tarihi</label><input type="date" id="raporBaslangic" value="2026-06-01"></div>
-                <div class="form-field"><label>Bitiş Tarihi</label><input type="date" id="raporBitis" value="2026-06-05"></div>
+                <div class="form-field"><label>Başlangıç</label><input type="date" id="raporBaslangic" value="2026-06-01"></div>
+                <div class="form-field"><label>Bitiş</label><input type="date" id="raporBitis" value="2026-06-05"></div>
                 <div><button class="btn-primary" onclick="gunlukSatisRaporuGetir()">Rapor Al</button></div>
             </div>
             <div id="gunlukSatisRaporuIcerik" class="rapor-container">Rapor almak için tarih seçin...</div>
@@ -340,7 +340,7 @@
                     html += `<tr><td>${g.GiderAdi || '-'}</td><td class="amount-right">${(g.Tutar || 0).toLocaleString('tr-TR')} ₺</td><td>${g.Tarih || '-'}</td></tr>`;
                 });
                 html += `<tr style="background:#334155;"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${(data.toplam || 0).toLocaleString('tr-TR')} ₺</strong></td><td></td></tr>`;
-                html += '</tbody></table>';
+                html += '</tbody></tr>';
                 document.getElementById('giderListesi').innerHTML = html;
             } else {
                 document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider bulunamadı</div>';
@@ -419,7 +419,6 @@
         try {
             let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let data = await res.json();
-            
             if (data.rapor && data.rapor.length > 0) {
                 let html = '<table class="rapor-tablo"><thead><tr><th>Tarih</th><th>Brüt Satış</th><th>Nakit</th><th>Kredi Kartı</th><th>Müşteri Hesabı</th><th>Adisyon Sayısı</th></tr></thead><tbody>';
                 data.rapor.forEach(r => {
@@ -444,7 +443,7 @@
                 document.getElementById('gunlukSatisRaporuIcerik').innerHTML = '<div>Seçilen tarih aralığında veri bulunamadı</div>';
             }
         } catch(err) {
-            document.getElementById('gunlukSatisRaporuIcerik').innerHTML = '<div style="color:#ef4444;">Rapor alınamadı: ' + err.message + '</div>';
+            document.getElementById('gunlukSatisRaporuIcerik').innerHTML = '<div style="color:#ef4444;">Rapor alınamadı</div>';
         }
     }
     
@@ -452,7 +451,6 @@
         try {
             let res = await fetch(`${API_BASE}/api/fiyatListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let urunler = await res.json();
-            
             let kategoriler = ['Tümü'];
             urunler.forEach(u => {
                 if (u.Kategori && u.Kategori !== '-' && !kategoriler.includes(u.Kategori)) {
@@ -460,18 +458,15 @@
                 }
             });
             tumKategoriler = kategoriler;
-            
             let filterHtml = '';
             kategoriler.forEach(kat => {
                 filterHtml += `<button class="category-btn ${kat === aktifKategori ? 'active' : ''}" onclick="kategoriSec('${kat}')">${kat}</button>`;
             });
             document.getElementById('kategoriFilter').innerHTML = filterHtml;
-            
             let filtrelenmisUrunler = urunler;
             if (aktifKategori !== 'Tümü') {
                 filtrelenmisUrunler = urunler.filter(u => u.Kategori === aktifKategori);
             }
-            
             if (filtrelenmisUrunler.length === 0) {
                 document.getElementById('fiyatListesi').innerHTML = '<div>Ürün bulunamadı</div>';
             } else {
