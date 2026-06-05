@@ -117,11 +117,10 @@
         
         .badge-acik { background: rgba(239,68,68,0.2); color: #f87171; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
         .badge-kapali { background: rgba(34,197,94,0.2); color: #4ade80; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
-        .badge-gider { background: rgba(249,115,22,0.2); color: #f97316; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
+        .badge-modul { background: rgba(139,92,246,0.2); color: #a78bfa; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
         
         .footer { text-align: center; font-size: 0.65rem; color: #475569; margin-top: 20px; }
         
-        /* Grafikler */
         .graph-container { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
         .graph-card { flex: 1; min-width: 300px; background: rgba(255,255,255,0.03); border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); }
         .graph-card h4 { margin-bottom: 16px; font-size: 0.9rem; color: #f97316; }
@@ -134,7 +133,7 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP - Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Gelir/Gider | Fiyat Yönetimi | Adisyonlar | Raporlama</p>
+        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Gelir/Gider | Fiyat Yönetimi | Modüler Sistem</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -147,11 +146,10 @@
         <div>
             <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
             <button class="btn-outline" onclick="pdfIndir()">📄 PDF Rapor</button>
-            <button class="btn-outline" onclick="excelIndir()">📊 Excel İndir</button>
         </div>
     </div>
 
-    <div class="tab-bar">
+    <div class="tab-bar" id="tabBar">
         <button class="tab-btn active" data-tab="ana">🏠 Ana Panel</button>
         <button class="tab-btn" data-tab="gelirGider">💰 Gelir & Gider</button>
         <button class="tab-btn" data-tab="fiyatlar">💲 Fiyat Listesi</button>
@@ -189,173 +187,163 @@
                 <div class="table-wrapper">
                     <table id="giderDetayTablo">
                         <thead><tr><th>Gider Kalemi</th><th>Tutar (TL)</th></tr></thead>
-                        <tbody id="giderDetayTbody"><tr><td colspan="2">Yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <tbody id="giderDetayTbody"><tr><td colspan="2">Yükleniyor...<\/td><\/tr><\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Gelir & Gider Tab -->
     <div id="gelirGiderTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">📊 Gelirler</div>
+            <div class="card-header">📊 Gelirler<\/div>
             <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="gelirTarih" value="2026-06-05" onchange="gelirGiderGuncelle()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"></div>
-                <div class="stats-grid" id="gelirKartlari"></div>
-            </div>
-        </div>
+                <div style="margin-bottom:16px;"><input type="date" id="gelirTarih" value="2026-06-05" onchange="gelirGiderGuncelle()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
+                <div class="stats-grid" id="gelirKartlari"><\/div>
+            <\/div>
+        <\/div>
         <div class="card">
-            <div class="card-header">📝 Giderler (Kalem Kalem)</div>
+            <div class="card-header">📝 Giderler (Kalem Kalem)<\/div>
             <div class="card-body">
                 <div class="table-wrapper">
                     <table id="giderKalemTablo">
-                        <thead><tr><th>Gider Adı</th><th>Tutar (TL)</th><th>Tarih</th></tr></thead>
-                        <tbody id="giderKalemTbody"><tr><td colspan="3">Yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                        <thead><tr><th>Gider Adı<\/th><th>Tutar (TL)<\/th><th>Tarih<\/th><\/tr><\/thead>
+                        <tbody id="giderKalemTbody"><tr><td colspan="3">Yükleniyor...<\/td><\/tr><\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+        <\/div>
         <div class="card">
-            <div class="card-header">➕ Manuel Gider Ekle (SQL'e kaydedilir)</div>
+            <div class="card-header">➕ Manuel Gider Ekle (SQL'e kaydedilir)<\/div>
             <div class="card-body">
                 <div class="form-row">
-                    <div class="form-field"><label>Tarih</label><input type="date" id="manuelTarih" value="2026-06-05"></div>
-                    <div class="form-field"><label>Açıklama</label><input type="text" id="manuelAciklama" placeholder="Örn: Maya, Kaşar"></div>
-                    <div class="form-field"><label>Tutar (TL)</label><input type="number" id="manuelTutar" step="0.01"></div>
-                    <div class="form-field"><label>Tür</label><select id="manuelTur"><option value="Nakit">Nakit</option><option value="Kredi">Kredi Kartı</option></select></div>
-                    <div><button class="btn-success" onclick="manuelGiderEkleSQL()">💾 SQL'e Kaydet</button></div>
-                </div>
-                <div id="manuelSonuc" style="margin-top:8px; font-size:0.65rem;"></div>
-            </div>
-        </div>
-    </div>
+                    <div class="form-field"><label>Tarih<\/label><input type="date" id="manuelTarih" value="2026-06-05"><\/div>
+                    <div class="form-field"><label>Açıklama<\/label><input type="text" id="manuelAciklama" placeholder="Örn: Maya, Kaşar"><\/div>
+                    <div class="form-field"><label>Tutar (TL)<\/label><input type="number" id="manuelTutar" step="0.01"><\/div>
+                    <div class="form-field"><label>Tür<\/label><select id="manuelTur"><option value="Nakit">Nakit<\/option><option value="Kredi">Kredi Kartı<\/option><\/select><\/div>
+                    <div><button class="btn-success" onclick="manuelGiderEkleSQL()">💾 SQL'e Kaydet<\/button><\/div>
+                <\/div>
+                <div id="manuelSonuc" style="margin-top:8px; font-size:0.65rem;"><\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Fiyat Listesi Tab -->
     <div id="fiyatlarTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">💲 Fiyat Listesi (Değiştir → SambaPOS'a yansır)</div>
+            <div class="card-header">💲 Fiyat Listesi (Değiştir → SambaPOS'a yansır)<\/div>
             <div class="card-body">
                 <div class="table-wrapper">
                     <table id="fiyatTablo">
-                        <thead><tr><th>Kategori</th><th>Ürün</th><th>Porsiyon</th><th>Fiyat (TL)</th><th>Barkod</th><th></th></tr></thead>
-                        <tbody id="fiyatTbody"><tr><td colspan="6">Yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <thead><tr><th>Kategori<\/th><th>Ürün<\/th><th>Porsiyon<\/th><th>Fiyat (TL)<\/th><th>Barkod<\/th><th><\/th><\/tr><\/thead>
+                        <tbody id="fiyatTbody"><tr><td colspan="6">Yükleniyor...<\/td><\/tr><\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Adisyonlar Tab -->
     <div id="adisyonlarTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">📋 Adisyonlar</div>
+            <div class="card-header">📋 Adisyonlar<\/div>
             <div class="card-body">
-                <div class="filter-bar" style="margin-bottom:16px; display:flex; gap:10px;">
-                    <input type="date" id="adisyonTarih" value="2026-06-05" onchange="adisyonlariGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;">
-                    <button class="btn-secondary" onclick="adisyonlariGetir()">Açık Adisyonlar</button>
-                    <button class="btn-secondary" onclick="kapaliAdisyonlariGetir()">Kapalı Adisyonlar</button>
-                </div>
+                <div style="margin-bottom:16px;"><input type="date" id="adisyonTarih" value="2026-06-05" onchange="adisyonlariGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
                 <div class="table-wrapper">
                     <table id="adisyonTablo">
-                        <thead><tr><th>Adisyon No</th><th>Saat</th><th>Kullanıcı</th><th>Masa/Müşteri</th><th>Toplam</th><th>Durum</th></tr></thead>
-                        <tbody id="adisyonTbody"><tr><td colspan="6">Yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <thead><tr><th>Adisyon No<\/th><th>Saat<\/th><th>Kullanıcı<\/th><th>Masa/Müşteri<\/th><th>Toplam<\/th><th>Durum<\/th><\/tr><\/thead>
+                        <tbody id="adisyonTbody"><tr><td colspan="6">Yükleniyor...<\/td><\/tr><\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Açık Masalar Tab -->
     <div id="masalarTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">🪑 Açık Masalar</div>
+            <div class="card-header">🪑 Açık Masalar<\/div>
             <div class="card-body">
                 <div class="table-wrapper">
                     <table id="masaTablo">
-                        <thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam Tutar</th></tr></thead>
-                        <tbody id="masaTbody"><tr><td colspan="5">Yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <thead><tr><th>Masa<\/th><th>Adisyon No<\/th><th>Saat<\/th><th>Ürün Adet<\/th><th>Toplam Tutar<\/th><\/tr><\/thead>
+                        <tbody id="masaTbody"><tr><td colspan="5">Yükleniyor...<\/td><\/tr><\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Kasa & Satış Tab -->
     <div id="kasaTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">💰 Kasa Durumu</div>
+            <div class="card-header">💰 Kasa Durumu<\/div>
             <div class="card-body">
-                <div class="stats-grid" id="kasaKartlari"></div>
-            </div>
-        </div>
+                <div class="stats-grid" id="kasaKartlari"><\/div>
+            <\/div>
+        <\/div>
         <div class="card">
-            <div class="card-header">📊 Günlük Satış Raporu</div>
+            <div class="card-header">📊 Günlük Satış Raporu<\/div>
             <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="gunlukSatisTarih" value="2026-06-05" onchange="gunlukSatisGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"></div>
-                <div class="stats-grid" id="gunlukSatisKartlari"></div>
-            </div>
-        </div>
-    </div>
+                <div style="margin-bottom:16px;"><input type="date" id="gunlukSatisTarih" value="2026-06-05" onchange="gunlukSatisGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
+                <div class="stats-grid" id="gunlukSatisKartlari"><\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Ürün Satış Tab -->
     <div id="urunSatisTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">📦 Ürün Bazlı Satış Raporu</div>
+            <div class="card-header">📦 Ürün Bazlı Satış Raporu<\/div>
             <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="urunSatisTarih" value="2026-06-05" onchange="urunSatisGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"></div>
+                <div style="margin-bottom:16px;"><input type="date" id="urunSatisTarih" value="2026-06-05" onchange="urunSatisGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
                 <div class="table-wrapper">
                     <table id="urunSatisTablo">
-                        <thead><tr><th>Ürün Adı</th><th>Satış Adedi</th><th>Toplam Tutar</th></tr></thead>
-                        <tbody id="urunSatisTbody"><td><td colspan="3">Yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <thead><tr><th>Ürün Adı<\/th><th>Satış Adedi<\/th><th>Toplam Tutar<\/th><\/tr><\/thead>
+                        <tbody id="urunSatisTbody"><tr><td colspan="3">Yükleniyor...<\/td><\/tr><\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
 
     <!-- Grafikler Tab -->
     <div id="grafiklerTab" class="tab-content" style="display:none;">
         <div class="graph-container">
-            <div class="graph-card"><h4>📈 Aylık Ciro Grafiği</h4><canvas id="aylikCiroGrafik"></canvas></div>
-            <div class="graph-card"><h4>🥧 Gelir Dağılımı (Nakit/Kredi)</h4><canvas id="gelirDagilimGrafik"></canvas></div>
-        </div>
+            <div class="graph-card"><h4>📈 Aylık Ciro Grafiği<\/h4><canvas id="aylikCiroGrafik"><\/canvas><\/div>
+            <div class="graph-card"><h4>🥧 Gelir Dağılımı (Nakit/Kredi)<\/h4><canvas id="gelirDagilimGrafik"><\/canvas><\/div>
+        <\/div>
         <div class="graph-container">
-            <div class="graph-card"><h4>📊 Günlük Satış Trendi</h4><canvas id="gunlukTrendGrafik"></canvas></div>
-            <div class="graph-card"><h4>📦 En Çok Satan Ürünler</h4><canvas id="enCokSatanGrafik"></canvas></div>
-        </div>
-    </div>
+            <div class="graph-card"><h4>📊 Günlük Satış Trendi<\/h4><canvas id="gunlukTrendGrafik"><\/canvas><\/div>
+            <div class="graph-card"><h4>📦 En Çok Satan Ürünler<\/h4><canvas id="enCokSatanGrafik"><\/canvas><\/div>
+        <\/div>
+    <\/div>
 
-    <!-- Modüller Tab -->
+    <!-- Modüller Tab (Dinamik) -->
     <div id="modullerTab" class="tab-content" style="display:none;">
         <div class="card">
-            <div class="card-header">🧩 Modül Yönetimi</div>
+            <div class="card-header">🧩 Modül Yönetimi<\/div>
             <div class="card-body">
-                <p>Yeni özellikler eklemek için <code>C:\samba-api\endpoints\</code> klasörüne yeni bir .js dosyası ekleyin. Örnek modül şablonu:</p>
-                <pre style="background:#1e293b; padding:12px; border-radius:16px; margin-top:12px; overflow-x:auto;">
-module.exports = {
-    path: '/api/yeniModul',
-    handler: async (req, res) => {
-        res.json({ success: true, message: 'Yeni modül çalışıyor!' });
-    }
-};</pre>
+                <p>Yeni özellikler eklemek için <code>C:\\samba-api\\endpoints\\<\/code> klasörüne yeni bir .js dosyası ekleyin. Modüller otomatik olarak burada görünecektir.<\/p>
                 <div style="margin-top:16px;">
-                    <button class="btn-outline" onclick="modulListesiniGetir()">🔄 Modülleri Listele</button>
-                </div>
-                <div id="modulListesi" style="margin-top:16px;"></div>
-            </div>
-        </div>
-    </div>
+                    <button class="btn-primary" onclick="modulListesiniGetir()">🔄 Modülleri Listele<\/button>
+                <\/div>
+                <div id="modulListesi" style="margin-top:16px;"><\/div>
+            <\/div>
+        <\/div>
+        <div id="dinamikModuller" style="margin-top:16px;"><\/div>
+    <\/div>
 
     <div class="footer">
-        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Tüm hakları saklıdır.
-    </div>
-</div>
+        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Modüler Sistem
+    <\/div>
+<\/div>
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
     let aktifTab = 'ana';
-    let aylikCiroChart, gelirDagilimChart, gunlukTrendChart, enCokSatanChart;
+    let aylikCiroChart, gelirDagilimChart;
     
     document.getElementById('apiUrl').value = API_BASE;
     
@@ -370,22 +358,104 @@ module.exports = {
         tumVerileriGuncelle();
     }
 
+    // Dinamik tab oluşturma ve modül butonları ekleme
+    async function modulListesiniGetir() {
+        let modulDiv = document.getElementById('modulListesi');
+        modulDiv.innerHTML = '<div style="color:#f97316;">Modüller yükleniyor...<\/div>';
+        try {
+            let res = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await res.json();
+            
+            if (!data.moduller || data.moduller.length === 0) {
+                modulDiv.innerHTML = '<div>Henüz ek modül bulunamadı. endpoints klasörüne .js dosyası ekleyin.<\/div>';
+                return;
+            }
+            
+            // Modülleri listele
+            let modulHtml = '<div class="table-wrapper"><table><thead><tr><th>Modül Adı<\/th><th>Endpoint<\/th><th>Durum<\/th><th>İşlem<\/th><\/tr><\/thead><tbody>';
+            data.moduller.forEach(m => {
+                modulHtml += `
+                    <tr>
+                        <td>🧩 ${m.adi}<\/td>
+                        <td><code>${m.path}<\/code><\/td>
+                        <td><span class="badge-modul">${m.durum}<\/span><\/td>
+                        <td><button class="btn-outline" onclick="moduluAc('${m.path}')">🔍 Test Et<\/button><\/td>
+                    <\/tr>
+                `;
+            });
+            modulHtml += '<\/tbody><\/table><\/div>';
+            modulDiv.innerHTML = modulHtml;
+            
+            // Dinamik olarak tab-bar'a modül butonları ekle
+            const tabBar = document.getElementById('tabBar');
+            data.moduller.forEach(m => {
+                const btnId = `tab_${m.adi}`;
+                if (!document.getElementById(btnId)) {
+                    const newBtn = document.createElement('button');
+                    newBtn.id = btnId;
+                    newBtn.className = 'tab-btn';
+                    newBtn.setAttribute('data-tab', `modul_${m.adi}`);
+                    newBtn.innerHTML = `🧩 ${m.adi}`;
+                    newBtn.onclick = () => {
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        newBtn.classList.add('active');
+                        aktifTab = `modul_${m.adi}`;
+                        document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+                        const modulContent = document.getElementById(`modul_${m.adi}_content`);
+                        if (!modulContent) {
+                            const newDiv = document.createElement('div');
+                            newDiv.id = `modul_${m.adi}_content`;
+                            newDiv.className = 'tab-content';
+                            newDiv.style.display = 'block';
+                            newDiv.innerHTML = `<div class="card"><div class="card-header">🧩 ${m.adi} Modülü</div><div class="card-body" id="${m.adi}_icerik">Yükleniyor...</div></div>`;
+                            document.querySelector('.container').appendChild(newDiv);
+                            modulIcerikGetir(m.path, m.adi);
+                        } else {
+                            modulContent.style.display = 'block';
+                            modulIcerikGetir(m.path, m.adi);
+                        }
+                    };
+                    tabBar.appendChild(newBtn);
+                }
+            });
+        } catch(err) {
+            modulDiv.innerHTML = '<div>Modül listesi alınamadı. API çalışıyor mu?</div>';
+        }
+    }
+    
+    async function modulIcerikGetir(path, modulAdi) {
+        const icerikDiv = document.getElementById(`${modulAdi}_icerik`);
+        if (!icerikDiv) return;
+        icerikDiv.innerHTML = '<div style="color:#f97316;">Veri yükleniyor...</div>';
+        try {
+            let res = await fetch(`${API_BASE}${path}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await res.json();
+            icerikDiv.innerHTML = `<pre style="background:#1e293b; padding:12px; border-radius:16px; overflow-x:auto;">${JSON.stringify(data, null, 2)}</pre>`;
+        } catch(err) {
+            icerikDiv.innerHTML = '<div style="color:#ef4444;">Modül çalıştırılamadı.</div>';
+        }
+    }
+    
+    function moduluAc(path) {
+        window.open(`${API_BASE}${path}`, '_blank');
+    }
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            aktifTab = btn.getAttribute('data-tab');
-            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            document.getElementById(aktifTab + 'Tab').style.display = 'block';
-            if (aktifTab === 'ana') anaPaneliGuncelle();
-            else if (aktifTab === 'gelirGider') gelirGiderGuncelle();
-            else if (aktifTab === 'fiyatlar') fiyatListesiniGetir();
-            else if (aktifTab === 'adisyonlar') adisyonlariGetir();
-            else if (aktifTab === 'masalar') acikMasalariGetir();
-            else if (aktifTab === 'kasa') { kasaDurumuGetir(); gunlukSatisGetir(); }
-            else if (aktifTab === 'urunSatis') urunSatisGetir();
-            else if (aktifTab === 'grafikler') grafikleriYukle();
-            else if (aktifTab === 'moduller') modulListesiniGetir();
+            const tab = btn.getAttribute('data-tab');
+            if (tab.startsWith('modul_')) {
+                const modulAdi = tab.replace('modul_', '');
+                const modulContent = document.getElementById(`modul_${modulAdi}_content`);
+                if (modulContent) {
+                    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                    modulContent.style.display = 'block';
+                }
+            } else {
+                document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                document.getElementById(tab + 'Tab').style.display = 'block';
+            }
         });
     });
 
@@ -414,14 +484,9 @@ module.exports = {
         let karMarji = ana.ToplamCiro > 0 ? ((ana.NetKar / ana.ToplamCiro) * 100).toFixed(1) : 0;
         document.getElementById('karMarji').innerHTML = karMarji + '%';
         
-        // Gider Detayları
         let giderRes = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let gider = await giderRes.json();
-        let giderHtml = '';
-        if (gider.Muhtelif > 0) giderHtml += `<tr><td>📦 Muhtelif Gider</td><td class="amount-right">${gider.Muhtelif.toLocaleString('tr-TR')} ₺</td></tr>`;
-        if (gider.Personel > 0) giderHtml += `<tr><td>👥 Personel Gider</td><td class="amount-right">${gider.Personel.toLocaleString('tr-TR')} ₺</td></tr>`;
-        if (!giderHtml) giderHtml = '<tr><td colspan="2">Bugün için gider bulunamadı</td></tr>';
-        document.getElementById('giderDetayTbody').innerHTML = giderHtml;
+        document.getElementById('giderDetayTbody').innerHTML = `<tr><td>📦 Muhtelif Gider</td><td class="amount-right">${(gider.Muhtelif || 0).toLocaleString('tr-TR')} ₺</td></tr>`;
     }
 
     // ========== GELİR & GİDER ==========
@@ -437,11 +502,7 @@ module.exports = {
             <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(gelir.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
             <div class="stat-card"><h4>📊 Toplam Gelir</h4><div class="stat-number ciro">${(gelir.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
         `;
-        
-        document.getElementById('giderKalemTbody').innerHTML = `
-            <tr><td>📦 Muhtelif Gider</td><td class="amount-right">${(gider.Muhtelif || 0).toLocaleString('tr-TR')} ₺</td><td>${tarih}</td></tr>
-            <tr><td>👥 Personel Gider</td><td class="amount-right">${(gider.Personel || 0).toLocaleString('tr-TR')} ₺</td><td>${tarih}</td></tr>
-        `;
+        document.getElementById('giderKalemTbody').innerHTML = `<tr><td>📦 Muhtelif Gider</td><td class="amount-right">${(gider.Muhtelif || 0).toLocaleString('tr-TR')} ₺</td><td>${tarih}</td></tr>`;
     }
 
     // ========== MANUEL GİDER ==========
@@ -485,7 +546,7 @@ module.exports = {
                     <td><input type="number" id="fiyat_${u.PorsiyonId}" value="${u.Fiyat}" step="0.01" style="width:80px; padding:4px; border-radius:8px; background:#1e293b; color:white; border:1px solid #334155; text-align:right;"> ₺</td>
                     <td>${u.Barkod || '-'}</td>
                     <td><button class="btn-success" onclick="fiyatGuncelle(${u.PorsiyonId})">💾 Kaydet</button></td>
-                </tr>
+                </table>
             `).join('');
         }
     }
@@ -514,7 +575,7 @@ module.exports = {
         let data = await res.json();
         let tbody = document.getElementById('adisyonTbody');
         let acikAdisyonlar = data.filter(a => a.Durum === 'Açık');
-        if (!acikAdisyonlar.length) tbody.innerHTML = '</table><td colspan="6">Açık adisyon bulunamadı</tbody>';
+        if (!acikAdisyonlar.length) tbody.innerHTML = '<tr><td colspan="6">Açık adisyon bulunamadı</td></tr>';
         else {
             tbody.innerHTML = acikAdisyonlar.map(a => `
                 <tr>
@@ -529,35 +590,13 @@ module.exports = {
         }
     }
 
-    async function kapaliAdisyonlariGetir() {
-        let tarih = document.getElementById('adisyonTarih').value;
-        let url = `${API_BASE}/api/adisyonlar?tarih=${tarih}`;
-        let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-        let data = await res.json();
-        let tbody = document.getElementById('adisyonTbody');
-        let kapaliAdisyonlar = data.filter(a => a.Durum === 'Kapalı');
-        if (!kapaliAdisyonlar.length) tbody.innerHTML = '<tr><td colspan="6">Kapalı adisyon bulunamadı</tbody>';
-        else {
-            tbody.innerHTML = kapaliAdisyonlar.map(a => `
-                <tr>
-                    <td>${a.AdisyonNo || '-'}</td>
-                    <td>${a.Saat || '-'}</td>
-                    <td>${a.Kullanici || '-'}</td>
-                    <td>${a.Masa || '-'}</td>
-                    <td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺</td>
-                    <td><span class="badge-kapali">Kapalı</span></td>
-                </tr>
-            `).join('');
-        }
-    }
-
     // ========== AÇIK MASALAR ==========
     async function acikMasalariGetir() {
         let url = `${API_BASE}/api/acikMasalar`;
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('masaTbody');
-        if (!data.length) tbody.innerHTML = '<tr><td colspan="5">Açık masa bulunamadı</tbody>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="5">Açık masa bulunamadı</td></tr>';
         else {
             tbody.innerHTML = data.map(m => `
                 <tr>
@@ -604,7 +643,7 @@ module.exports = {
         let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let data = await res.json();
         let tbody = document.getElementById('urunSatisTbody');
-        if (!data.length) tbody.innerHTML = '<tr><td colspan="3">Veri bulunamadı</tbody>';
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="3">Veri bulunamadı</td></tr>';
         else {
             tbody.innerHTML = data.map(u => `
                 <tr>
@@ -618,7 +657,6 @@ module.exports = {
 
     // ========== GRAFİKLER ==========
     async function grafikleriYukle() {
-        // Aylık Ciro Grafiği
         let yillikRes = await fetch(`${API_BASE}/api/yillik?yil=2026`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let aylar = await yillikRes.json();
         let aylarIsimleri = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
@@ -633,7 +671,6 @@ module.exports = {
             options: { responsive: true, maintainAspectRatio: true }
         });
         
-        // Gelir Dağılımı (bugün için)
         let tarih = new Date().toISOString().slice(0,10);
         let gelirRes = await fetch(`${API_BASE}/api/gelirler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         let gelir = await gelirRes.json();
@@ -644,26 +681,10 @@ module.exports = {
         });
     }
 
-    // ========== MODÜL LİSTESİ ==========
-    async function modulListesiniGetir() {
-        document.getElementById('modulListesi').innerHTML = '<div style="color:#f97316;">Modüller yükleniyor...</div>';
-        try {
-            let res = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let moduller = await res.json();
-            if (!moduller.length) document.getElementById('modulListesi').innerHTML = '<div>Henüz ek modül bulunamadı. endpoints klasörüne .js dosyası ekleyin.</div>';
-            else {
-                document.getElementById('modulListesi').innerHTML = `
-                    <table class="table-wrapper"><thead><tr><th>Modül Adı</th><th>Endpoint</th><th>Durum</th></tr></thead><tbody>
-                    ${moduller.map(m => `<tr><td>${m.baslik}</td><td>${m.path}</td><td><span class="badge-acik">Aktif</span></td></tr>`).join('')}
-                    </tbody></table>
-                `;
-            }
-        } catch(err) { document.getElementById('modulListesi').innerHTML = '<div>Modül listesi alınamadı. API çalışıyor mu?</div>'; }
-    }
-
     function pdfIndir() { window.print(); }
-    function excelIndir() { alert('Excel export yakında eklenecek'); }
 
+    // Sayfa yüklendiğinde modülleri getir
+    modulListesiniGetir();
     anaPaneliGuncelle();
 </script>
 </body>
