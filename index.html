@@ -2,351 +2,91 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Öz Urfa Kebap | Executive Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öz Urfa Kebap | Yönetim Paneli</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f172a;
             padding: 20px;
-            min-height: 100vh;
             color: #f1f5f9;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        
-        .header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 28px;
-            padding: 20px 28px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .header h1 { font-size: 1.6rem; color: #f97316; }
-        .header p { color: #94a3b8; margin-top: 8px; font-size: 0.8rem; }
-        .date-time { font-size: 0.75rem; color: #f97316; margin-top: 8px; }
-        
-        .btn { padding: 8px 18px; border-radius: 40px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; font-size: 0.75rem; }
-        .btn-primary { background: #f97316; color: white; }
-        .btn-primary:hover { transform: translateY(-2px); }
-        .btn-secondary { background: #334155; color: white; }
-        .btn-outline { background: transparent; border: 1px solid #475569; color: #cbd5e1; }
-        .btn-success { background: #10b981; color: white; }
-        
-        .api-bar {
-            background: rgba(255,255,255,0.03);
-            border-radius: 20px;
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .api-input input { padding: 8px 15px; border-radius: 30px; border: 1px solid #334155; background: #1e293b; color: white; width: 380px; }
-        
-        .tab-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 20px;
-        }
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            cursor: pointer;
-            color: #94a3b8;
-            transition: all 0.2s;
-        }
-        .tab-btn.active { background: #f97316; color: white; }
-        
-        .stats-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
-        .stat-card {
-            flex: 1; min-width: 150px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 24px;
-            padding: 20px;
-            text-align: center;
-        }
-        .stat-card h4 { font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; }
-        .stat-number { font-size: 1.6rem; font-weight: 800; }
-        .stat-number.nakit { color: #10b981; }
-        .stat-number.kredi { color: #3b82f6; }
-        .stat-number.ciro { color: #fbbf24; }
-        .stat-number.odenmeyen { color: #ef4444; }
-        .stat-number.gider { color: #f97316; }
-        .stat-number.kar { color: #10b981; }
-        
-        .card {
-            background: rgba(255,255,255,0.03);
-            border-radius: 24px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .card-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            font-weight: 700;
-            color: #f97316;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        .card-body { padding: 16px 20px; }
-        
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th { background: rgba(255,255,255,0.05); padding: 10px; text-align: left; color: #94a3b8; }
-        td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: #1e293b; border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        .header h1 { color: #f97316; font-size: 24px; }
+        .api-bar { background: #1e293b; border-radius: 20px; padding: 15px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .api-bar input { padding: 8px 15px; border-radius: 30px; border: 1px solid #334155; background: #0f172a; color: white; width: 300px; }
+        .btn { background: #f97316; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; }
+        .btn-outline { background: transparent; border: 1px solid #f97316; color: #f97316; }
+        .stats-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #1e293b; border-radius: 20px; padding: 20px; flex: 1; min-width: 150px; text-align: center; }
+        .stat-card h4 { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+        .stat-number { font-size: 24px; font-weight: bold; }
+        .nakit { color: #10b981; }
+        .kredi { color: #3b82f6; }
+        .ciro { color: #fbbf24; }
+        .gider { color: #f97316; }
+        .kar { color: #10b981; }
+        .loss { color: #ef4444; }
+        .card { background: #1e293b; border-radius: 20px; margin-bottom: 20px; }
+        .card-header { padding: 15px 20px; border-bottom: 1px solid #334155; font-weight: bold; color: #f97316; }
+        .card-body { padding: 15px 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; }
         .amount-right { text-align: right; }
-        
-        .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
-        .form-field { flex: 1; min-width: 100px; }
-        .form-field label { display: block; font-size: 0.65rem; color: #94a3b8; margin-bottom: 4px; }
-        .form-field input, .form-field select { width: 100%; padding: 8px; border-radius: 16px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 0.75rem; }
-        
-        .badge-acik { background: rgba(239,68,68,0.2); color: #f87171; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
-        .badge-kapali { background: rgba(34,197,94,0.2); color: #4ade80; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
-        .badge-modul { background: rgba(139,92,246,0.2); color: #a78bfa; padding: 3px 10px; border-radius: 30px; display: inline-block; font-size: 0.65rem; }
-        
-        .modul-json {
-            background: #1e293b;
-            padding: 12px;
-            border-radius: 16px;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 0.7rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .footer { text-align: center; font-size: 0.65rem; color: #475569; margin-top: 20px; }
-        
-        @media (max-width: 700px) { .stat-number { font-size: 1.2rem; } .api-input input { width: 200px; } }
+        .badge { background: #f97316; color: white; padding: 4px 12px; border-radius: 30px; font-size: 11px; }
+        .footer { text-align: center; font-size: 11px; color: #64748b; margin-top: 20px; }
+        @media (max-width: 700px) { .stat-number { font-size: 18px; } }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>🧾 ÖZ URFA KEBAP - Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Gelir/Gider | Fiyat Yönetimi | Modüler Sistem</p>
-        <div class="date-time" id="dateTime"></div>
+        <h1>🧾 ÖZ URFA KEBAP - Yönetim Paneli</h1>
+        <p>SambaPOS SQL Bağlantılı | Gerçek Zamanlı</p>
+        <div id="dateTime" style="font-size: 11px; color: #f97316; margin-top: 8px;"></div>
     </div>
 
     <div class="api-bar">
-        <div class="api-input">
-            <span>🌐 API Adresi:</span>
-            <input type="text" id="apiUrl" value="http://100.97.45.8:3001">
-            <button class="btn-primary" onclick="apiUrlKaydet()">Kaydet</button>
-        </div>
-        <div>
-            <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
-            <button class="btn-outline" onclick="pdfIndir()">📄 PDF Rapor</button>
+        <span>🌐 API Adresi:</span>
+        <input type="text" id="apiUrl" value="http://100.97.45.8:3001">
+        <button class="btn" onclick="apiUrlKaydet()">Kaydet</button>
+        <button class="btn" onclick="tumVerileriGuncelle()">Güncelle</button>
+    </div>
+
+    <!-- Ana Kartlar -->
+    <div class="stats-grid">
+        <div class="stat-card"><h4>💰 Nakit Gelir</h4><div class="stat-number nakit" id="nakitGelir">0 ₺</div></div>
+        <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi" id="krediGelir">0 ₺</div></div>
+        <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro" id="toplamCiro">0 ₺</div></div>
+        <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider" id="toplamGider">0 ₺</div></div>
+        <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number" id="netKar">0 ₺</div></div>
+    </div>
+
+    <!-- Gider Detayları -->
+    <div class="card">
+        <div class="card-header">📝 Giderler Detayı</div>
+        <div class="card-body">
+            <div id="giderDetay">Yükleniyor...</div>
         </div>
     </div>
 
-    <div class="tab-bar" id="tabBar">
-        <button class="tab-btn active" data-tab="ana">🏠 Ana Panel</button>
-        <button class="tab-btn" data-tab="gelirGider">💰 Gelir & Gider</button>
-        <button class="tab-btn" data-tab="fiyatlar">💲 Fiyat Listesi</button>
-        <button class="tab-btn" data-tab="adisyonlar">📋 Adisyonlar</button>
-        <button class="tab-btn" data-tab="masalar">🪑 Açık Masalar</button>
-        <button class="tab-btn" data-tab="kasa">💰 Kasa & Satış</button>
-        <button class="tab-btn" data-tab="urunSatis">📦 Ürün Satış</button>
-        <button class="tab-btn" data-tab="grafikler">📈 Grafikler</button>
-        <button class="tab-btn" data-tab="moduller">🧩 Modüller</button>
+    <!-- Modüller -->
+    <div class="card">
+        <div class="card-header">🧩 Modüller</div>
+        <div class="card-body">
+            <div id="moduller">Yükleniyor...</div>
+        </div>
     </div>
-
-    <!-- Ana Panel Tab -->
-    <div id="anaTab" class="tab-content">
-        <div class="stats-grid">
-            <div class="stat-card"><h4>💰 Nakit Gelir</h4><div class="stat-number nakit" id="nakitGelir">0 ₺</div></div>
-            <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi" id="krediGelir">0 ₺</div></div>
-            <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro" id="toplamCiro">0 ₺</div></div>
-            <div class="stat-card"><h4>📝 Ödenmeyenler</h4><div class="stat-number odenmeyen" id="odenmeyenler">0 ₺</div></div>
-            <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider" id="toplamGider">0 ₺</div></div>
-            <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number kar" id="netKar">0 ₺</div></div>
-            <div class="stat-card"><h4>📊 Kâr Marjı</h4><div class="stat-number" id="karMarji">0%</div></div>
-        </div>
-        <div class="card">
-            <div class="card-header">📅 Tarih Seçimi</div>
-            <div class="card-body">
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <input type="date" id="anaTarih" value="2026-06-05" style="padding: 8px; border-radius: 30px; background: #1e293b; color: white; border: 1px solid #334155;">
-                    <button class="btn-primary" onclick="anaPaneliGuncelle()">Göster</button>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">📝 Giderler Detayı</div>
-            <div class="card-body">
-                <div class="table-wrapper">
-                    <table id="giderDetayTablo">
-                        <thead><tr><th>Gider Kalemi</th><th>Tutar (TL)</th><tr></thead>
-                        <tbody id="giderDetayTbody"><tr><td colspan="2">Yükleniyor...<\/td><\/tr><\/tbody>
-                    <\/table>
-                <\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Gelir & Gider Tab -->
-    <div id="gelirGiderTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">📊 Gelirler<\/div>
-            <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="gelirTarih" value="2026-06-05" onchange="gelirGiderGuncelle()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
-                <div class="stats-grid" id="gelirKartlari"><\/div>
-            <\/div>
-        <\/div>
-        <div class="card">
-            <div class="card-header">📝 Giderler (Kalem Kalem)<\/div>
-            <div class="card-body">
-                <div class="table-wrapper">
-                    <table id="giderKalemTablo">
-                        <thead><tr><th>Gider Adı<\/th><th>Tutar (TL)<\/th><th>Tarih<\/th><\/tr><\/thead>
-                        <tbody id="giderKalemTbody"><tr><td colspan="3">Yükleniyor...<\/td><\/tr><\/tbody>
-                    <\/table>
-                <\/div>
-            <\/div>
-        <\/div>
-        <div class="card">
-            <div class="card-header">➕ Manuel Gider Ekle (SQL'e kaydedilir)<\/div>
-            <div class="card-body">
-                <div class="form-row">
-                    <div class="form-field"><label>Tarih<\/label><input type="date" id="manuelTarih" value="2026-06-05"><\/div>
-                    <div class="form-field"><label>Açıklama<\/label><input type="text" id="manuelAciklama" placeholder="Örn: Maya, Kaşar"><\/div>
-                    <div class="form-field"><label>Tutar (TL)<\/label><input type="number" id="manuelTutar" step="0.01"><\/div>
-                    <div class="form-field"><label>Tür<\/label><select id="manuelTur"><option value="Nakit">Nakit<\/option><option value="Kredi">Kredi Kartı<\/option><\/select><\/div>
-                    <div><button class="btn-success" onclick="manuelGiderEkleSQL()">💾 SQL'e Kaydet<\/button><\/div>
-                <\/div>
-                <div id="manuelSonuc" style="margin-top:8px; font-size:0.65rem;"><\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Fiyat Listesi Tab -->
-    <div id="fiyatlarTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">💲 Fiyat Listesi (Değiştir → SambaPOS'a yansır)<\/div>
-            <div class="card-body">
-                <div class="table-wrapper">
-                    <table id="fiyatTablo">
-                        <thead><tr><th>Kategori<\/th><th>Ürün<\/th><th>Porsiyon<\/th><th>Fiyat (TL)<\/th><th>Barkod<\/th><th><\/th><\/tr><\/thead>
-                        <tbody id="fiyatTbody"><tr><td colspan="6">Yükleniyor...<\/td><\/tr><\/tbody>
-                    <\/table>
-                <\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Adisyonlar Tab -->
-    <div id="adisyonlarTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">📋 Adisyonlar<\/div>
-            <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="adisyonTarih" value="2026-06-05" onchange="adisyonlariGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
-                <div class="table-wrapper">
-                    <table id="adisyonTablo">
-                        <thead><tr><th>Adisyon No<\/th><th>Saat<\/th><th>Kullanıcı<\/th><th>Masa\/Müşteri<\/th><th>Toplam<\/th><th>Durum<\/th><\/tr><\/thead>
-                        <tbody id="adisyonTbody"><tr><td colspan="6">Yükleniyor...<\/td><\/tr><\/tbody>
-                    <\/table>
-                <\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Açık Masalar Tab -->
-    <div id="masalarTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">🪑 Açık Masalar<\/div>
-            <div class="card-body">
-                <div class="table-wrapper">
-                    <table id="masaTablo">
-                        <thead><tr><th>Masa<\/th><th>Adisyon No<\/th><th>Saat<\/th><th>Ürün Adet<\/th><th>Toplam Tutar<\/th><\/tr><\/thead>
-                        <tbody id="masaTbody"><tr><td colspan="5">Yükleniyor...<\/td><\/tr><\/tbody>
-                    <\/table>
-                <\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Kasa & Satış Tab -->
-    <div id="kasaTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">💰 Kasa Durumu<\/div>
-            <div class="card-body">
-                <div class="stats-grid" id="kasaKartlari"><\/div>
-            <\/div>
-        <\/div>
-        <div class="card">
-            <div class="card-header">📊 Günlük Satış Raporu<\/div>
-            <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="gunlukSatisTarih" value="2026-06-05" onchange="gunlukSatisGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
-                <div class="stats-grid" id="gunlukSatisKartlari"><\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Ürün Satış Tab -->
-    <div id="urunSatisTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">📦 Ürün Bazlı Satış Raporu<\/div>
-            <div class="card-body">
-                <div style="margin-bottom:16px;"><input type="date" id="urunSatisTarih" value="2026-06-05" onchange="urunSatisGetir()" style="padding:6px; border-radius:30px; background:#1e293b; color:white; border:1px solid #334155;"><\/div>
-                <div class="table-wrapper">
-                    <table id="urunSatisTablo">
-                        <thead><tr><th>Ürün Adı<\/th><th>Satış Adedi<\/th><th>Toplam Tutar<\/th><\/tr><\/thead>
-                        <tbody id="urunSatisTbody"><tr><td colspan="3">Yükleniyor...<\/td><\/tr><\/tbody>
-                    <\/table>
-                <\/div>
-            <\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Grafikler Tab -->
-    <div id="grafiklerTab" class="tab-content" style="display:none;">
-        <div class="graph-container">
-            <div class="graph-card"><h4>📈 Aylık Ciro Grafiği<\/h4><canvas id="aylikCiroGrafik"><\/canvas><\/div>
-            <div class="graph-card"><h4>🥧 Gelir Dağılımı (Nakit\/Kredi)<\/h4><canvas id="gelirDagilimGrafik"><\/canvas><\/div>
-        <\/div>
-    <\/div>
-
-    <!-- Modüller Tab (Dinamik) -->
-    <div id="modullerTab" class="tab-content" style="display:none;">
-        <div class="card">
-            <div class="card-header">🧩 Modül Yönetimi<\/div>
-            <div class="card-body">
-                <p>Yeni modüller <code>C:\\samba-api\\endpoints\\<\/code> klasörüne eklenir. API yeniden başlatıldığında otomatik yüklenir.<\/p>
-                <div style="margin-top:16px;">
-                    <button class="btn-primary" onclick="modulListesiniGetir()">🔄 Modülleri Listele<\/button>
-                <\/div>
-                <div id="modulListesi" style="margin-top:16px;"><\/div>
-                <div id="dinamikModuller" style="margin-top:16px;"><\/div>
-            <\/div>
-        <\/div>
-    <\/div>
 
     <div class="footer">
-        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Gerçek Zamanlı | Modüler Sistem
-    <\/div>
-<\/div>
+        ⚡ Öz Urfa Kebap | SambaPOS SQL Bağlantılı
+    </div>
+</div>
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
-    let aktifTab = 'ana';
-    let aylikCiroChart, gelirDagilimChart;
-    
     document.getElementById('apiUrl').value = API_BASE;
     
     setInterval(() => {
@@ -358,299 +98,62 @@
         localStorage.setItem('apiBase', API_BASE);
         alert('API adresi kaydedildi');
         tumVerileriGuncelle();
-        if (aktifTab === 'moduller') modulListesiniGetir();
     }
-
-    // Tab değişimi
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            aktifTab = btn.getAttribute('data-tab');
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.getElementById(aktifTab + 'Tab').style.display = 'block';
-            if (aktifTab === 'ana') anaPaneliGuncelle();
-            else if (aktifTab === 'gelirGider') gelirGiderGuncelle();
-            else if (aktifTab === 'fiyatlar') fiyatListesiniGetir();
-            else if (aktifTab === 'adisyonlar') adisyonlariGetir();
-            else if (aktifTab === 'masalar') acikMasalariGetir();
-            else if (aktifTab === 'kasa') { kasaDurumuGetir(); gunlukSatisGetir(); }
-            else if (aktifTab === 'urunSatis') urunSatisGetir();
-            else if (aktifTab === 'grafikler') grafikleriYukle();
-            else if (aktifTab === 'moduller') modulListesiniGetir();
-        });
-    });
 
     async function tumVerileriGuncelle() {
-        if (aktifTab === 'ana') anaPaneliGuncelle();
-        else if (aktifTab === 'gelirGider') gelirGiderGuncelle();
-        else if (aktifTab === 'fiyatlar') fiyatListesiniGetir();
-        else if (aktifTab === 'adisyonlar') adisyonlariGetir();
-        else if (aktifTab === 'masalar') acikMasalariGetir();
-        else if (aktifTab === 'kasa') { kasaDurumuGetir(); gunlukSatisGetir(); }
-        else if (aktifTab === 'urunSatis') urunSatisGetir();
-        else if (aktifTab === 'grafikler') grafikleriYukle();
-    }
-
-    // ========== ANA PANEL ==========
-    async function anaPaneliGuncelle() {
-        let tarih = document.getElementById('anaTarih').value;
+        let tarih = new Date().toISOString().slice(0,10);
+        
+        // Ana Panel
         try {
             let anaRes = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             let ana = await anaRes.json();
             document.getElementById('nakitGelir').innerHTML = (ana.NakitGelir || 0).toLocaleString('tr-TR') + ' ₺';
             document.getElementById('krediGelir').innerHTML = (ana.KrediGelir || 0).toLocaleString('tr-TR') + ' ₺';
             document.getElementById('toplamCiro').innerHTML = (ana.ToplamCiro || 0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('odenmeyenler').innerHTML = (ana.Odenmeyenler || 0).toLocaleString('tr-TR') + ' ₺';
             document.getElementById('toplamGider').innerHTML = (ana.ToplamGider || 0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('netKar').innerHTML = (ana.NetKar || 0).toLocaleString('tr-TR') + ' ₺';
-            let karMarji = ana.ToplamCiro > 0 ? ((ana.NetKar / ana.ToplamCiro) * 100).toFixed(1) : 0;
-            document.getElementById('karMarji').innerHTML = karMarji + '%';
-            
+            let netKar = (ana.ToplamCiro || 0) - (ana.ToplamGider || 0);
+            document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR') + ' ₺';
+            if (netKar >= 0) document.getElementById('netKar').className = 'stat-number nakit';
+            else document.getElementById('netKar').className = 'stat-number loss';
+        } catch(err) { console.error(err); }
+        
+        // Gider Detayları
+        try {
             let giderRes = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let gider = await giderRes.json();
-            document.getElementById('giderDetayTbody').innerHTML = `<tr><td>📦 Muhtelif Gider<\/td><td class="amount-right">${(gider.Muhtelif || 0).toLocaleString('tr-TR')} ₺<\/td><\/tr>`;
+            let data = await giderRes.json();
+            
+            if (data.giderler && data.giderler.length > 0) {
+                let html = '<table><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
+                data.giderler.forEach(g => {
+                    html += `<tr><td>${g.GiderAdi || '-'}</td><td class="amount-right">${(g.Tutar || 0).toLocaleString('tr-TR')} ₺</td><td>${g.Tarih || '-'}</td></tr>`;
+                });
+                html += `<tr style="background:#334155;"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${(data.toplam || 0).toLocaleString('tr-TR')} ₺</strong></td><td></td></tr>`;
+                html += '</tbody></table>';
+                document.getElementById('giderDetay').innerHTML = html;
+            } else {
+                document.getElementById('giderDetay').innerHTML = '<div>Bugün için gider bulunamadı</div>';
+            }
         } catch(err) {
-            console.error('Ana panel hatası:', err);
+            document.getElementById('giderDetay').innerHTML = '<div>Giderler alınamadı</div>';
         }
-    }
-
-    // ========== GELİR & GİDER ==========
-    async function gelirGiderGuncelle() {
-        let tarih = document.getElementById('gelirTarih').value;
+        
+        // Modüller
         try {
-            let gelirRes = await fetch(`${API_BASE}/api/gelirler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let gelir = await gelirRes.json();
-            let giderRes = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let gider = await giderRes.json();
+            let modulRes = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            let data = await modulRes.json();
             
-            document.getElementById('gelirKartlari').innerHTML = `
-                <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number nakit">${(gelir.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(gelir.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📊 Toplam Gelir</h4><div class="stat-number ciro">${(gelir.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
-            `;
-            document.getElementById('giderKalemTbody').innerHTML = `<tr><td>📦 Muhtelif Gider<\/td><td class="amount-right">${(gider.Muhtelif || 0).toLocaleString('tr-TR')} ₺<\/td><td>${tarih}<\/td><\/tr>`;
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== MANUEL GİDER ==========
-    async function manuelGiderEkleSQL() {
-        let tarih = document.getElementById('manuelTarih').value;
-        let aciklama = document.getElementById('manuelAciklama').value;
-        let tutar = parseFloat(document.getElementById('manuelTutar').value);
-        let tur = document.getElementById('manuelTur').value;
-        if (!aciklama || isNaN(tutar) || tutar <= 0) { alert('Eksik bilgi'); return; }
-        let sonucDiv = document.getElementById('manuelSonuc');
-        sonucDiv.innerHTML = '<span style="color:#f97316;">Kaydediliyor...</span>';
-        try {
-            let response = await fetch(`${API_BASE}/api/manuelGider`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-                body: JSON.stringify({ tarih, aciklama, tutar, tur })
-            });
-            let data = await response.json();
-            if (data.success) {
-                sonucDiv.innerHTML = '<span style="color:#10b981;">✅ Gider SQL\'e kaydedildi!</span>';
-                document.getElementById('manuelAciklama').value = '';
-                document.getElementById('manuelTutar').value = '';
-                gelirGiderGuncelle();
-                anaPaneliGuncelle();
-            } else { sonucDiv.innerHTML = `<span style="color:#ef4444;">❌ Hata: ${data.error}</span>`; }
-        } catch(err) { sonucDiv.innerHTML = `<span style="color:#ef4444;">❌ Bağlantı hatası</span>`; }
-    }
-
-    // ========== FİYAT LİSTESİ ==========
-    async function fiyatListesiniGetir() {
-        let url = `${API_BASE}/api/fiyatListesi`;
-        try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            let tbody = document.getElementById('fiyatTbody');
-            if (!data.length) tbody.innerHTML = '<tr><td colspan="6">Veri bulunamadı<\/td><\/tr>';
-            else {
-                tbody.innerHTML = data.map(u => `
-                    <tr>
-                        <td>${u.Kategori || '-'}<\/td>
-                        <td>${u.Urun || '-'}<\/td>
-                        <td>${u.Porsiyon || '-'}<\/td>
-                        <td><input type="number" id="fiyat_${u.PorsiyonId}" value="${u.Fiyat}" step="0.01" style="width:80px; padding:4px; border-radius:8px; background:#1e293b; color:white; border:1px solid #334155; text-align:right;"> ₺<\/td>
-                        <td>${u.Barkod || '-'}<\/td>
-                        <td><button class="btn-success" onclick="fiyatGuncelle(${u.PorsiyonId})">💾 Kaydet<\/button><\/td>
-                    <\/tr>
-                `).join('');
+            if (data.moduller && data.moduller.length > 0) {
+                let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
+                data.moduller.forEach(m => {
+                    html += `<button class="btn-outline" onclick="moduluAc('${m.path}')">🧩 ${m.adi}</button>`;
+                });
+                html += '</div>';
+                document.getElementById('moduller').innerHTML = html;
+            } else {
+                document.getElementById('moduller').innerHTML = '<div>Henüz modül bulunamadı</div>';
             }
-        } catch(err) { console.error(err); }
-    }
-
-    async function fiyatGuncelle(porsiyonId) {
-        let yeniFiyat = parseFloat(document.getElementById(`fiyat_${porsiyonId}`).value);
-        if (isNaN(yeniFiyat)) { alert('Geçerli fiyat girin'); return; }
-        try {
-            let response = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-                body: JSON.stringify({ porsiyonId, yeniFiyat })
-            });
-            let data = await response.json();
-            if (data.success) {
-                alert('Fiyat güncellendi! SambaPOS\'a yansıdı.');
-                fiyatListesiniGetir();
-            } else { alert('Hata: ' + data.error); }
-        } catch(err) { alert('Bağlantı hatası'); }
-    }
-
-    // ========== ADİSYONLAR ==========
-    async function adisyonlariGetir() {
-        let tarih = document.getElementById('adisyonTarih').value;
-        let url = `${API_BASE}/api/adisyonlar?tarih=${tarih}`;
-        try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            let tbody = document.getElementById('adisyonTbody');
-            let acikAdisyonlar = data.filter(a => a.Durum === 'Açık');
-            if (!acikAdisyonlar.length) tbody.innerHTML = '<tr><td colspan="6">Açık adisyon bulunamadı<\/td><\/tr>';
-            else {
-                tbody.innerHTML = acikAdisyonlar.map(a => `
-                    <tr>
-                        <td>${a.AdisyonNo || '-'}<\/td>
-                        <td>${a.Saat || '-'}<\/td>
-                        <td>${a.Kullanici || '-'}<\/td>
-                        <td>${a.Masa || '-'}<\/td>
-                        <td class="amount-right">${(a.Toplam || 0).toLocaleString('tr-TR')} ₺<\/td>
-                        <td><span class="badge-acik">Açık<\/span><\/td>
-                    <\/tr>
-                `).join('');
-            }
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== AÇIK MASALAR ==========
-    async function acikMasalariGetir() {
-        let url = `${API_BASE}/api/acikMasalar`;
-        try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            let tbody = document.getElementById('masaTbody');
-            if (!data.length) tbody.innerHTML = '<tr><td colspan="5">Açık masa bulunamadı<\/td><\/tr>';
-            else {
-                tbody.innerHTML = data.map(m => `
-                    <tr>
-                        <td>${m.Masa || '-'}<\/td>
-                        <td>${m.TicketNumber || '-'}<\/td>
-                        <td>${m.Saat || '-'}<\/td>
-                        <td class="amount-right">${m.UrunAdet || 0}<\/td>
-                        <td class="amount-right">${(m.Toplam || 0).toLocaleString('tr-TR')} ₺<\/td>
-                    <\/tr>
-                `).join('');
-            }
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== KASA DURUMU ==========
-    async function kasaDurumuGetir() {
-        let url = `${API_BASE}/api/kasaDurumu`;
-        try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            document.getElementById('kasaKartlari').innerHTML = `
-                <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number nakit">${(data.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(data.KrediKarti || 0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📊 Toplam</h4><div class="stat-number ciro">${(data.Toplam || 0).toLocaleString('tr-TR')} ₺</div></div>
-            `;
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== GÜNLÜK SATIŞ ==========
-    async function gunlukSatisGetir() {
-        let tarih = document.getElementById('gunlukSatisTarih').value;
-        let url = `${API_BASE}/api/gunlukSatis?tarih=${tarih}`;
-        try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            document.getElementById('gunlukSatisKartlari').innerHTML = `
-                <div class="stat-card"><h4>📋 Adisyon Sayısı</h4><div class="stat-number">${data.AdisyonSayisi || 0}</div></div>
-                <div class="stat-card"><h4>💰 Brut Satış</h4><div class="stat-number ciro">${(data.BrutSatis || 0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number nakit">${(data.Nakit || 0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(data.Kredi || 0).toLocaleString('tr-TR')} ₺</div></div>
-            `;
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== ÜRÜN SATIŞ ==========
-    async function urunSatisGetir() {
-        let tarih = document.getElementById('urunSatisTarih').value;
-        let url = `${API_BASE}/api/urunSatis?tarih=${tarih}`;
-        try {
-            let res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            let tbody = document.getElementById('urunSatisTbody');
-            if (!data.length) tbody.innerHTML = '</table><td colspan="3">Veri bulunamadı<\/td><\/tr>';
-            else {
-                tbody.innerHTML = data.map(u => `
-                    <tr>
-                        <td>${u.Urun || '-'}<\/td>
-                        <td class="amount-right">${u.Adet || 0}<\/td>
-                        <td class="amount-right">${(u.Toplam || 0).toLocaleString('tr-TR')} ₺<\/td>
-                    <\/tr>
-                `).join('');
-            }
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== GRAFİKLER ==========
-    async function grafikleriYukle() {
-        try {
-            let yillikRes = await fetch(`${API_BASE}/api/yillik?yil=2026`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let aylar = await yillikRes.json();
-            let aylarIsimleri = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-            let cirolar = [];
-            for (let i = 1; i <= 12; i++) {
-                let ayVeri = aylar.find(a => a.Ay === i) || { Toplam: 0 };
-                cirolar.push(ayVeri.Toplam);
-            }
-            if (aylikCiroChart) aylikCiroChart.destroy();
-            aylikCiroChart = new Chart(document.getElementById('aylikCiroGrafik'), {
-                type: 'bar', data: { labels: aylarIsimleri, datasets: [{ label: 'Aylık Ciro (TL)', data: cirolar, backgroundColor: '#f97316', borderRadius: 8 }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
-            });
-            
-            let tarih = new Date().toISOString().slice(0,10);
-            let gelirRes = await fetch(`${API_BASE}/api/gelirler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let gelir = await gelirRes.json();
-            if (gelirDagilimChart) gelirDagilimChart.destroy();
-            gelirDagilimChart = new Chart(document.getElementById('gelirDagilimGrafik'), {
-                type: 'doughnut', data: { labels: ['Nakit', 'Kredi Kartı'], datasets: [{ data: [gelir.Nakit || 0, gelir.KrediKarti || 0], backgroundColor: ['#10b981', '#3b82f6'] }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
-            });
-        } catch(err) { console.error(err); }
-    }
-
-    // ========== MODÜL LİSTESİ ==========
-    async function modulListesiniGetir() {
-        let modulDiv = document.getElementById('modulListesi');
-        modulDiv.innerHTML = '<div style="color:#f97316;">Modüller yükleniyor...</div>';
-        try {
-            let res = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            
-            if (!data.moduller || data.moduller.length === 0) {
-                modulDiv.innerHTML = '<div>Henüz ek modül bulunamadı. endpoints klasörüne .js dosyası ekleyin.</div>';
-                return;
-            }
-            
-            let modulHtml = '<div class="table-wrapper"><table><thead><tr><th>Modül Adı</th><th>Endpoint</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>';
-            data.moduller.forEach(m => {
-                modulHtml += `
-                    <tr>
-                        <td>🧩 ${m.adi}</td>
-                        <td><code>${m.path}</code></td>
-                        <td><span class="badge-modul">${m.durum}</span></td>
-                        <td><button class="btn-outline" onclick="moduluAc('${m.path}')">🔍 Test Et</button></td>
-                    </tr>
-                `;
-            });
-            modulHtml += '</tbody></table></div>';
-            modulDiv.innerHTML = modulHtml;
         } catch(err) {
-            modulDiv.innerHTML = '<div>Modül listesi alınamadı. API çalışıyor mu?</div>';
+            document.getElementById('moduller').innerHTML = '<div>Modüller alınamadı</div>';
         }
     }
     
@@ -658,11 +161,7 @@
         window.open(`${API_BASE}${path}`, '_blank');
     }
 
-    function pdfIndir() { window.print(); }
-
-    // Sayfa yüklendiğinde
-    anaPaneliGuncelle();
-    modulListesiniGetir();
+    tumVerileriGuncelle();
 </script>
 </body>
 </html>
