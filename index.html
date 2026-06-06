@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Öz Urfa Kebap | Executive Dashboard</title>
+    <title>Öz Urfa Yusuf Usta | Executive Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -14,85 +17,96 @@
             min-height: 100vh;
             color: #eef2ff;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        
+        /* Layout */
+        .dashboard-layout { display: flex; gap: 24px; }
+        .main-content { flex: 1; min-width: 0; }
+        .right-sidebar { width: 300px; flex-shrink: 0; }
         
         .header {
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(12px);
-            border-radius: 32px;
+            border-radius: 28px;
             padding: 20px 28px;
             margin-bottom: 24px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .header h1 { font-size: 1.6rem; background: linear-gradient(135deg, #f97316, #facc15); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .header p { color: #94a3b8; font-size: 0.8rem; margin-top: 6px; }
-        .date-time { font-size: 0.7rem; color: #f97316; margin-top: 10px; }
+        .logo h1 { font-size: 1.6rem; background: linear-gradient(135deg, #f97316, #facc15); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo p { color: #94a3b8; font-size: 0.75rem; margin-top: 5px; }
+        .date-time { background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 40px; font-family: monospace; font-size: 0.85rem; color: #f97316; }
         
-        .btn { padding: 8px 18px; border-radius: 40px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; font-size: 0.75rem; }
+        .btn { padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; font-size: 0.8rem; }
         .btn-primary { background: linear-gradient(95deg, #f97316, #ea580c); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(249,115,22,0.4); }
         .btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
-        .btn-outline:hover { background: rgba(249,115,22,0.15); border-color: #f97316; color: #f97316; }
+        .btn-outline:hover { background: rgba(249,115,22,0.2); border-color: #f97316; color: #f97316; }
         .btn-success { background: #10b981; color: white; }
-        .btn-sm { padding: 4px 10px; font-size: 0.65rem; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 4px 12px; font-size: 0.7rem; }
         
         .api-bar {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30,41,59,0.6);
             border-radius: 60px;
-            padding: 8px 20px;
+            padding: 10px 20px;
             margin-bottom: 24px;
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
             justify-content: space-between;
         }
-        .api-input input { background: #0f172a; border: 1px solid #334155; padding: 8px 16px; border-radius: 40px; color: white; width: 300px; }
         
         .tab-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 6px;
             margin-bottom: 24px;
-            background: rgba(0,0,0,0.25);
+            background: rgba(0,0,0,0.3);
             border-radius: 60px;
             padding: 6px;
-            width: fit-content;
+            overflow-x: auto;
         }
+        .tab-bar::-webkit-scrollbar { height: 4px; }
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 8px 24px;
+            padding: 8px 16px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             cursor: pointer;
-            color: #cbd5e1;
+            color: #94a3b8;
             transition: 0.2s;
+            white-space: nowrap;
         }
+        .tab-btn:hover { color: #f97316; }
         .tab-btn.active { background: #f97316; color: white; }
         
         .stats-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
         .stat-card {
-            flex: 1; min-width: 140px;
+            flex: 1; min-width: 130px;
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(8px);
             border-radius: 24px;
-            padding: 18px;
+            padding: 16px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
             transition: 0.2s;
+            cursor: pointer;
         }
-        .stat-card:hover { border-color: #f97316; transform: translateY(-2px); }
-        .stat-card h4 { font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; }
+        .stat-card:hover { border-color: #f97316; transform: translateY(-3px); }
+        .stat-card h4 { font-size: 0.65rem; color: #94a3b8; margin-bottom: 8px; letter-spacing: 1px; }
         .stat-number { font-size: 1.3rem; font-weight: 800; }
-        .stat-number.nakit { color: #22c55e; }
-        .stat-number.kredi { color: #3b82f6; }
-        .stat-number.ciro { color: #facc15; }
-        .stat-number.online { color: #8b5cf6; }
-        .stat-number.gider { color: #f97316; }
-        .loss { color: #ef4444; }
-        .success { color: #22c55e; }
+        .stat-number.positive { color: #22c55e; }
+        .stat-number.negative { color: #ef4444; }
+        .stat-number.warning { color: #f59e0b; }
         
         .card {
             background: rgba(15, 23, 42, 0.6);
@@ -104,10 +118,10 @@
         }
         .card.active-card { display: block; }
         .card-header {
-            padding: 16px 24px;
+            padding: 16px 22px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #f97316;
             display: flex;
             justify-content: space-between;
@@ -122,41 +136,41 @@
         th { text-align: left; padding: 10px 8px; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1); }
         td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .amount-right { text-align: right; font-weight: 600; }
+        .clickable-row { cursor: pointer; transition: 0.2s; }
+        .clickable-row:hover { background: rgba(249,115,22,0.15); }
         
-        .clickable-row {
+        .paket-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+        .paket-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 18px;
+            padding: 14px;
+            width: calc(25% - 12px);
+            min-width: 190px;
+            border: 1px solid #334155;
             cursor: pointer;
             transition: 0.2s;
         }
-        .clickable-row:hover {
-            background: rgba(249,115,22,0.15);
-        }
+        .paket-card:hover { border-color: #f97316; transform: translateY(-3px); }
+        .paket-card .no { font-size: 0.9rem; font-weight: 700; color: #f97316; margin-bottom: 8px; }
+        .paket-card .musteri { font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
+        .paket-card .tutar { font-size: 1.1rem; font-weight: 800; color: #facc15; margin-top: 8px; }
+        .paket-card .info { font-size: 0.65rem; color: #94a3b8; margin-top: 4px; }
         
-        .modul-list { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
-        .modul-btn { background: #1e293b; border: 1px solid #334155; border-radius: 40px; padding: 8px 20px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
-        .modul-btn:hover { background: #f97316; border-color: #f97316; color: white; }
-        
-        .modul-json {
-            background: #0f172a;
+        .right-card {
+            background: rgba(15, 23, 42, 0.7);
             border-radius: 20px;
             padding: 16px;
-            margin-top: 16px;
-            font-family: monospace;
-            font-size: 0.7rem;
-            white-space: pre-wrap;
-            border: 1px solid #334155;
-            display: none;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
+        .right-card h4 { color: #f97316; margin-bottom: 12px; font-size: 0.9rem; }
         
-        .two-col { display: flex; flex-wrap: wrap; gap: 24px; }
-        .two-col > div { flex: 1; min-width: 280px; }
-        
-        /* Modal Stili */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
@@ -171,361 +185,616 @@
             overflow-y: auto;
             border: 1px solid #f97316;
         }
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: #1e293b;
-        }
-        .modal-header h3 { color: #f97316; }
-        .close-modal {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 1.8rem;
-            cursor: pointer;
-            line-height: 1;
-        }
+        .modal-header { padding: 14px 18px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { color: #f97316; font-size: 1.1rem; }
+        .close-modal { background: none; border: none; color: #94a3b8; font-size: 1.6rem; cursor: pointer; }
         .close-modal:hover { color: #f97316; }
-        .modal-body { padding: 20px; }
+        .modal-body { padding: 18px; }
         
-        .urun-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #334155;
+        input, select, textarea {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 0.8rem;
+            width: 100%;
         }
-        .urun-item:last-child { border-bottom: none; }
+        .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .critical-stock { background: rgba(239,68,68,0.2); color: #ef4444; }
         
-        .badge-online { background: #8b5cf6; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; }
-        .badge-fiziki { background: #22c55e; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; }
+        .footer { text-align: center; font-size: 0.6rem; color: #5b6e8c; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
         
-        .footer { text-align: center; font-size: 0.65rem; color: #5b6e8c; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
-        
-        @media (max-width: 700px) { .stat-number { font-size: 1.1rem; } .tab-btn { padding: 6px 16px; font-size: 0.7rem; } }
+        @media (max-width: 900px) {
+            .dashboard-layout { flex-direction: column; }
+            .right-sidebar { width: 100%; }
+            .stat-number { font-size: 1rem; }
+            .paket-card { width: calc(50% - 8px); min-width: unset; }
+            .tab-btn { padding: 6px 12px; font-size: 0.6rem; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>🧾 ÖZ URFA KEBAP — Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL | Online Sipariş Takibi | %40 Komisyon | Gider Takibi</p>
+        <div class="logo"><h1>🧾 ÖZ URFA YUSUF USTA</h1><p>SambaPOS Executive Dashboard | %40 Komisyon | Gelişmiş Raporlama</p></div>
         <div class="date-time" id="dateTime"></div>
     </div>
-
+    
     <div class="api-bar">
-        <div class="api-input">
-            <span>🌐 API Adresi:</span>
-            <input type="text" id="apiUrl" value="http://100.97.45.8:3001">
-            <button class="btn-primary" onclick="apiUrlKaydet()">Kaydet</button>
+        <div class="flex-row">
+            <span>🌐 SambaPOS API:</span>
+            <input type="text" id="apiUrl" value="http://localhost:3001" style="width: 220px;">
+            <button class="btn-primary btn-sm" onclick="apiBaglan()">Bağlan</button>
+            <button class="btn-outline btn-sm" onclick="sambaPOSVerileriGetir()">📡 Veri Çek</button>
         </div>
-        <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
+        <button class="btn-outline btn-sm" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
+        <span id="apiDurum" style="font-size:0.7rem; color:#f97316;">⚡ Yerel Mod</span>
     </div>
 
-    <div class="tab-bar">
-        <button class="tab-btn active" data-tab="ozet">📊 Özet</button>
-        <button class="tab-btn" data-tab="giderler">📝 Giderler</button>
-        <button class="tab-btn" data-tab="masalar">🪑 Açık Masalar</button>
-        <button class="tab-btn" data-tab="online">📱 Online Siparişler</button>
-        <button class="tab-btn" data-tab="ciro">📈 Ciro Karşılaştırma</button>
-        <button class="tab-btn" data-tab="manuel">✏️ Manuel Gider</button>
-        <button class="tab-btn" data-tab="moduller">🧩 Modüller</button>
-    </div>
-
-    <!-- Modal -->
-    <div id="adisyonModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>📋 Adisyon Detayı</h3>
-                <button class="close-modal" onclick="kapatModal()">&times;</button>
+    <div class="dashboard-layout">
+        <div class="main-content">
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="ozet">📊 Özet</button>
+                <button class="tab-btn" data-tab="giderler">📝 Giderler</button>
+                <button class="tab-btn" data-tab="acikMasalar">🪑 Açık Masalar</button>
+                <button class="tab-btn" data-tab="paketServis">📦 Paket Servis</button>
+                <button class="tab-btn" data-tab="onlineSiparis">📱 Online</button>
+                <button class="tab-btn" data-tab="urunler">🍔 Ürünler</button>
+                <button class="tab-btn" data-tab="stok">📦 Stok</button>
+                <button class="tab-btn" data-tab="raporlar">📈 Raporlar</button>
+                <button class="tab-btn" data-tab="moduller">🧩 Modüller</button>
             </div>
-            <div class="modal-body" id="modalBody">
-                Yükleniyor...
+
+            <!-- ÖZET TAB -->
+            <div id="ozetTab" class="card active-card">
+                <div class="card-header">📊 Günlük Özet — <span id="ozetTarih"></span></div>
+                <div class="card-body">
+                    <div class="stats-grid" id="ozetKartlar"></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>🏪 Fiziki Ciro</h4><div class="stat-number positive" id="fizikiCiro">0 ₺</div></div>
+                        <div class="stat-card"><h4>📱 Online Brüt</h4><div class="stat-number" id="onlineBrut">0 ₺</div></div>
+                        <div class="stat-card"><h4>📱 Online Net (%40)</h4><div class="stat-number positive" id="onlineNet">0 ₺</div></div>
+                        <div class="stat-card"><h4>💰 Toplam Ciro</h4><div class="stat-number positive" id="toplamCiro">0 ₺</div></div>
+                        <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number negative" id="toplamGider">0 ₺</div></div>
+                        <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number" id="netKar">0 ₺</div></div>
+                    </div>
+                    <canvas id="haftalikCiroChart" style="max-height: 200px;"></canvas>
+                </div>
+            </div>
+
+            <!-- GİDERLER TAB -->
+            <div id="giderlerTab" class="card">
+                <div class="card-header">📝 Giderler <button class="btn-primary btn-sm" onclick="yeniGiderEkle()">+ Ekle</button></div>
+                <div class="card-body" id="giderListesi"></div>
+            </div>
+
+            <!-- AÇIK MASALAR TAB -->
+            <div id="acikMasalarTab" class="card">
+                <div class="card-header">🪑 Açık Masalar <span id="sureSayaci"></span></div>
+                <div class="card-body" id="acikMasaListesi"></div>
+            </div>
+
+            <!-- PAKET SERVİS TAB -->
+            <div id="paketServisTab" class="card">
+                <div class="card-header">📦 Paket Servis</div>
+                <div class="card-body" id="paketServisListesi"></div>
+            </div>
+
+            <!-- ONLINE SİPARİŞ TAB -->
+            <div id="onlineSiparisTab" class="card">
+                <div class="card-header">📱 Online Siparişler (%40 Komisyon)</div>
+                <div class="card-body" id="onlineSiparisListesi"></div>
+            </div>
+
+            <!-- ÜRÜNLER TAB -->
+            <div id="urunlerTab" class="card">
+                <div class="card-header">🍔 Ürün Yönetimi <button class="btn-primary btn-sm" onclick="yeniUrunEkle()">+ Yeni Ürün</button></div>
+                <div class="card-body">
+                    <div class="flex-row" style="margin-bottom:16px; gap:10px;">
+                        <input type="text" id="urunAra" placeholder="🔍 Ara" style="width:200px;">
+                        <select id="kategoriFiltre"><option value="tumu">Tüm Kategoriler</option></select>
+                        <button class="btn-outline btn-sm" onclick="urunleriGoster()">Ara</button>
+                        <button class="btn-warning btn-sm" onclick="topluFiyatDegistir()">💰 Toplu Fiyat</button>
+                    </div>
+                    <div id="urunListesi"></div>
+                </div>
+            </div>
+
+            <!-- STOK TAB -->
+            <div id="stokTab" class="card">
+                <div class="card-header">📦 Stok Takibi <button class="btn-primary btn-sm" onclick="stokGirisiYap()">+ Stok Girişi</button></div>
+                <div class="card-body" id="stokListesi"></div>
+            </div>
+
+            <!-- RAPORLAR TAB -->
+            <div id="raporlarTab" class="card">
+                <div class="card-header">📈 Raporlar</div>
+                <div class="card-body">
+                    <div class="flex-row" style="gap:10px; margin-bottom:20px;">
+                        <button class="btn-primary btn-sm" onclick="raporGoster('gunluk')">📅 Günlük</button>
+                        <button class="btn-primary btn-sm" onclick="raporGoster('aylik')">📊 Aylık</button>
+                        <button class="btn-primary btn-sm" onclick="raporGoster('yillik')">📈 Yıllık</button>
+                        <button class="btn-outline btn-sm" onclick="raporExcelIndir()">📤 Excel</button>
+                        <button class="btn-outline btn-sm" onclick="raporPDFIndir()">📄 PDF</button>
+                    </div>
+                    <div id="raporIcerik"></div>
+                </div>
+            </div>
+
+            <!-- MODÜLLER TAB -->
+            <div id="modullerTab" class="card">
+                <div class="card-header">🧩 Modüller <button class="btn-primary btn-sm" onclick="modulEklemeFormuGoster()">+ Yeni</button></div>
+                <div class="card-body" id="modullerIcerik"></div>
+            </div>
+        </div>
+
+        <!-- SAĞ SİDEBAR -->
+        <div class="right-sidebar">
+            <div class="right-card">
+                <h4><i class="fas fa-truck"></i> TEDARİKÇİ SİPARİŞ</h4>
+                <select id="tedarikciSecim" style="margin-bottom:10px;">
+                    <option value="">Tedarikçi Seç</option>
+                </select>
+                <textarea id="siparisNotu" rows="3" placeholder="Sipariş detayı...&#10;Örn: 10 kg et, 5 kg domates" style="margin-bottom:10px;"></textarea>
+                <div class="flex-row" style="gap:8px;">
+                    <button class="btn-primary btn-sm" onclick="siparisGonder()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="btn-outline btn-sm" onclick="siparisPDFOlustur()">📄 PDF Sipariş</button>
+                    <button class="btn-outline btn-sm" onclick="siparisOzetGoster()">📋 Özet</button>
+                </div>
+                <div id="siparisOzet" style="margin-top:12px; font-size:0.7rem; color:#94a3b8;"></div>
+            </div>
+
+            <div class="right-card">
+                <h4><i class="fas fa-users"></i> PERSONEL & MAAŞ</h4>
+                <select id="personelSecim" style="margin-bottom:10px;">
+                    <option value="">Personel Seç</option>
+                </select>
+                <div class="flex-row" style="gap:8px; margin-bottom:10px;">
+                    <input type="number" id="maasTutar" placeholder="Maaş" style="width:100px;">
+                    <input type="number" id="primTutar" placeholder="Prim" style="width:100px;">
+                </div>
+                <button class="btn-success btn-sm" onclick="bordroKaydet()"><i class="fas fa-save"></i> Bordro Kaydet</button>
+                <button class="btn-outline btn-sm" onclick="maasOdemesiYap()"><i class="fas fa-money-bill"></i> Ödeme Yap</button>
+                <div id="personelBordroListe" style="margin-top:12px; font-size:0.7rem;"></div>
+            </div>
+
+            <div class="right-card">
+                <h4><i class="fas fa-chart-line"></i> HIZLI İŞLEMLER</h4>
+                <button class="btn-outline btn-sm" style="width:100%; margin-bottom:8px;" onclick="kritikStoklariGoster()">⚠️ Kritik Stoklar</button>
+                <button class="btn-outline btn-sm" style="width:100%; margin-bottom:8px;" onclick="gunSonuRaporu()">📋 Gün Sonu</button>
+                <button class="btn-outline btn-sm" style="width:100%;" onclick="hesaplariKapat()">💰 Hesapları Kapat</button>
+            </div>
+
+            <div class="right-card">
+                <h4><i class="fas fa-bell"></i> BİLDİRİMLER</h4>
+                <div id="bildirimListesi" style="font-size:0.7rem; max-height:200px; overflow-y:auto;"></div>
             </div>
         </div>
     </div>
 
-    <!-- ÖZET TAB -->
-    <div id="ozetTab" class="card active-card">
-        <div class="card-header">📊 Günlük Özet — <span id="ozetTarih"></span></div>
-        <div class="card-body">
-            <div class="stats-grid" id="ozetKartlar"></div>
-            <div class="stats-grid">
-                <div class="stat-card"><h4>🏪 Fiziki Ciro</h4><div class="stat-number ciro" id="fizikiCiro">0 ₺</div></div>
-                <div class="stat-card"><h4>📱 Online Ciro (Brüt)</h4><div class="stat-number online" id="onlineCiroBrut">0 ₺</div></div>
-                <div class="stat-card"><h4>📱 Online Net (%40 komisyon sonrası)</h4><div class="stat-number online" id="onlineCiroNet">0 ₺</div></div>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card"><h4>💰 Kasa (Bugün)</h4><div class="stat-number ciro" id="kasaToplam">0 ₺</div></div>
-                <div class="stat-card"><h4>📆 Toplam Net Ciro</h4><div class="stat-number ciro" id="toplamNetCiro">0 ₺</div></div>
-                <div class="stat-card"><h4>📝 Ödenmeyen Adisyonlar</h4><div class="stat-number loss" id="odenmeyenOzet">0 ₺</div></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- GİDERLER TAB -->
-    <div id="giderlerTab" class="card">
-        <div class="card-header">📝 Giderler — Kalem Kalem</div>
-        <div class="card-body" id="giderListesi">Yükleniyor...</div>
-    </div>
-
-    <!-- AÇIK MASALAR TAB (Fiziki) -->
-    <div id="masalarTab" class="card">
-        <div class="card-header">🪑 Açık Fiziki Masalar</div>
-        <div class="card-body" id="fizikiMasaListesi">Yükleniyor...</div>
-    </div>
-
-    <!-- ONLINE SİPARİŞLER TAB -->
-    <div id="onlineTab" class="card">
-        <div class="card-header">📱 Açık Online Siparişler (Trendyol, Getir, Yemeksepeti)</div>
-        <div class="card-body" id="onlineSiparisListesi">Yükleniyor...</div>
-    </div>
-
-    <!-- CİRO KARŞILAŞTIRMA TAB -->
-    <div id="ciroTab" class="card">
-        <div class="card-header">📈 Aylık & Yıllık Ciro Karşılaştırma</div>
-        <div class="card-body" id="ciroKarsilastirma">Yükleniyor...</div>
-    </div>
-
-    <!-- MANUEL GİDER TAB -->
-    <div id="manuelTab" class="card">
-        <div class="card-header">✏️ Manuel Gider Ekle (SQL'e kaydedilir)</div>
-        <div class="card-body">
-            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
-                <div><label>Tarih</label><br><input type="date" id="manuelTarih" value="2026-06-05" style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white;"></div>
-                <div><label>Açıklama</label><br><input type="text" id="manuelAciklama" placeholder="Maya, Kaşar..." style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white; width:160px;"></div>
-                <div><label>Tutar (TL)</label><br><input type="number" id="manuelTutar" step="0.01" style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white; width:120px;"></div>
-                <div><label>Tür</label><br><select id="manuelTur" style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white;"><option>Nakit</option><option>Kredi</option></select></div>
-                <div><button class="btn-success" onclick="manuelGiderEkle()">💾 Kaydet</button></div>
-            </div>
-            <div id="manuelSonuc" style="margin-top:20px; font-size:0.8rem;"></div>
-        </div>
-    </div>
-
-    <!-- MODÜLLER TAB -->
-    <div id="modullerTab" class="card">
-        <div class="card-header">🧩 Modüller</div>
-        <div class="card-body">
-            <div id="modulListesi" class="modul-list">Yükleniyor...</div>
-            <div id="modulIcerik" class="modul-json"></div>
-        </div>
-    </div>
-
-    <div class="footer">Öz Urfa Kebap | SambaPOS SQL | Online Siparişlerde %40 Komisyon Düşülür | Adisyonlara tıklayın</div>
+    <div class="footer">Öz Urfa Yusuf Usta | SambaPOS Entegrasyonlu | Tüm veriler LocalStorage'da saklanır | Butonlar sağ taraftadır</div>
 </div>
 
+<!-- MODALLAR -->
+<div id="urunModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle">✏️ Ürün Düzenle</h3><button class="close-modal" onclick="kapatModal()">&times;</button></div><div class="modal-body" id="modalBody"></div></div></div>
+<div id="modulModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>➕ Yeni Modül Ekle</h3><button class="close-modal" onclick="kapatModulModal()">&times;</button></div><div class="modal-body" id="modulModalBody"></div></div></div>
+
 <script>
-    let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
+    // ========== VERİLER ==========
+    let API_BASE = localStorage.getItem('apiBase') || 'http://localhost:3001';
     document.getElementById('apiUrl').value = API_BASE;
     
-    const ONLINE_PLATFORMS = ['trendyol', 'getir', 'yemeksepeti', 'online', 'paket', 'sipariş'];
-    
-    function isOnlineSiparis(masaAdi) {
-        if (!masaAdi) return false;
-        return ONLINE_PLATFORMS.some(platform => masaAdi.toLowerCase().includes(platform));
+    let urunler = JSON.parse(localStorage.getItem('urunler')) || [
+        { id: 1, ad: "Adana Kebap", kategori: "Izgara", fiyat: 180, maliyet: 95, stok: 45, kritikStok: 10 },
+        { id: 2, ad: "Lahmacun", kategori: "Hamur işi", fiyat: 35, maliyet: 18, stok: 32, kritikStok: 15 },
+        { id: 3, ad: "Karışık Pide", kategori: "Pide", fiyat: 89, maliyet: 45, stok: 28, kritikStok: 10 },
+        { id: 4, ad: "Ayran", kategori: "İçecek", fiyat: 15, maliyet: 4, stok: 120, kritikStok: 20 }
+    ];
+    let giderler = JSON.parse(localStorage.getItem('giderler')) || [];
+    let acikMasalar = JSON.parse(localStorage.getItem('acikMasalar')) || [];
+    let paketServisler = JSON.parse(localStorage.getItem('paketServisler')) || [];
+    let onlineSiparisler = JSON.parse(localStorage.getItem('onlineSiparisler')) || [];
+    let personeller = JSON.parse(localStorage.getItem('personeller')) || [
+        { id: 1, ad: "Ahmet Yılmaz", pozisyon: "Garson", maas: 17000, prim: 0, odemeDurumu: "Ödendi", sonOdeme: "01.06.2026", telefon: "5551112233" },
+        { id: 2, ad: "Mehmet Demir", pozisyon: "Aşçı", maas: 22000, prim: 0, odemeDurumu: "Bekliyor", sonOdeme: "01.05.2026", telefon: "5554445566" }
+    ];
+    let tedarikciler = JSON.parse(localStorage.getItem('tedarikciler')) || [
+        { id: 1, ad: "Kasap Ali", urun: "Et", borc: 5200, telefon: "905551234567", adres: "İstanbul" },
+        { id: 2, ad: "Manav Mehmet", urun: "Sebze", borc: 2100, telefon: "905557778899", adres: "Kadıköy" }
+    ];
+    let musteriler = JSON.parse(localStorage.getItem('musteriler')) || [];
+    let bildirimler = JSON.parse(localStorage.getItem('bildirimler')) || [
+        { id: 1, tip: "info", mesaj: "Sistem başlatıldı", tarih: new Date().toLocaleDateString(), okundu: false }
+    ];
+    let aylikCiroGecmisi = JSON.parse(localStorage.getItem('aylikCiroGecmisi')) || [
+        { ay: "Ocak", ciro: 35200 }, { ay: "Şubat", ciro: 38400 }, { ay: "Mart", ciro: 41200 },
+        { ay: "Nisan", ciro: 38500 }, { ay: "Mayıs", ciro: 42100 }, { ay: "Haziran", ciro: 45230 }
+    ];
+    let moduller = JSON.parse(localStorage.getItem('moduller')) || [];
+
+    function tumVerileriKaydet() {
+        localStorage.setItem('urunler', JSON.stringify(urunler));
+        localStorage.setItem('giderler', JSON.stringify(giderler));
+        localStorage.setItem('acikMasalar', JSON.stringify(acikMasalar));
+        localStorage.setItem('paketServisler', JSON.stringify(paketServisler));
+        localStorage.setItem('onlineSiparisler', JSON.stringify(onlineSiparisler));
+        localStorage.setItem('personeller', JSON.stringify(personeller));
+        localStorage.setItem('tedarikciler', JSON.stringify(tedarikciler));
+        localStorage.setItem('musteriler', JSON.stringify(musteriler));
+        localStorage.setItem('bildirimler', JSON.stringify(bildirimler));
+        localStorage.setItem('aylikCiroGecmisi', JSON.stringify(aylikCiroGecmisi));
+        localStorage.setItem('moduller', JSON.stringify(moduller));
     }
+
+    // ========== GENEL FONKSİYONLAR ==========
+    function tarihSaatGuncelle() { document.getElementById('dateTime').innerHTML = `📅 ${new Date().toLocaleDateString('tr-TR')} 🕐 ${new Date().toLocaleTimeString('tr-TR')}`; }
+    setInterval(tarihSaatGuncelle, 1000); tarihSaatGuncelle();
     
-    function kapatModal() {
-        document.getElementById('adisyonModal').style.display = 'none';
-    }
+    function kapatModal() { document.getElementById('urunModal').style.display = 'none'; }
+    function kapatModulModal() { document.getElementById('modulModal').style.display = 'none'; }
     
-    async function adisyonDetayGoster(ticketNumber) {
-        const modal = document.getElementById('adisyonModal');
-        const modalBody = document.getElementById('modalBody');
-        modal.style.display = 'flex';
-        modalBody.innerHTML = '<div style="text-align:center;">🔄 Yükleniyor...</div>';
-        
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
+        document.getElementById(btn.getAttribute('data-tab') + 'Tab').classList.add('active-card');
+        if (btn.getAttribute('data-tab') === 'moduller') modulleriGoster();
+        tumTablolariGuncelle();
+    }));
+    
+    async function apiBaglan() {
+        API_BASE = document.getElementById('apiUrl').value;
+        localStorage.setItem('apiBase', API_BASE);
         try {
-            const res = await fetch(`${API_BASE}/api/adisyonDetay?ticketNumber=${ticketNumber}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            const data = await res.json();
-            
-            if (data.error) {
-                modalBody.innerHTML = `<div style="color:#ef4444;">❌ ${data.error}</div>`;
-                return;
-            }
-            
-            let urunHtml = '<div style="margin-top:16px;"><table style="width:100%"><thead><tr><th>Ürün</th><th>Adet</th><th>Fiyat</th><th>Toplam</th></tr></thead><tbody>';
-            data.urunler.forEach(u => {
-                urunHtml += `<tr>
-                    <td>${u.UrunAdi || '-'} ${u.Porsiyon ? `(${u.Porsiyon})` : ''}</td>
-                    <td class="amount-right">${u.Adet || 0}</td>
-                    <td class="amount-right">${(u.BirimFiyat || 0).toLocaleString('tr-TR')} ₺</td>
-                    <td class="amount-right">${(u.Toplam || 0).toLocaleString('tr-TR')} ₺</td>
-                </tr>`;
-            });
-            urunHtml += '</tbody></table></div>';
-            
-            modalBody.innerHTML = `
-                <div style="background:#0f172a; padding:12px; border-radius:16px; margin-bottom:16px;">
-                    <div><strong>📋 Adisyon No:</strong> ${ticketNumber}</div>
-                    <div><strong>🪑 Masa:</strong> ${data.adisyon.MasaAdi || '-'}</div>
-                    <div><strong>⏰ Tarih/Saat:</strong> ${data.adisyon.TarihSaat || '-'}</div>
-                    <div><strong>👤 Kullanıcı:</strong> ${data.adisyon.CreatedUserName || '-'}</div>
-                    <div><strong>💰 Toplam Tutar:</strong> <span style="color:#facc15;">${(data.toplamTutar || 0).toLocaleString('tr-TR')} ₺</span></div>
-                    <div><strong>📦 Ürün Sayısı:</strong> ${data.urunSayisi || 0}</div>
-                </div>
-                <h4 style="color:#f97316; margin-bottom:12px;">🛒 Ürünler</h4>
-                ${urunHtml}
-            `;
-        } catch (err) {
-            modalBody.innerHTML = `<div style="color:#ef4444;">❌ Bağlantı hatası: ${err.message}</div>`;
+            let test = await fetch(`${API_BASE}/api/test`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            document.getElementById('apiDurum').innerHTML = `✅ SambaPOS Bağlı | ${API_BASE}`;
+            document.getElementById('apiDurum').style.color = '#22c55e';
+            bildirimEkle('Başarılı', 'SambaPOS API bağlantısı kuruldu', 'success');
+        } catch(e) {
+            document.getElementById('apiDurum').innerHTML = `⚠️ Yerel Mod | ${API_BASE}`;
+            document.getElementById('apiDurum').style.color = '#f59e0b';
         }
     }
     
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const tab = btn.getAttribute('data-tab');
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
-            document.getElementById(tab + 'Tab').classList.add('active-card');
-            if (tab === 'moduller') modulListesiGetir();
-        });
-    });
-    
-    setInterval(() => document.getElementById('dateTime').innerHTML = `📅 ${new Date().toLocaleDateString('tr-TR')} - 🕐 ${new Date().toLocaleTimeString('tr-TR')}`, 1000);
-    
-    function apiUrlKaydet() { API_BASE = document.getElementById('apiUrl').value; localStorage.setItem('apiBase', API_BASE); alert('API adresi kaydedildi'); tumVerileriGuncelle(); }
-    
-    async function tumVerileriGuncelle() {
+    async function sambaPOSVerileriGetir() {
         let tarih = new Date().toISOString().slice(0,10);
-        document.getElementById('ozetTarih').innerHTML = tarih;
-        
-        // Detaylı Özet
+        document.getElementById('apiDurum').innerHTML = '🔄 Veri çekiliyor...';
         try {
             let ozet = await fetch(`${API_BASE}/api/detayliOzet?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            
-            document.getElementById('ozetKartlar').innerHTML = `
-                <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number nakit">${(ozet.nakit||0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(ozet.kredi||0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📊 Toplam Ciro (Brüt)</h4><div class="stat-number ciro">${(ozet.toplamCiro||0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider">${(ozet.toplamGider||0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📈 Net Kâr</h4><div class="stat-number success">${(ozet.netKar||0).toLocaleString('tr-TR')} ₺</div></div>
-            `;
-            document.getElementById('fizikiCiro').innerHTML = (ozet.fizikiCiro||0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('onlineCiroBrut').innerHTML = (ozet.onlineCiroBrut||0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('onlineCiroNet').innerHTML = (ozet.onlineCiroNet||0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('kasaToplam').innerHTML = (ozet.toplamCiro||0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('toplamNetCiro').innerHTML = (ozet.toplamCiroNet||0).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('odenmeyenOzet').innerHTML = (ozet.odenmeyenler||0).toLocaleString('tr-TR') + ' ₺';
-        } catch(e) { console.error('Özet hatası:', e); }
-        
-        // Giderler
-        try {
-            let g = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            if(g.giderler?.length){
-                let html = '<table class="gider-table"><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
-                g.giderler.forEach(i=> html += `<tr><td style="font-weight:500;">${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${i.Tarih||'-'}</td></tr>`);
-                html += `<tr style="background:#f9731610; font-weight:bold;"><td>TOPLAM</td><td class="amount-right">${(g.toplam||0).toLocaleString('tr-TR')} ₺</td><td></td></tr></tbody></table>`;
-                document.getElementById('giderListesi').innerHTML = html;
-            } else document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider yok</div>';
-        } catch(e){ document.getElementById('giderListesi').innerHTML = '<div>Gider alınamadı</div>'; }
-        
-        // Açık Masalar (Fiziki ve Online ayrı)
-        try {
-            let m = await fetch(`${API_BASE}/api/acikMasalar`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            let fiziki = m.filter(x => !isOnlineSiparis(x.Masa));
-            let online = m.filter(x => isOnlineSiparis(x.Masa));
-            
-            let fizikiHtml = '<div class="table-wrapper"><table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
-            fiziki.forEach(t=> fizikiHtml += `<tr class="clickable-row" onclick="adisyonDetayGoster('${t.TicketNumber}')"><td>${t.Masa||'-'}</td><td>${t.TicketNumber||'-'}</td><td>${t.Saat||'-'}</td><td class="amount-right">${t.UrunAdet||0}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-            fizikiHtml += '</tbody></table></div>';
-            
-            let onlineHtml = '<div class="table-wrapper"><table><thead><tr><th>Platform</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Brüt Tutar</th><th>Komisyon %40</th><th>Net Tutar</th></tr></thead><tbody>';
-            online.forEach(t=> {
-                let brut = t.Toplam || 0;
-                let komisyon = brut * 0.40;
-                let net = brut - komisyon;
-                onlineHtml += `<tr class="clickable-row" onclick="adisyonDetayGoster('${t.TicketNumber}')">
-                    <td>${t.Masa||'-'}</td>
-                    <td>${t.TicketNumber||'-'}</td>
-                    <td>${t.Saat||'-'}</td>
-                    <td class="amount-right">${t.UrunAdet||0}</td>
-                    <td class="amount-right">${brut.toLocaleString('tr-TR')} ₺</td>
-                    <td class="amount-right loss">${komisyon.toLocaleString('tr-TR')} ₺</td>
-                    <td class="amount-right success">${net.toLocaleString('tr-TR')} ₺</td>
-                </tr>`;
-            });
-            onlineHtml += '</tbody></table></div>';
-            
-            document.getElementById('fizikiMasaListesi').innerHTML = fizikiHtml || '<div>Fiziki masa yok</div>';
-            document.getElementById('onlineSiparisListesi').innerHTML = onlineHtml || '<div>Online sipariş yok</div>';
-        } catch(e){ document.getElementById('fizikiMasaListesi').innerHTML = '<div>Masa alınamadı</div>'; }
-        
-        // Ciro Karşılaştırma
-        try {
-            let c = await fetch(`${API_BASE}/api/ciroKarsilastirma`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            let html = '<div class="table-wrapper"><table><thead><tr><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></tr></thead><tbody>';
-            if(c.aylik?.length){
-                c.aylik.forEach(a => {
-                    let [yil, ay] = a.Ay.split('-');
-                    let gunSayisi = new Date(parseInt(yil), parseInt(ay), 0).getDate();
-                    let gunluk = (a.Ciro / gunSayisi).toFixed(2);
-                    html += `<tr><td>${a.Ay}</td><td class="amount-right">${(a.Ciro||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${parseFloat(gunluk).toLocaleString('tr-TR')} ₺</td></tr>`;
-                });
+            if(ozet.success) {
+                document.getElementById('fizikiCiro').innerHTML = (ozet.fizikiCiro||0).toLocaleString('tr-TR') + ' ₺';
+                document.getElementById('onlineBrut').innerHTML = (ozet.onlineCiroBrut||0).toLocaleString('tr-TR') + ' ₺';
+                document.getElementById('onlineNet').innerHTML = (ozet.onlineCiroNet||0).toLocaleString('tr-TR') + ' ₺';
+                document.getElementById('toplamCiro').innerHTML = (ozet.toplamCiroNet||0).toLocaleString('tr-TR') + ' ₺';
+                document.getElementById('toplamGider').innerHTML = (ozet.toplamGider||0).toLocaleString('tr-TR') + ' ₺';
+                let netKar = document.getElementById('netKar');
+                netKar.innerHTML = (ozet.netKar||0).toLocaleString('tr-TR') + ' ₺';
+                netKar.className = 'stat-number ' + ((ozet.netKar||0) >= 0 ? 'positive' : 'negative');
+                bildirimEkle('Veri Çekildi', 'SambaPOS verileri başarıyla güncellendi', 'success');
             }
-            html += '</tbody></table></div><div class="table-wrapper" style="margin-top:20px;"><table><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
-            if(c.yillik?.length) c.yillik.forEach(y=> html += `<tr><td>${y.Yil}</td><td class="amount-right">${(y.Ciro||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-            html += '</tbody></table></div>';
-            document.getElementById('ciroKarsilastirma').innerHTML = html;
-        } catch(e){ document.getElementById('ciroKarsilastirma').innerHTML = '<div>Veri alınamadı</div>'; }
-    }
-    
-    async function manuelGiderEkle(){
-        let tarih = document.getElementById('manuelTarih').value;
-        let aciklama = document.getElementById('manuelAciklama').value;
-        let tutar = parseFloat(document.getElementById('manuelTutar').value);
-        let tur = document.getElementById('manuelTur').value;
-        if(!aciklama || isNaN(tutar) || tutar<=0) { alert('Eksik veya hatalı bilgi'); return; }
-        document.getElementById('manuelSonuc').innerHTML = '<span style="color:#facc15;">Kaydediliyor...</span>';
-        try{
-            let res = await fetch(`${API_BASE}/api/manuelGider`, {
-                method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'true'},
-                body:JSON.stringify({tarih,aciklama,tutar,tur})
-            });
-            let data = await res.json();
-            if(data.success){
-                document.getElementById('manuelSonuc').innerHTML = '<span style="color:#22c55e;">✅ Gider kaydedildi!</span>';
-                document.getElementById('manuelAciklama').value = '';
-                document.getElementById('manuelTutar').value = '';
-                tumVerileriGuncelle();
-            } else document.getElementById('manuelSonuc').innerHTML = `<span style="color:#ef4444;">❌ Hata: ${data.error}</span>`;
-        } catch(e){ document.getElementById('manuelSonuc').innerHTML = '<span style="color:#ef4444;">❌ Bağlantı hatası</span>'; }
-    }
-    
-    async function modulListesiGetir(){
-        try{
-            let res = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            if(data.moduller?.length){
-                let html = '';
-                data.moduller.forEach(m => {
-                    html += `<div class="modul-btn" onclick="modulGoster('${m.path}','${m.adi}')">🧩 ${m.adi}</div>`;
-                });
-                document.getElementById('modulListesi').innerHTML = html;
-            } else document.getElementById('modulListesi').innerHTML = '<div>Modül bulunamadı</div>';
-        } catch(e){ document.getElementById('modulListesi').innerHTML = '<div>Modüller alınamadı</div>'; }
-    }
-    
-    async function modulGoster(path,adi){
-        let icerikDiv = document.getElementById('modulIcerik');
-        icerikDiv.style.display = 'block';
-        icerikDiv.innerHTML = `<div style="color:#f97316;">🔄 ${adi} yükleniyor...</div>`;
-        try{
-            let res = await fetch(`${API_BASE}${path}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            icerikDiv.innerHTML = `<div style="color:#f97316; margin-bottom:12px;">📌 Modül: ${adi}</div><pre style="font-family:monospace; font-size:0.7rem; white-space:pre-wrap;">${JSON.stringify(data,null,2)}</pre>`;
-        } catch(e){
-            icerikDiv.innerHTML = `<div style="color:#ef4444;">❌ Modül çalıştırılamadı</div>`;
+            let masalar = await fetch(`${API_BASE}/api/acikMasalar`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            if(masalar.length) {
+                acikMasalar = masalar.map(m => ({ id: m.TicketNumber, masa: m.Masa, adisyonNo: m.TicketNumber, saat: m.Saat, acilisZamani: Date.now(), urunAdet: m.UrunAdet, tutar: m.Toplam }));
+                localStorage.setItem('acikMasalar', JSON.stringify(acikMasalar));
+                acikMasalariGoster();
+            }
+            document.getElementById('apiDurum').innerHTML = `✅ Veriler Çekildi | ${new Date().toLocaleTimeString()}`;
+            document.getElementById('apiDurum').style.color = '#22c55e';
+            ozetGuncelle();
+        } catch(e) {
+            document.getElementById('apiDurum').innerHTML = `⚠️ Bağlantı Hatası: ${e.message}`;
+            document.getElementById('apiDurum').style.color = '#ef4444';
         }
     }
     
-    tumVerileriGuncelle();
-    modulListesiGetir();
+    function bildirimEkle(baslik, mesaj, tip) {
+        bildirimler.unshift({ id: Date.now(), tip: tip || 'info', mesaj: `${baslik}: ${mesaj}`, tarih: new Date().toLocaleString(), okundu: false });
+        if(bildirimler.length > 20) bildirimler.pop();
+        tumVerileriKaydet();
+        bildirimleriGoster();
+    }
+    
+    function tumVerileriGuncelle() { tumTablolariGuncelle(); bildirimEkle('Güncelleme', 'Tüm veriler yenilendi', 'info'); }
+    
+    function tumTablolariGuncelle() {
+        ozetGuncelle(); giderleriGoster(); acikMasalariGoster(); paketServisleriGoster(); onlineSiparisleriGoster();
+        urunleriGoster(); stoklariGoster(); personelSecenekleriGuncelle(); tedarikciSecenekleriGuncelle();
+        bildirimleriGoster(); raporGoster('gunluk'); modulleriGoster(); grafikleriGuncelle(); tumVerileriKaydet();
+    }
+
+    // ========== GRAFİK ==========
+    let haftalikChart;
+    function grafikleriGuncelle() {
+        let ctx = document.getElementById('haftalikCiroChart')?.getContext('2d');
+        if(ctx) { if(haftalikChart) haftalikChart.destroy(); haftalikChart = new Chart(ctx, { type: 'line', data: { labels: aylikCiroGecmisi.map(a=>a.ay), datasets: [{ label: 'Aylık Ciro (₺)', data: aylikCiroGecmisi.map(a=>a.ciro), borderColor: '#f97316', fill: true }] }, options: { responsive: true } }); }
+    }
+
+    // ========== ÖZET ==========
+    function ozetGuncelle() {
+        let fiziki = (paketServisler.reduce((s,p)=>s+(p.tutar||0),0) + acikMasalar.reduce((s,m)=>s+(m.tutar||0),0)) || 0;
+        let onlineBrut = onlineSiparisler.reduce((s,o)=>s+(o.brut||0),0);
+        let onlineNet = onlineSiparisler.reduce((s,o)=>s+(o.net||0),0);
+        let giderTop = giderler.reduce((s,g)=>s+(g.tutar||0),0);
+        let toplamCiro = fiziki + onlineNet;
+        document.getElementById('ozetTarih').innerHTML = new Date().toLocaleDateString('tr-TR');
+        document.getElementById('fizikiCiro').innerHTML = fiziki.toLocaleString('tr-TR')+' ₺';
+        document.getElementById('onlineBrut').innerHTML = onlineBrut.toLocaleString('tr-TR')+' ₺';
+        document.getElementById('onlineNet').innerHTML = onlineNet.toLocaleString('tr-TR')+' ₺';
+        document.getElementById('toplamCiro').innerHTML = toplamCiro.toLocaleString('tr-TR')+' ₺';
+        document.getElementById('toplamGider').innerHTML = giderTop.toLocaleString('tr-TR')+' ₺';
+        let netKar = toplamCiro - giderTop;
+        document.getElementById('netKar').innerHTML = netKar.toLocaleString('tr-TR')+' ₺';
+        document.getElementById('netKar').className = 'stat-number ' + (netKar>=0?'positive':'negative');
+        document.getElementById('ozetKartlar').innerHTML = `<div class="stat-card"><h4>💰 Nakit Tahmini</h4><div class="stat-number positive">${(fiziki*0.6).toLocaleString()} ₺</div></div><div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number">${(fiziki*0.4).toLocaleString()} ₺</div></div>`;
+    }
+
+    // ========== GİDERLER ==========
+    function giderleriGoster() { 
+        let html='<table><thead><tr><th>Gider</th><th>Tutar</th><th>Tarih</th><th>İşlem</th></tr></thead><tbody>'; 
+        giderler.forEach(g=>{html+=`<tr><td>${g.ad}</td><td class="amount-right">${(g.tutar||0).toLocaleString()} ₺</td><td>${g.tarih}</td><td><button class="btn-danger btn-sm" onclick="giderSil(${g.id})">Sil</button></td></tr>`;}); 
+        html+=`<tr style="background:#334155;"><td><strong>TOPLAM</strong></td><td class="amount-right"><strong>${giderler.reduce((s,g)=>s+(g.tutar||0),0).toLocaleString()} ₺</strong></td><td></td><td></td></tr></tbody></table>`; 
+        document.getElementById('giderListesi').innerHTML=html; 
+    }
+    function yeniGiderEkle() { let ad=prompt("Gider adı:"); let tutar=parseFloat(prompt("Tutar:")); if(ad&&tutar) { giderler.push({id:Date.now(),ad:ad,tutar:tutar,tarih:new Date().toISOString().slice(0,10)}); giderleriGoster(); ozetGuncelle(); tumVerileriKaydet(); bildirimEkle('Gider', `${ad} eklendi`, 'info'); } }
+    function giderSil(id) { giderler=giderler.filter(g=>g.id!==id); giderleriGoster(); ozetGuncelle(); tumVerileriKaydet(); bildirimEkle('Gider', 'Silindi', 'warning'); }
+
+    // ========== AÇIK MASALAR ==========
+    function acikMasalariGoster() { 
+        let html='<div class="paket-grid">'; 
+        let simdi=Date.now(); 
+        acikMasalar.forEach(m=>{let dk=Math.floor((simdi-(m.acilisZamani||simdi))/60000); html+=`<div class="paket-card" onclick="adisyonDetay('${m.adisyonNo}')"><div class="no">🪑 ${m.masa}</div><div class="musteri">📋 ${m.adisyonNo}</div><div class="info">⏱️ ${dk} dk | ${m.urunAdet||0} ürün</div><div class="tutar">💰 ${(m.tutar||0).toLocaleString()} ₺</div></div>`;}); 
+        html+='</div>'; 
+        document.getElementById('acikMasaListesi').innerHTML=html||'<div>Açık masa yok</div>';
+        let kritik=acikMasalar.filter(m=>(Date.now()-(m.acilisZamani||Date.now()))/60000>45);
+        document.getElementById('sureSayaci').innerHTML=kritik.length?`⚠️ ${kritik.length} masa 45 dk aştı!`:'';
+    }
+    
+    // ========== PAKET SERVİS ==========
+    function paketServisleriGoster() { 
+        let html='<div class="paket-grid">'; 
+        paketServisler.forEach(p=>{html+=`<div class="paket-card" onclick="adisyonDetay('${p.adisyonNo}')"><div class="no">📦 ${p.adisyonNo}</div><div class="musteri">👤 ${p.musteri || 'Misafir'}</div><div class="info">🕐 ${p.saat || '-'}</div><div class="tutar">💰 ${(p.tutar||0).toLocaleString()} ₺</div></div>`;}); 
+        html+='</div>'; 
+        document.getElementById('paketServisListesi').innerHTML=html||'<div>Paket servis yok</div>'; 
+    }
+
+    // ========== ONLINE SİPARİŞ ==========
+    function onlineSiparisleriGoster() { 
+        let html='<table><thead><tr><th>Platform</th><th>Adisyon</th><th>Brüt</th><th>Komisyon %40</th><th>Net</th></tr></thead><tbody>'; 
+        onlineSiparisler.forEach(o=>{html+=`<tr onclick="adisyonDetay('${o.adisyon}')" style="cursor:pointer"><td>${o.platform}</td><td>${o.adisyon}</td><td class="amount-right">${(o.brut||0).toLocaleString()} ₺</td><td class="amount-right negative">-${((o.brut||0)*0.4).toLocaleString()} ₺</td><td class="amount-right positive">${(o.net||0).toLocaleString()} ₺</td></tr>`;}); 
+        html+=`<tr style="background:#334155;"><td><strong>TOPLAM</strong></td><td></td><td class="amount-right"><strong>${onlineSiparisler.reduce((s,o)=>s+(o.brut||0),0).toLocaleString()} ₺</strong></td><td class="amount-right negative"><strong>-${(onlineSiparisler.reduce((s,o)=>s+(o.brut||0),0)*0.4).toLocaleString()} ₺</strong></td><td class="amount-right positive"><strong>${onlineSiparisler.reduce((s,o)=>s+(o.net||0),0).toLocaleString()} ₺</strong></td></tr></tbody></table>`; 
+        document.getElementById('onlineSiparisListesi').innerHTML=html||'<div>Online sipariş yok</div>'; 
+    }
+
+    // ========== ÜRÜN YÖNETİMİ ==========
+    function urunleriGoster() { 
+        let ara=document.getElementById('urunAra')?.value.toLowerCase()||''; 
+        let kat=document.getElementById('kategoriFiltre')?.value||'tumu'; 
+        let filt=urunler.filter(u=>u.ad.toLowerCase().includes(ara)&&(kat==='tumu'||u.kategori===kat)); 
+        let html='<table><thead><tr><th>Ürün</th><th>Fiyat</th><th>Yeni Fiyat</th><th>Stok</th><th>İşlem</th></tr></thead><tbody>'; 
+        filt.forEach(u=>{html+=`<tr><td>${u.ad}</td><td class="amount-right">${(u.fiyat||0).toLocaleString()} ₺</td><td><input type="number" id="yeniFiyat_${u.id}" placeholder="Yeni fiyat" style="width:100px;"></td><td class="${u.stok<=u.kritikStok?'critical-stock':''}">${u.stok}</td><td><button class="btn-success btn-sm" onclick="fiyatGuncelle(${u.id})">Kaydet</button> <button class="btn-outline btn-sm" onclick="urunDuzenle(${u.id})">Düzenle</button> <button class="btn-danger btn-sm" onclick="urunSil(${u.id})">Sil</button></td></tr>`;}); 
+        html+='</tbody></table>'; 
+        document.getElementById('urunListesi').innerHTML=html; 
+        let katSelect=document.getElementById('kategoriFiltre'); 
+        if(katSelect&&katSelect.options.length<=1){katSelect.innerHTML='<option value="tumu">Tüm Kategoriler</option>'+[...new Set(urunler.map(u=>u.kategori))].map(k=>`<option value="${k}">${k}</option>`).join('');} 
+    }
+    
+    async function fiyatGuncelle(id){ 
+        let yeni=parseFloat(document.getElementById(`yeniFiyat_${id}`).value); 
+        if(yeni&&yeni>0){ 
+            let u=urunler.find(u=>u.id===id); 
+            if(u){
+                u.fiyat=yeni; 
+                urunleriGoster(); 
+                ozetGuncelle(); 
+                tumVerileriKaydet();
+                bildirimEkle('Fiyat', `${u.ad} fiyatı ${yeni} ₺ olarak güncellendi`, 'success');
+                // SambaPOS'a yansıt
+                try {
+                    await fetch(`${API_BASE}/api/fiyatGuncelle`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+                        body: JSON.stringify({ porsiyonId: u.id, yeniFiyat: yeni, urunAdi: u.ad })
+                    });
+                } catch(e) { console.log('SambaPOS güncelleme hatası:', e); }
+            }
+        } else alert("Geçerli fiyat girin!");
+    }
+    
+    function topluFiyatDegistir(){ let oran=parseFloat(prompt("Tüm ürünlere % değişim (örn: +10 veya -5):")); if(!isNaN(oran)){urunler.forEach(u=>{u.fiyat=Math.round(u.fiyat*(1+oran/100));}); alert(`Fiyatlar %${oran} güncellendi.`); urunleriGoster(); ozetGuncelle(); tumVerileriKaydet(); bildirimEkle('Toplu Fiyat', `%${oran} değişim uygulandı`, 'info');}}
+    function urunDuzenle(id){ let u=urunler.find(u=>u.id===id); if(u){ document.getElementById('modalTitle').innerHTML=`✏️ ${u.ad}`; document.getElementById('modalBody').innerHTML=`<label>Ad:</label><input id="editAd" value="${u.ad}"><label>Kategori:</label><input id="editKategori" value="${u.kategori}"><label>Fiyat:</label><input id="editFiyat" value="${u.fiyat}"><label>Maliyet:</label><input id="editMaliyet" value="${u.maliyet}"><label>Stok:</label><input id="editStok" value="${u.stok}"><label>Kritik Stok:</label><input id="editKritikStok" value="${u.kritikStok}"><button class="btn-success" onclick="kaydetUrunDuzenle(${id})">Kaydet</button><button class="btn-outline" onclick="kapatModal()">İptal</button>`; document.getElementById('urunModal').style.display='flex';}}
+    function kaydetUrunDuzenle(id){ let u=urunler.find(u=>u.id===id); if(u){ u.ad=document.getElementById('editAd').value; u.kategori=document.getElementById('editKategori').value; u.fiyat=parseFloat(document.getElementById('editFiyat').value); u.maliyet=parseFloat(document.getElementById('editMaliyet').value); u.stok=parseInt(document.getElementById('editStok').value); u.kritikStok=parseInt(document.getElementById('editKritikStok').value); kapatModal(); urunleriGoster(); stoklariGoster(); ozetGuncelle(); tumVerileriKaydet(); bildirimEkle('Ürün', `${u.ad} güncellendi`, 'success');}}
+    function urunSil(id){ if(confirm("Silinsin mi?")){ let u=urunler.find(u=>u.id===id); urunler=urunler.filter(u=>u.id!==id); urunleriGoster(); tumVerileriKaydet(); bildirimEkle('Ürün', `${u.ad} silindi`, 'warning');}}
+    function yeniUrunEkle(){ alert("Yeni ürün ekleme formu açılacak."); }
+
+    // ========== STOK ==========
+    function stoklariGoster(){ 
+        let html='<table><thead><tr><th>Ürün</th><th>Stok</th><th>Kritik</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'; 
+        urunler.forEach(u=>{let kritikDurum=u.stok<=u.kritikStok?'critical-stock':''; html+=`<tr class="${kritikDurum}"><td>${u.ad}</td><td>${u.stok}</td><td>${u.kritikStok}</td><td>${u.stok<=u.kritikStok?'🔴 KRİTİK':'🟢 Normal'}</td><td><button class="btn-primary btn-sm" onclick="stokEkle(${u.id})">+ Ekle</button> <button class="btn-warning btn-sm" onclick="stokCikar(${u.id})">- Çıkar</button></td></tr>`;}); 
+        html+='</tbody></table>'; 
+        document.getElementById('stokListesi').innerHTML=html; 
+    }
+    async function stokEkle(id){ 
+        let miktar=parseInt(prompt("Eklenecek miktar:")); 
+        if(miktar>0){ 
+            let u=urunler.find(u=>u.id===id); 
+            u.stok+=miktar; 
+            stoklariGoster(); 
+            urunleriGoster(); 
+            tumVerileriKaydet();
+            bildirimEkle('Stok', `${u.ad} stoğuna +${miktar} eklendi`, 'success');
+            try {
+                await fetch(`${API_BASE}/api/stokGuncelle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+                    body: JSON.stringify({ urunAdi: u.ad, miktar: miktar, islemTipi: 'Stok Girişi' })
+                });
+            } catch(e) {}
+        }
+    }
+    async function stokCikar(id){ 
+        let miktar=parseInt(prompt("Çıkarılacak miktar:")); 
+        if(miktar>0){ 
+            let u=urunler.find(u=>u.id===id); 
+            if(u.stok>=miktar){ 
+                u.stok-=miktar; 
+                stoklariGoster(); 
+                urunleriGoster(); 
+                tumVerileriKaydet();
+                bildirimEkle('Stok', `${u.ad} stoğundan -${miktar} çıkarıldı`, 'warning');
+                if(u.stok <= u.kritikStok) bildirimEkle('KRİTİK STOK', `${u.ad} stoğu kritik seviyede! (${u.stok})`, 'danger');
+            } else alert("Yetersiz stok!");
+        }
+    }
+    function stokGirisiYap(){ alert("Toplu stok girişi yapılabilir."); }
+    function kritikStoklariGoster(){ let kritik=urunler.filter(u=>u.stok<=u.kritikStok); alert(kritik.length?kritik.map(u=>`${u.ad}: ${u.stok} (Kritik:${u.kritikStok})`).join('\n'):'Kritik stok yok'); }
+
+    // ========== TEDARİKÇİ ==========
+    function tedarikciSecenekleriGuncelle() {
+        let select = document.getElementById('tedarikciSecim');
+        if(select) { select.innerHTML = '<option value="">Tedarikçi Seç</option>' + tedarikciler.map(t => `<option value="${t.id}">${t.ad} - ${t.urun}</option>`).join(''); }
+    }
+    function siparisGonder() {
+        let id = document.getElementById('tedarikciSecim').value;
+        let t = tedarikciler.find(t => t.id == id);
+        let not = document.getElementById('siparisNotu').value;
+        if(!t) { alert('Tedarikçi seçin'); return; }
+        if(!not) { alert('Sipariş detayı girin'); return; }
+        let msg = `MERHABA ${t.ad.toUpperCase()},\n\nÖZ URFA YUSUF USTA'dan sipariş:\n${not}\n\nTeşekkürler.`;
+        window.open(`https://wa.me/${t.telefon}?text=${encodeURIComponent(msg)}`, '_blank');
+        document.getElementById('siparisOzet').innerHTML = `📤 Sipariş gönderildi: ${t.ad}<br>📦 ${not.substring(0,50)}...`;
+        bildirimEkle('Sipariş', `${t.ad}'ye sipariş gönderildi`, 'success');
+        try {
+            fetch(`${API_BASE}/api/tedarikciSiparis`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tedarikciAdi: t.ad, urunler: not, toplamTutar: 0 })
+            }).catch(e=>{});
+        } catch(e) {}
+    }
+    function siparisPDFOlustur() {
+        let id = document.getElementById('tedarikciSecim').value;
+        let t = tedarikciler.find(t => t.id == id);
+        let not = document.getElementById('siparisNotu').value;
+        if(!t) { alert('Tedarikçi seçin'); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("ÖZ URFA YUSUF USTA", 20, 20);
+        doc.text(`Tedarikçi: ${t.ad}`, 20, 40);
+        doc.text(`Telefon: ${t.telefon}`, 20, 50);
+        doc.text(`Adres: ${t.adres || '-'}`, 20, 60);
+        doc.text("Sipariş Detayı:", 20, 80);
+        doc.text(not, 20, 90);
+        doc.text(`Tarih: ${new Date().toLocaleString()}`, 20, 120);
+        doc.save(`siparis_${t.ad}.pdf`);
+        bildirimEkle('PDF', `${t.ad} için sipariş PDF'i oluşturuldu`, 'info');
+    }
+    function siparisOzetGoster() {
+        let id = document.getElementById('tedarikciSecim').value;
+        let t = tedarikciler.find(t => t.id == id);
+        let not = document.getElementById('siparisNotu').value;
+        if(!t) { alert('Tedarikçi seçin'); return; }
+        document.getElementById('siparisOzet').innerHTML = `<strong>${t.ad}</strong><br>${not || 'Detay yok'}<br><span style="color:#f97316;">📅 ${new Date().toLocaleString()}</span>`;
+    }
+
+    // ========== PERSONEL ==========
+    function personelSecenekleriGuncelle() {
+        let select = document.getElementById('personelSecim');
+        if(select) { select.innerHTML = '<option value="">Personel Seç</option>' + personeller.map(p => `<option value="${p.id}">${p.ad} - ${p.pozisyon} (${p.maas} ₺)</option>`).join(''); }
+        let listeDiv = document.getElementById('personelBordroListe');
+        if(listeDiv) { listeDiv.innerHTML = personeller.map(p => `<div style="margin-bottom:8px; padding:8px; background:#0f172a; border-radius:12px;"><strong>${p.ad}</strong><br>Maaş: ${p.maas.toLocaleString()} ₺ | Prim: ${p.prim.toLocaleString()} ₺<br>Durum: ${p.odemeDurumu || 'Bekliyor'}</div>`).join(''); }
+    }
+    async function bordroKaydet() {
+        let id = document.getElementById('personelSecim').value;
+        let p = personeller.find(p => p.id == id);
+        let maas = parseFloat(document.getElementById('maasTutar').value);
+        let prim = parseFloat(document.getElementById('primTutar').value) || 0;
+        if(!p) { alert('Personel seçin'); return; }
+        if(!maas) { alert('Maaş girin'); return; }
+        p.maas = maas;
+        p.prim = prim;
+        p.odemeDurumu = 'Bekliyor';
+        personelSecenekleriGuncelle();
+        tumVerileriKaydet();
+        bildirimEkle('Bordro', `${p.ad} bordrosu kaydedildi. Maaş: ${maas} ₺, Prim: ${prim} ₺`, 'success');
+        document.getElementById('maasTutar').value = '';
+        document.getElementById('primTutar').value = '';
+        try {
+            await fetch(`${API_BASE}/api/personelBordro`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ personelAdi: p.ad, maas: maas, prim: prim })
+            }).catch(e=>{});
+        } catch(e) {}
+    }
+    function maasOdemesiYap() {
+        let id = document.getElementById('personelSecim').value;
+        let p = personeller.find(p => p.id == id);
+        if(!p) { alert('Personel seçin'); return; }
+        p.odemeDurumu = 'Ödendi';
+        p.sonOdeme = new Date().toLocaleDateString();
+        personelSecenekleriGuncelle();
+        tumVerileriKaydet();
+        bildirimEkle('Ödeme', `${p.ad} maaşı ödendi (${p.maas.toLocaleString()} ₺)`, 'success');
+        alert(`${p.ad} maaşı ödendi.`);
+    }
+
+    // ========== RAPORLAR ==========
+    function raporGoster(tip){ 
+        let fiziki=paketServisler.reduce((s,p)=>s+(p.tutar||0),0)+acikMasalar.reduce((s,m)=>s+(m.tutar||0),0); 
+        let onlineNet=onlineSiparisler.reduce((s,o)=>s+(o.net||0),0); 
+        let giderTop=giderler.reduce((s,g)=>s+(g.tutar||0),0); 
+        let html=`<table><thead><tr><th>Gösterge</th><th>Değer</th></tr></thead><tbody><tr><td>Fiziki Ciro</td><td class="amount-right">${fiziki.toLocaleString()} ₺</td></tr><tr><td>Online Net</td><td class="amount-right">${onlineNet.toLocaleString()} ₺</td></tr><tr><td>Toplam Gider</td><td class="amount-right negative">${giderTop.toLocaleString()} ₺</td></tr><tr style="background:#334155;"><td><strong>NET KAR</strong></td><td class="amount-right positive">${(fiziki+onlineNet-giderTop).toLocaleString()} ₺</td></tr></tbody></table>`; 
+        if(tip==='aylik'){html+=`<h4 style="margin-top:20px;">Aylık Ciro</h4><table>${aylikCiroGecmisi.map(a=>`<tr><td>${a.ay}</td><td class="amount-right">${a.ciro.toLocaleString()} ₺</td></tr>`).join('')}</table>`;} 
+        document.getElementById('raporIcerik').innerHTML=html; 
+    }
+    function raporExcelIndir(){ 
+        let csv="Gösterge,Değer\n"; 
+        let fiziki=paketServisler.reduce((s,p)=>s+(p.tutar||0),0)+acikMasalar.reduce((s,m)=>s+(m.tutar||0),0); 
+        let onlineNet=onlineSiparisler.reduce((s,o)=>s+(o.net||0),0); 
+        let giderTop=giderler.reduce((s,g)=>s+(g.tutar||0),0); 
+        csv+=`Fiziki Ciro,${fiziki}\nOnline Net,${onlineNet}\nToplam Gider,${giderTop}\nNet Kar,${fiziki+onlineNet-giderTop}\n`; 
+        let blob=new Blob([csv],{type:"text/csv"}); 
+        let a=document.createElement("a"); 
+        a.href=URL.createObjectURL(blob); 
+        a.download=`rapor_${new Date().toISOString().slice(0,10)}.csv`; 
+        a.click(); 
+        bildirimEkle('Excel', 'Rapor Excel olarak indirildi', 'info');
+    }
+    function raporPDFIndir(){ alert("PDF raporu hazırlanıyor..."); }
+    function gunSonuRaporu() { alert("Gün sonu raporu hazırlanıyor...\nToplam Ciro: " + document.getElementById('toplamCiro').innerHTML); }
+    function hesaplariKapat() { if(confirm("Gün sonu hesapları kapatılsın mı?")) { alert("Hesaplar kapatıldı."); bildirimEkle('Gün Sonu', 'Hesaplar kapatıldı', 'success'); } }
+
+    // ========== BİLDİRİMLER ==========
+    function bildirimleriGoster(){ 
+        let html = bildirimler.slice(0,5).map(b => `<div style="padding:8px; border-bottom:1px solid #334155; ${!b.okundu?'background:#f9731620;':''}"><strong>${b.tip==='danger'?'🔴':b.tip==='success'?'✅':b.tip==='warning'?'⚠️':'ℹ️'}</strong> ${b.mesaj}<br><small style="color:#94a3b8;">${b.tarih}</small></div>`).join(''); 
+        document.getElementById('bildirimListesi').innerHTML = html || '<div>Bildirim yok</div>';
+    }
+    function tumBildirimleriOkundu(){ bildirimler.forEach(b=>b.okundu=true); bildirimleriGoster(); tumVerileriKaydet(); }
+
+    // ========== MODÜLLER ==========
+    function modulleriGoster(){ let html='<div class="paket-grid">'; moduller.forEach(m=>{html+=`<div class="paket-card"><div class="no">🔌 ${m.ad}</div><div class="info">${m.aciklama}</div><button class="btn-primary btn-sm" onclick="modulCalistir('${m.id}')">Çalıştır</button> <button class="btn-danger btn-sm" onclick="modulSil('${m.id}')">Sil</button></div>`;}); html+='</div>'; document.getElementById('modullerIcerik').innerHTML=html||'<div>Modül yok</div>'; }
+    function modulEklemeFormuGoster(){ document.getElementById('modulModalBody').innerHTML=`<label>Modül Adı:</label><input id="yeniModulAd"><label>Açıklama:</label><input id="yeniModulAciklama"><label>Kod (JavaScript):</label><textarea id="yeniModulKod" rows="5">function(){ alert("Merhaba!"); }</textarea><button class="btn-success" onclick="modulKaydet()">Kaydet</button>`; document.getElementById('modulModal').style.display='flex'; }
+    function modulKaydet(){ let ad=document.getElementById('yeniModulAd').value; let aciklama=document.getElementById('yeniModulAciklama').value; let kod=document.getElementById('yeniModulKod').value; if(ad){ moduller.push({id:Date.now().toString(),ad:ad,aciklama:aciklama,kod:kod}); tumVerileriKaydet(); modulleriGoster(); kapatModulModal(); bildirimEkle('Modül', `${ad} eklendi`, 'success');} else alert("Ad giriniz.");}
+    function modulCalistir(id){ let m=moduller.find(m=>m.id===id); if(m){ try{ eval(m.kod); bildirimEkle('Modül', `${m.ad} çalıştırıldı`, 'info'); }catch(e){ alert("Modül hatası: "+e);} } }
+    function modulSil(id){ if(confirm("Modül silinsin mi?")){ let m=moduller.find(m=>m.id===id); moduller=moduller.filter(m=>m.id!==id); tumVerileriKaydet(); modulleriGoster(); bildirimEkle('Modül', `${m.ad} silindi`, 'warning');} }
+
+    // ========== ADİSYON DETAY ==========
+    function adisyonDetay(no){ alert(`📋 Adisyon ${no}\n\nSambaPOS'tan detaylı bilgi almak için "Veri Çek" butonuna tıklayın.`); }
+
+    // ========== BAŞLAT ==========
+    tumTablolariGuncelle();
+    apiBaglan();
+    setInterval(() => { tumTablolariGuncelle(); }, 60000);
 </script>
 </body>
 </html>
