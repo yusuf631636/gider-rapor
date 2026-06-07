@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Öz Urfa Kebap | Executive Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -61,7 +62,7 @@
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.7rem;
@@ -146,7 +147,7 @@
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP — Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL | Gerçek Zamanlı | Gider Takibi | Ciro Analizi | Ürün Yönetimi | Stok | Personel | Telegram</p>
+        <p>📡 SambaPOS SQL | Gerçek Zamanlı | Gider Takibi | Ciro Analizi | Tüm Raporlar</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -162,13 +163,16 @@
 
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="ozet">📊 Özet</button>
+        <button class="tab-btn" data-tab="gunSonu">📋 Gün Sonu</button>
+        <button class="tab-btn" data-tab="urunSatis">🍽️ Ürün Satış</button>
+        <button class="tab-btn" data-tab="personelSatis">👥 Personel</button>
+        <button class="tab-btn" data-tab="onlineSiparis">📱 Online Sipariş</button>
+        <button class="tab-btn" data-tab="fire">⚠️ İkram/İade/Zayi</button>
         <button class="tab-btn" data-tab="giderler">📝 Giderler</button>
         <button class="tab-btn" data-tab="repoGiderler">🗄️ Repo</button>
         <button class="tab-btn" data-tab="masalar">🪑 Masalar</button>
         <button class="tab-btn" data-tab="ciro">📈 Ciro</button>
         <button class="tab-btn" data-tab="urunler">🏷️ Ürünler</button>
-        <button class="tab-btn" data-tab="stok">📦 Stok</button>
-        <button class="tab-btn" data-tab="personel">👥 Personel</button>
         <button class="tab-btn" data-tab="manuel">✏️ Gider</button>
         <button class="tab-btn" data-tab="telegram">🔔 Telegram</button>
         <button class="tab-btn" data-tab="moduller">🧩 Modüller</button>
@@ -185,6 +189,36 @@
                 <div class="stat-card"><h4>📝 Ödenmeyenler</h4><div class="stat-number loss" id="odenmeyenOzet">0 ₺</div></div>
             </div>
         </div>
+    </div>
+
+    <!-- GÜN SONU RAPORU TAB -->
+    <div id="gunSonuTab" class="card">
+        <div class="card-header">📋 Gün Sonu Raporu — <span id="gunSonuTarih"></span></div>
+        <div class="card-body" id="gunSonuRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- ÜRÜN SATIŞ RAPORU TAB -->
+    <div id="urunSatisTab" class="card">
+        <div class="card-header">🍽️ Ürün Satış Raporu — <span id="urunSatisTarih"></span></div>
+        <div class="card-body" id="urunSatisRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- PERSONEL SATIŞ RAPORU TAB -->
+    <div id="personelSatisTab" class="card">
+        <div class="card-header">👥 Personel Satış Raporu — <span id="personelSatisTarih"></span></div>
+        <div class="card-body" id="personelSatisRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- ONLINE SİPARİŞ RAPORU TAB -->
+    <div id="onlineSiparisTab" class="card">
+        <div class="card-header">📱 Online Sipariş Raporu — <span id="onlineSiparisTarih"></span></div>
+        <div class="card-body" id="onlineSiparisRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- İKRAM/İADE/ZAYİ RAPORU TAB -->
+    <div id="fireTab" class="card">
+        <div class="card-header">⚠️ İkram / İade / Zayi Raporu — <span id="fireTarih"></span></div>
+        <div class="card-body" id="fireRaporu">Yükleniyor...</div>
     </div>
 
     <!-- GİDERLER TAB -->
@@ -234,7 +268,6 @@
                 <select id="kategoriFiltre" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;" onchange="urunFiltrele()">
                     <option value="">Tüm Kategoriler</option>
                 </select>
-                <button class="btn-primary" onclick="yeniUrunEkle()">➕ Yeni Ürün</button>
             </div>
             <div class="table-wrapper">
                 <table id="urunTablosu">
@@ -242,34 +275,6 @@
                     <tbody id="urunTbody">Yükleniyor...</tbody>
                 </table>
             </div>
-        </div>
-    </div>
-
-    <!-- STOK TAB -->
-    <div id="stokTab" class="card">
-        <div class="card-header">📦 Stok Takibi</div>
-        <div class="card-body">
-            <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
-                <input type="text" id="stokUrunAdi" placeholder="Ürün adı" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
-                <input type="number" id="stokMiktar" placeholder="Miktar" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white; width:100px;">
-                <select id="stokIslem" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
-                    <option value="set">Set Et</option><option value="ekle">Ekle</option><option value="cikar">Çıkar</option>
-                </select>
-                <button class="btn-primary" onclick="stokGuncelle()">Kaydet</button>
-            </div>
-            <div id="stokListesi">Yükleniyor...</div>
-        </div>
-    </div>
-
-    <!-- PERSONEL TAB -->
-    <div id="personelTab" class="card">
-        <div class="card-header">👥 Personel Satış Performansı</div>
-        <div class="card-body">
-            <div style="margin-bottom:15px; display:flex; gap:10px;">
-                <input type="date" id="personelTarih" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
-                <button class="btn-primary" onclick="personelRaporuGetir()">Getir</button>
-            </div>
-            <div id="personelListesi">Yükleniyor...</div>
         </div>
     </div>
 
@@ -293,15 +298,10 @@
         <div class="card-header">🔔 Telegram Bildirim</div>
         <div class="card-body">
             <div class="stats-grid">
-                <div class="stat-card"><h4>📊 Durum</h4><div id="telegramDurum">✅ Aktif</div></div>
+                <div class="stat-card"><h4>📊 Durum</h4><div>✅ Bot Aktif</div></div>
                 <div class="stat-card"><h4>📱 Test</h4><button class="btn-primary" onclick="telegramTest()">Test Gönder</button></div>
             </div>
-            <div style="margin-top:15px;">
-                <label>Günlük Rapor Saati: </label>
-                <input type="number" id="raporSaat" min="0" max="23" style="background:#0f172a; border:1px solid #334155; padding:4px 8px; border-radius:20px; color:white; width:60px;">
-                <button class="btn-primary" style="margin-left:10px;" onclick="telegramAyariKaydet()">Kaydet</button>
-            </div>
-            <div style="margin-top:10px; font-size:0.7rem; color:#94a3b8;">
+            <div style="margin-top:15px; font-size:0.7rem; color:#94a3b8;">
                 📌 Bot: @yusufcetin636316_bot
             </div>
         </div>
@@ -315,14 +315,13 @@
         </div>
     </div>
 
-    <div class="footer">Öz Urfa Kebap | SambaPOS SQL | Telegram Bildirim Aktif | JSON Repo Aktif</div>
+    <div class="footer">Öz Urfa Kebap | SambaPOS SQL | Tüm Raporlar Aktif | JSON Repo Aktif</div>
 </div>
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
     document.getElementById('apiUrl').value = API_BASE;
     let tumUrunler = [];
-    let stoklar = JSON.parse(localStorage.getItem('stoklar') || '{}');
     
     // Tab değiştirme
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -333,8 +332,11 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
             document.getElementById(tab + 'Tab').classList.add('active-card');
             if (tab === 'urunler') urunleriGetir();
-            if (tab === 'stok') stoklariGoster();
-            if (tab === 'personel') { document.getElementById('personelTarih').value = new Date().toISOString().slice(0,10); personelRaporuGetir(); }
+            if (tab === 'gunSonu') gunSonuRaporuGetir();
+            if (tab === 'urunSatis') urunSatisRaporuGetir();
+            if (tab === 'personelSatis') personelSatisRaporuGetir();
+            if (tab === 'onlineSiparis') onlineSiparisRaporuGetir();
+            if (tab === 'fire') fireRaporuGetir();
             if (tab === 'repoGiderler') repoGiderleriGetir();
             if (tab === 'moduller') modulListesiGetir();
         });
@@ -358,6 +360,11 @@
         let tarih = new Date().toISOString().slice(0,10);
         document.getElementById('ozetTarih').innerHTML = tarih;
         document.getElementById('manuelTarih').value = tarih;
+        document.getElementById('gunSonuTarih').innerHTML = tarih;
+        document.getElementById('urunSatisTarih').innerHTML = tarih;
+        document.getElementById('personelSatisTarih').innerHTML = tarih;
+        document.getElementById('onlineSiparisTarih').innerHTML = tarih;
+        document.getElementById('fireTarih').innerHTML = tarih;
         
         try {
             let ana = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`).then(r=>r.json());
@@ -383,8 +390,9 @@
             let g = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`).then(r=>r.json());
             if(g.giderler?.length){
                 let html = '<table><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
-                g.giderler.forEach(i=> html += `<tr><td>${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td>${i.Tarih||'-'}</td></tr>`);
-                html += `<tr style="background:#f9731610;"><td><b>TOPLAM</b></td><td class="amount-right"><b>${(g.toplam||0).toLocaleString('tr-TR')} ₺</b></td><td></td></tr></tbody></table>`;
+                g.giderler.forEach(i=> html += `<tr><td style="font-weight:500;">${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${i.Tarih||'-'}</td></tr>`);
+                html += `<tr style="background:#f9731610;"><td><b>TOPLAM</b></td><td class="amount-right"><b>${(g.toplam||0).toLocaleString('tr-TR')} ₺</b></td><td></td></tr>`;
+                html += '</tbody><tr>';
                 document.getElementById('giderListesi').innerHTML = html;
             } else document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider yok</div>';
         } catch(e){}
@@ -393,13 +401,13 @@
             let m = await fetch(`${API_BASE}/api/acikMasalar`).then(r=>r.json());
             let fiziki = m.filter(x => !x.Masa?.toLowerCase().includes('paket'));
             let paket = m.filter(x => x.Masa?.toLowerCase().includes('paket'));
-            document.getElementById('fizikiMasaListesi').innerHTML = fiziki.length ? `<table><thead><tr><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></tr></thead><tbody>${fiziki.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td>${t.UrunAdet}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`).join('')}</tbody></table>` : '<div>Fiziki masa yok</div>';
-            document.getElementById('paketServisListesi').innerHTML = paket.length ? `<table><thead><tr><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></tr></thead><tbody>${paket.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td>${t.UrunAdet}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`).join('')}</tbody></table>` : '<div>Paket servis yok</div>';
+            document.getElementById('fizikiMasaListesi').innerHTML = fiziki.length ? `<td><thead><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></thead><tbody>${fiziki.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td>${t.UrunAdet}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`).join('')}</tbody></td>` : '<div>Fiziki masa yok</div>';
+            document.getElementById('paketServisListesi').innerHTML = paket.length ? `<table><thead><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></thead><tbody>${paket.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td>${t.UrunAdet}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`).join('')}</tbody></table>` : '<div>Paket servis yok</div>';
         } catch(e){}
         
         try {
             let c = await fetch(`${API_BASE}/api/ciroKarsilastirma`).then(r=>r.json());
-            let html = '<table><thead><tr><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></tr></thead><tbody>';
+            let html = '<table><thead><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></thead><tbody>';
             if(c.aylik?.length){
                 c.aylik.forEach(a => {
                     let gunSayisi = new Date(parseInt(a.Ay.split('-')[0]), parseInt(a.Ay.split('-')[1]), 0).getDate();
@@ -407,11 +415,130 @@
                     html += `<tr><td>${a.Ay}</td><td class="amount-right">${(a.Ciro||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${parseFloat(gunluk).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
             }
-            html += '</tbody></table><table style="margin-top:15px;"><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
+            html += '</tbody><tr><table style="margin-top:15px;"><thead><th>Yıl</th><th>Ciro</th></thead><tbody>';
             if(c.yillik?.length) c.yillik.forEach(y=> html += `<tr><td>${y.Yil}</td><td class="amount-right">${(y.Ciro||0).toLocaleString('tr-TR')} ₺</td></tr>`);
             html += '</tbody></table>';
             document.getElementById('ciroKarsilastirma').innerHTML = html;
         } catch(e){}
+    }
+    
+    // ========== GÜN SONU RAPORU ==========
+    async function gunSonuRaporuGetir() {
+        let tarih = new Date().toISOString().slice(0,10);
+        try {
+            let res = await fetch(`${API_BASE}/api/rapor/gunSonu?tarih=${tarih}`).then(r=>r.json());
+            if(res.success) {
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro">${res.toplamCiro.toLocaleString('tr-TR')} ₺</div></div>
+                        <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider">${res.toplamGider.toLocaleString('tr-TR')} ₺</div></div>
+                        <div class="stat-card"><h4>💚 Net Kar</h4><div class="stat-number ciro">${(res.toplamCiro - res.toplamGider).toLocaleString('tr-TR')} ₺</div></div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>📝 Toplam Adisyon</h4><div class="stat-number">${res.adisyonlar?.ToplamAdisyon || 0}</div></div>
+                        <div class="stat-card"><h4>✅ Kapalı Adisyon</h4><div class="stat-number nakit">${res.adisyonlar?.KapaliAdisyon || 0}</div></div>
+                        <div class="stat-card"><h4>🔄 Açık Adisyon</h4><div class="stat-number loss">${res.adisyonlar?.AcikAdisyon || 0}</div></div>
+                    </div>
+                    <h4 style="color:#f97316; margin-top:15px;">💰 Gelirler</h4>
+                    <div class="table-wrapper"><table><thead><th>Ödeme Tipi</th><th>Tutar</th></thead><tbody>
+                    ${res.satislar?.map(s => `<tr><td>${s.OdemeTipi}</td><td class="amount-right">${s.Tutar.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                    <h4 style="color:#f97316; margin-top:15px;">📉 Giderler</h4>
+                    <div class="table-wrapper"><table><thead><th>Gider Adı</th><th>Tutar</th></thead><tbody>
+                    ${res.giderler?.map(g => `<tr><td>${g.GiderAdi}</td><td class="amount-right">${g.Tutar.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                `;
+                document.getElementById('gunSonuRaporu').innerHTML = html;
+            } else document.getElementById('gunSonuRaporu').innerHTML = '<div>Rapor alınamadı</div>';
+        } catch(e) { document.getElementById('gunSonuRaporu').innerHTML = '<div>Rapor alınamadı</div>'; }
+    }
+    
+    // ========== ÜRÜN SATIŞ RAPORU ==========
+    async function urunSatisRaporuGetir() {
+        let tarih = new Date().toISOString().slice(0,10);
+        try {
+            let res = await fetch(`${API_BASE}/api/rapor/urunSatis?tarih=${tarih}`).then(r=>r.json());
+            if(res.success) {
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>📦 Toplam Ürün</h4><div class="stat-number">${res.toplam?.adet || 0}</div></div>
+                        <div class="stat-card"><h4>💰 Toplam Tutar</h4><div class="stat-number ciro">${(res.toplam?.tutar || 0).toLocaleString('tr-TR')} ₺</div></div>
+                    </div>
+                    <div class="table-wrapper"><table><thead><th>Ürün Adı</th><th>Porsiyon</th><th>Adet</th><th>Toplam Tutar</th><th>Ortalama Fiyat</th></thead><tbody>
+                    ${res.urunler?.map(u => `<tr><td>${u.UrunAdi}</td><td>${u.Porsiyon}</td><td>${u.Adet}</td><td class="amount-right">${u.ToplamTutar.toLocaleString('tr-TR')} ₺</td><td class="amount-right">${u.OrtalamaFiyat.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                `;
+                document.getElementById('urunSatisRaporu').innerHTML = html;
+            } else document.getElementById('urunSatisRaporu').innerHTML = '<div>Rapor alınamadı</div>';
+        } catch(e) { document.getElementById('urunSatisRaporu').innerHTML = '<div>Rapor alınamadı</div>'; }
+    }
+    
+    // ========== PERSONEL SATIŞ RAPORU ==========
+    async function personelSatisRaporuGetir() {
+        let tarih = new Date().toISOString().slice(0,10);
+        try {
+            let res = await fetch(`${API_BASE}/api/rapor/personelSatis?tarih=${tarih}`).then(r=>r.json());
+            if(res.success) {
+                let html = `
+                    <div class="table-wrapper"><table><thead><th>Sıra</th><th>Personel</th><th>Adisyon Sayısı</th><th>Sipariş Sayısı</th><th>Toplam Satış</th></thead><tbody>
+                    ${res.personeller?.map((p, i) => `<tr><td class="amount-right">${i+1}</td><td><b>${p.Personel}</b></td><td class="amount-right">${p.AdisyonSayisi}</td><td class="amount-right">${p.SiparisSayisi}</td><td class="amount-right">${p.ToplamSatis.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                `;
+                document.getElementById('personelSatisRaporu').innerHTML = html;
+            } else document.getElementById('personelSatisRaporu').innerHTML = '<div>Rapor alınamadı</div>';
+        } catch(e) { document.getElementById('personelSatisRaporu').innerHTML = '<div>Rapor alınamadı</div>'; }
+    }
+    
+    // ========== ONLINE SİPARİŞ RAPORU ==========
+    async function onlineSiparisRaporuGetir() {
+        let tarih = new Date().toISOString().slice(0,10);
+        try {
+            let res = await fetch(`${API_BASE}/api/rapor/onlineSiparis?tarih=${tarih}`).then(r=>r.json());
+            if(res.success) {
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>📦 Toplam Sipariş</h4><div class="stat-number">${res.platformlar?.reduce((s,p)=>s+p.SiparisSayisi,0) || 0}</div></div>
+                        <div class="stat-card"><h4>💰 Brüt Tutar</h4><div class="stat-number ciro">${res.genelToplam?.brut.toLocaleString('tr-TR')} ₺</div></div>
+                        <div class="stat-card"><h4>💰 Komisyon (%${(res.komisyonOrani*100).toFixed(0)})</h4><div class="stat-number loss">${res.genelToplam?.komisyon.toLocaleString('tr-TR')} ₺</div></div>
+                        <div class="stat-card"><h4>💰 Net Tutar</h4><div class="stat-number nakit">${res.genelToplam?.net.toLocaleString('tr-TR')} ₺</div></div>
+                    </div>
+                    <div class="table-wrapper">树<thead><th>Platform</th><th>Sipariş Sayısı</th><th>Brüt Tutar</th><th>Komisyon</th><th>Net Tutar</th></thead><tbody>
+                    ${res.platformlar?.map(p => `<tr><td><b>${p.Platform}</b></td><td class="amount-right">${p.SiparisSayisi}</td><td class="amount-right">${p.ToplamTutar.toLocaleString('tr-TR')} ₺</td><td class="amount-right loss">${p.Komisyon.toLocaleString('tr-TR')} ₺</td><td class="amount-right nakit">${p.NetTutar.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                `;
+                document.getElementById('onlineSiparisRaporu').innerHTML = html;
+            } else document.getElementById('onlineSiparisRaporu').innerHTML = '<div>Rapor alınamadı</div>';
+        } catch(e) { document.getElementById('onlineSiparisRaporu').innerHTML = '<div>Rapor alınamadı</div>'; }
+    }
+    
+    // ========== İKRAM/İADE/ZAYİ RAPORU ==========
+    async function fireRaporuGetir() {
+        let tarih = new Date().toISOString().slice(0,10);
+        try {
+            let res = await fetch(`${API_BASE}/api/rapor/fire?tarih=${tarih}`).then(r=>r.json());
+            if(res.success) {
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>↩️ İade</h4><div class="stat-number loss">${res.toplamlar?.iade.toLocaleString('tr-TR')} ₺</div></div>
+                        <div class="stat-card"><h4>🎁 İkram</h4><div class="stat-number gider">${res.toplamlar?.ikram.toLocaleString('tr-TR')} ₺</div></div>
+                        <div class="stat-card"><h4>🗑️ Zayi</h4><div class="stat-number loss">${res.toplamlar?.zayi.toLocaleString('tr-TR')} ₺</div></div>
+                    </div>
+                    <h4 style="color:#ef4444;">↩️ İade Edilenler</h4>
+                    <div class="table-wrapper"><table><thead><th>Ürün</th><th>Porsiyon</th><th>Adet</th><th>Tutar</th></thead><tbody>
+                    ${res.iade?.map(u => `<tr><td>${u.UrunAdi}</td><td>${u.Porsiyon}</td><td class="amount-right">${u.Adet}</td><td class="amount-right loss">${u.ToplamTutar.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                    <h4 style="color:#22c55e; margin-top:15px;">🎁 İkram Edilenler</h4>
+                    <div class="table-wrapper"><table><thead><th>Ürün</th><th>Porsiyon</th><th>Adet</th><th>Tutar</th></thead><tbody>
+                    ${res.ikram?.map(u => `<tr><td>${u.UrunAdi}</td><td>${u.Porsiyon}</td><td class="amount-right">${u.Adet}</td><td class="amount-right nakit">${u.ToplamTutar.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                    <h4 style="color:#f97316; margin-top:15px;">🗑️ Zayi Edilenler</h4>
+                    <div class="table-wrapper"><table><thead><th>Ürün</th><th>Porsiyon</th><th>Adet</th><th>Tutar</th></thead><tbody>
+                    ${res.zayi?.map(u => `<tr><td>${u.UrunAdi}</td><td>${u.Porsiyon}</td><td class="amount-right">${u.Adet}</td><td class="amount-right gider">${u.ToplamTutar.toLocaleString('tr-TR')} ₺</td></tr>`).join('')}
+                    </tbody></table></div>
+                `;
+                document.getElementById('fireRaporu').innerHTML = html;
+            } else document.getElementById('fireRaporu').innerHTML = '<div>Rapor alınamadı</div>';
+        } catch(e) { document.getElementById('fireRaporu').innerHTML = '<div>Rapor alınamadı</div>'; }
     }
     
     // ========== ÜRÜN YÖNETİMİ ==========
@@ -437,7 +564,7 @@
         document.getElementById('urunTbody').innerHTML = filtered.map(u => `
             <tr>
                 <td>${u.Kategori || 'Diğer'}</td>
-                <td><input type="text" value="${u.Urun || ''}" class="fiyat-input" style="width:150px;" data-urunid="${u.PorsiyonId}" data-field="adi" onchange="urunAdiGuncelle(this, ${u.PorsiyonId})"></td>
+                <td><input type="text" value="${u.Urun || ''}" class="fiyat-input" style="width:150px;" data-porsiyon="${u.PorsiyonId}" data-field="adi" onchange="urunAdiGuncelle(this, ${u.PorsiyonId})"></td>
                 <td>${u.Porsiyon || 'Normal'}</td>
                 <td><input type="number" step="0.01" value="${u.Fiyat || 0}" class="fiyat-input" data-porsiyon="${u.PorsiyonId}" onchange="fiyatGuncelle(this, ${u.PorsiyonId})"></td>
                 <td>-</td>
@@ -454,25 +581,20 @@
                 body: JSON.stringify({porsiyonId, yeniFiyat})
             }).then(r=>r.json());
             if(res.success) toast(`Fiyat güncellendi: ${yeniFiyat} ₺`);
-            else toast('Hata: ' + res.error, 'error');
+            else toast('Hata: ' + JSON.stringify(res), 'error');
         } catch(e) { toast('Bağlantı hatası', 'error'); }
     }
     
     async function urunAdiGuncelle(input, porsiyonId) {
-        let yeniUrunAdi = input.value;
-        try {
-            let res = await fetch(`${API_BASE}/api/urunAdiGuncelle`, {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({urunId: porsiyonId, yeniUrunAdi})
-            }).then(r=>r.json());
-            if(res.success) toast('Ürün adı güncellendi');
-        } catch(e) { toast('Hata', 'error'); }
+        toast('Ürün adı değiştirme API hazırlanıyor', 'error');
     }
     
     async function topluFiyatKaydet() {
         let updates = [];
         document.querySelectorAll('#urunTbody input[data-porsiyon]').forEach(input => {
-            updates.push({ porsiyonId: parseInt(input.dataset.porsiyon), yeniFiyat: parseFloat(input.value) });
+            if(input.dataset.field !== 'adi') {
+                updates.push({ porsiyonId: parseInt(input.dataset.porsiyon), yeniFiyat: parseFloat(input.value) });
+            }
         });
         let basarili = 0;
         for (let item of updates) {
@@ -487,61 +609,6 @@
         toast(`${basarili} ürün güncellendi`);
     }
     
-    async function yeniUrunEkle() {
-        let urunAdi = prompt('Ürün adı:');
-        if(!urunAdi) return;
-        let kategori = prompt('Kategori (örn: Kebap, Salata):', 'Diğer');
-        let porsiyon = prompt('Porsiyon (örn: Normal):', 'Normal');
-        let fiyat = prompt('Fiyat (TL):');
-        if(!fiyat) return;
-        toast('Yeni ürün ekleme özelliği için /api/yeniUrun endpointi gereklidir. Şimdilik manuel SambaPOS\'tan ekleyin.', 'error');
-    }
-    
-    // ========== STOK ==========
-    function stoklariGoster() {
-        let html = '<table><thead><tr><th>Ürün</th><th>Miktar</th><th>Birim</th><th>İşlem</th></tr></thead><tbody>';
-        for (let [ad, veri] of Object.entries(stoklar)) {
-            html += `<tr><td>${ad}</td><td class="${veri.miktar <= (veri.kritik || 5) ? 'loss' : ''}">${veri.miktar} ${veri.birim || 'adet'}</td><td>${veri.birim || 'adet'}</td><td><button class="btn-outline" style="padding:2px 8px;" onclick="stokSil('${ad}')">Sil</button></td></tr>`;
-        }
-        html += '</tbody></table>';
-        document.getElementById('stokListesi').innerHTML = html || '<div>Stok kaydı yok</div>';
-    }
-    
-    function stokGuncelle() {
-        let urunAdi = document.getElementById('stokUrunAdi').value;
-        let miktar = parseFloat(document.getElementById('stokMiktar').value);
-        let islem = document.getElementById('stokIslem').value;
-        if(!urunAdi || isNaN(miktar)) { toast('Ürün adı ve miktar girin', 'error'); return; }
-        if(!stoklar[urunAdi]) stoklar[urunAdi] = { miktar: 0, birim: 'adet', kritik: 5 };
-        if(islem === 'ekle') stoklar[urunAdi].miktar += miktar;
-        else if(islem === 'cikar') stoklar[urunAdi].miktar -= miktar;
-        else stoklar[urunAdi].miktar = miktar;
-        localStorage.setItem('stoklar', JSON.stringify(stoklar));
-        stoklariGoster();
-        document.getElementById('stokUrunAdi').value = '';
-        document.getElementById('stokMiktar').value = '';
-        toast('Stok güncellendi');
-    }
-    
-    function stokSil(ad) {
-        delete stoklar[ad];
-        localStorage.setItem('stoklar', JSON.stringify(stoklar));
-        stoklariGoster();
-        toast('Stok silindi');
-    }
-    
-    // ========== PERSONEL ==========
-    async function personelRaporuGetir() {
-        let tarih = document.getElementById('personelTarih').value;
-        let res = await fetch(`${API_BASE}/api/personelSatis?tarih=${tarih}`).then(r=>r.json());
-        if(res.length) {
-            let html = '<table><thead><tr><th>Sıra</th><th>Personel</th><th>Adisyon</th><th>Toplam Satış</th></tr></thead><tbody>';
-            res.forEach((p, i) => html += `<tr><td>${i+1}</td><td><b>${p.Personel}</b></td><td>${p.AdisyonSayisi}</td><td class="amount-right">${(p.ToplamSatis||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-            html += '</tbody></table>';
-            document.getElementById('personelListesi').innerHTML = html;
-        } else document.getElementById('personelListesi').innerHTML = '<div>Bu tarihte veri yok</div>';
-    }
-    
     // ========== REPO GİDERLER ==========
     async function repoGiderleriGetir() {
         let baslangic = document.getElementById('repoBaslangic').value || '2024-01-01';
@@ -551,7 +618,7 @@
             if(res.giderler?.length) {
                 let toplam = res.giderler.reduce((s,g)=>s+g.tutar,0);
                 document.getElementById('repoGiderListesi').innerHTML = `<div><b>Toplam ${res.giderler.length} gider, ${toplam.toLocaleString('tr-TR')} ₺</b></div>
-                <table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th></tr></thead><tbody>
+                <table><thead><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th></thead><tbody>
                 ${res.giderler.map(g => `<tr><td>${g.tarih}</td><td>${g.aciklama}</td><td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td><td>${g.tur}</td></tr>`).join('')}
                 </tbody></table>`;
             } else document.getElementById('repoGiderListesi').innerHTML = '<div>Bu tarihte gider yok</div>';
@@ -566,11 +633,6 @@
             if(res.success) toast('✅ Telegram test mesajı gönderildi!');
             else toast('❌ Telegram hatası', 'error');
         } catch(e) { toast('Bağlantı hatası', 'error'); }
-    }
-    
-    async function telegramAyariKaydet() {
-        let raporSaat = parseInt(document.getElementById('raporSaat').value);
-        toast('Telegram ayarları kaydedildi (yerel)');
     }
     
     // ========== MODÜLLER ==========
@@ -603,6 +665,7 @@
                 document.getElementById('manuelTutar').value = '';
                 tumVerileriGuncelle();
                 repoGiderleriGetir();
+                gunSonuRaporuGetir();
             } else document.getElementById('manuelSonuc').innerHTML = `<span style="color:#ef4444;">❌ Hata: ${data.error}</span>`;
         } catch(e){ document.getElementById('manuelSonuc').innerHTML = '<span style="color:#ef4444;">❌ Bağlantı hatası</span>'; }
     }
@@ -610,11 +673,14 @@
     // ========== BAŞLAT ==========
     tumVerileriGuncelle();
     urunleriGetir();
-    stoklariGoster();
+    gunSonuRaporuGetir();
+    urunSatisRaporuGetir();
+    personelSatisRaporuGetir();
+    onlineSiparisRaporuGetir();
+    fireRaporuGetir();
     modulListesiGetir();
     document.getElementById('repoBaslangic').value = new Date(new Date().setDate(1)).toISOString().slice(0,10);
     document.getElementById('repoBitis').value = new Date().toISOString().slice(0,10);
-    document.getElementById('raporSaat').value = 20;
 </script>
 </body>
 </html>
