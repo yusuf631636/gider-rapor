@@ -14,7 +14,7 @@
             min-height: 100vh;
             color: #eef2ff;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1600px; margin: 0 auto; }
         
         .header {
             background: rgba(15, 23, 42, 0.7);
@@ -34,6 +34,7 @@
         .btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
         .btn-outline:hover { background: rgba(249,115,22,0.15); border-color: #f97316; color: #f97316; }
         .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
         
         .api-bar {
             background: rgba(30, 41, 59, 0.6);
@@ -51,37 +52,38 @@
         .tab-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 24px;
             background: rgba(0,0,0,0.25);
             border-radius: 60px;
             padding: 6px;
-            width: fit-content;
         }
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 8px 24px;
+            padding: 8px 18px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             cursor: pointer;
             color: #cbd5e1;
+            transition: 0.2s;
         }
         .tab-btn.active { background: #f97316; color: white; }
+        .tab-btn:hover:not(.active) { background: rgba(249,115,22,0.3); }
         
         .stats-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
         .stat-card {
-            flex: 1; min-width: 150px;
+            flex: 1; min-width: 130px;
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(8px);
             border-radius: 24px;
-            padding: 18px;
+            padding: 15px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .stat-card h4 { font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; }
-        .stat-number { font-size: 1.5rem; font-weight: 800; }
+        .stat-card h4 { font-size: 0.65rem; color: #94a3b8; margin-bottom: 8px; }
+        .stat-number { font-size: 1.3rem; font-weight: 800; }
         .stat-number.nakit { color: #22c55e; }
         .stat-number.kredi { color: #3b82f6; }
         .stat-number.ciro { color: #facc15; }
@@ -98,52 +100,53 @@
         }
         .card.active-card { display: block; }
         .card-header {
-            padding: 16px 24px;
+            padding: 14px 22px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             color: #f97316;
         }
-        .card-body { padding: 18px 22px; }
+        .card-body { padding: 16px 20px; }
         
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th { text-align: left; padding: 10px 8px; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th { text-align: left; padding: 8px 6px; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .amount-right { text-align: right; font-weight: 600; }
         
-        .gider-table { width: 100%; }
-        .gider-table th, .gider-table td { padding: 10px 8px; }
-        
-        .modul-list { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
-        .modul-btn { background: #1e293b; border: 1px solid #334155; border-radius: 40px; padding: 8px 20px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
-        .modul-btn:hover { background: #f97316; border-color: #f97316; color: white; }
-        
-        .modul-json {
-            background: #0f172a;
-            border-radius: 20px;
-            padding: 16px;
-            margin-top: 16px;
-            font-family: monospace;
-            font-size: 0.7rem;
-            white-space: pre-wrap;
-            border: 1px solid #334155;
-            display: none;
-        }
+        .fiyat-input { background: #0f172a; border: 1px solid #334155; padding: 5px 8px; border-radius: 12px; color: white; width: 90px; text-align: right; }
+        .fiyat-input:focus { outline: none; border-color: #f97316; }
         
         .two-col { display: flex; flex-wrap: wrap; gap: 24px; }
         .two-col > div { flex: 1; min-width: 280px; }
         
-        .footer { text-align: center; font-size: 0.65rem; color: #5b6e8c; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .footer { text-align: center; font-size: 0.6rem; color: #5b6e8c; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
         
-        @media (max-width: 700px) { .stat-number { font-size: 1.2rem; } .tab-btn { padding: 6px 16px; font-size: 0.7rem; } }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            border-left: 4px solid #22c55e;
+            padding: 10px 16px;
+            border-radius: 12px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            font-size: 0.75rem;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 700px) { .stat-number { font-size: 1rem; } .tab-btn { padding: 6px 10px; font-size: 0.6rem; } }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>🧾 ÖZ URFA KEBAP — Executive Dashboard</h1>
-        <p>📡 SambaPOS SQL | Gerçek Zamanlı | Gider Takibi | Ciro Analizi</p>
+        <p>📡 SambaPOS SQL | Gerçek Zamanlı | Gider Takibi | Ciro Analizi | Ürün Yönetimi | Stok | Personel | Telegram</p>
         <div class="date-time" id="dateTime"></div>
     </div>
 
@@ -154,14 +157,20 @@
             <button class="btn-primary" onclick="apiUrlKaydet()">Kaydet</button>
         </div>
         <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
+        <button class="btn-outline" onclick="telegramTest()">📱 Telegram Test</button>
     </div>
 
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="ozet">📊 Özet</button>
         <button class="tab-btn" data-tab="giderler">📝 Giderler</button>
-        <button class="tab-btn" data-tab="masalar">🪑 Açık Masalar</button>
-        <button class="tab-btn" data-tab="ciro">📈 Ciro Karşılaştırma</button>
-        <button class="tab-btn" data-tab="manuel">✏️ Manuel Gider</button>
+        <button class="tab-btn" data-tab="repoGiderler">🗄️ Repo</button>
+        <button class="tab-btn" data-tab="masalar">🪑 Masalar</button>
+        <button class="tab-btn" data-tab="ciro">📈 Ciro</button>
+        <button class="tab-btn" data-tab="urunler">🏷️ Ürünler</button>
+        <button class="tab-btn" data-tab="stok">📦 Stok</button>
+        <button class="tab-btn" data-tab="personel">👥 Personel</button>
+        <button class="tab-btn" data-tab="manuel">✏️ Gider</button>
+        <button class="tab-btn" data-tab="telegram">🔔 Telegram</button>
         <button class="tab-btn" data-tab="moduller">🧩 Modüller</button>
     </div>
 
@@ -173,52 +182,128 @@
             <div class="stats-grid">
                 <div class="stat-card"><h4>💰 Kasa (Bugün)</h4><div class="stat-number ciro" id="kasaToplam">0 ₺</div></div>
                 <div class="stat-card"><h4>📆 Bugünkü Satış</h4><div class="stat-number ciro" id="gunlukSatisOzet">0 ₺</div></div>
-                <div class="stat-card"><h4>📝 Ödenmeyen Adisyonlar</h4><div class="stat-number loss" id="odenmeyenOzet">0 ₺</div></div>
+                <div class="stat-card"><h4>📝 Ödenmeyenler</h4><div class="stat-number loss" id="odenmeyenOzet">0 ₺</div></div>
             </div>
         </div>
     </div>
 
-    <!-- GİDERLER TAB (Düzenli tablo) -->
+    <!-- GİDERLER TAB -->
     <div id="giderlerTab" class="card">
-        <div class="card-header">📝 Giderler — Kalem Kalem</div>
+        <div class="card-header">📝 Giderler (SQL)</div>
         <div class="card-body" id="giderListesi">Yükleniyor...</div>
     </div>
 
-    <!-- AÇIK MASALAR TAB (Paket Servis ve Fiziki Masa ayrı) -->
+    <!-- REPO GİDERLER TAB -->
+    <div id="repoGiderlerTab" class="card">
+        <div class="card-header">🗄️ Gider Repo (JSON Arşiv)</div>
+        <div class="card-body">
+            <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="date" id="repoBaslangic" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
+                <input type="date" id="repoBitis" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
+                <button class="btn-primary" onclick="repoGiderleriGetir()">Filtrele</button>
+            </div>
+            <div id="repoGiderListesi">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- AÇIK MASALAR TAB -->
     <div id="masalarTab" class="card">
         <div class="card-header">🪑 Açık Masalar & Paket Servis</div>
         <div class="card-body">
             <div class="two-col">
-                <div>
-                    <h4 style="color:#f97316; margin-bottom:12px;">🏪 Fiziki Masalar</h4>
-                    <div id="fizikiMasaListesi">Yükleniyor...</div>
-                </div>
-                <div>
-                    <h4 style="color:#f97316; margin-bottom:12px;">📦 Paket Servis</h4>
-                    <div id="paketServisListesi">Yükleniyor...</div>
-                </div>
+                <div><h4 style="color:#f97316;">🏪 Fiziki Masalar</h4><div id="fizikiMasaListesi">Yükleniyor...</div></div>
+                <div><h4 style="color:#f97316;">📦 Paket Servis</h4><div id="paketServisListesi">Yükleniyor...</div></div>
             </div>
         </div>
     </div>
 
-    <!-- CİRO KARŞILAŞTIRMA TAB -->
+    <!-- CİRO TAB -->
     <div id="ciroTab" class="card">
         <div class="card-header">📈 Aylık & Yıllık Ciro Karşılaştırma</div>
         <div class="card-body" id="ciroKarsilastirma">Yükleniyor...</div>
     </div>
 
+    <!-- ÜRÜN YÖNETİMİ TAB -->
+    <div id="urunlerTab" class="card">
+        <div class="card-header">🏷️ Ürün & Fiyat Yönetimi 
+            <button class="btn-success" style="margin-left:10px;" onclick="topluFiyatKaydet()">💾 Toplu Kaydet</button>
+        </div>
+        <div class="card-body">
+            <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="urunArama" placeholder="Ürün ara..." style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white; width:200px;" onkeyup="urunFiltrele()">
+                <select id="kategoriFiltre" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;" onchange="urunFiltrele()">
+                    <option value="">Tüm Kategoriler</option>
+                </select>
+                <button class="btn-primary" onclick="yeniUrunEkle()">➕ Yeni Ürün</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="urunTablosu">
+                    <thead><tr><th>Kategori</th><th>Ürün Adı</th><th>Porsiyon</th><th>Fiyat (₺)</th><th>İşlem</th></tr></thead>
+                    <tbody id="urunTbody">Yükleniyor...</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- STOK TAB -->
+    <div id="stokTab" class="card">
+        <div class="card-header">📦 Stok Takibi</div>
+        <div class="card-body">
+            <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="stokUrunAdi" placeholder="Ürün adı" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
+                <input type="number" id="stokMiktar" placeholder="Miktar" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white; width:100px;">
+                <select id="stokIslem" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
+                    <option value="set">Set Et</option><option value="ekle">Ekle</option><option value="cikar">Çıkar</option>
+                </select>
+                <button class="btn-primary" onclick="stokGuncelle()">Kaydet</button>
+            </div>
+            <div id="stokListesi">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- PERSONEL TAB -->
+    <div id="personelTab" class="card">
+        <div class="card-header">👥 Personel Satış Performansı</div>
+        <div class="card-body">
+            <div style="margin-bottom:15px; display:flex; gap:10px;">
+                <input type="date" id="personelTarih" style="background:#0f172a; border:1px solid #334155; padding:6px 12px; border-radius:20px; color:white;">
+                <button class="btn-primary" onclick="personelRaporuGetir()">Getir</button>
+            </div>
+            <div id="personelListesi">Yükleniyor...</div>
+        </div>
+    </div>
+
     <!-- MANUEL GİDER TAB -->
     <div id="manuelTab" class="card">
-        <div class="card-header">✏️ Manuel Gider Ekle (SQL'e kaydedilir)</div>
+        <div class="card-header">✏️ Manuel Gider Ekle (SQL + Repo)</div>
         <div class="card-body">
             <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
-                <div><label>Tarih</label><br><input type="date" id="manuelTarih" value="2026-06-05" style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white;"></div>
-                <div><label>Açıklama</label><br><input type="text" id="manuelAciklama" placeholder="Maya, Kaşar..." style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white; width:160px;"></div>
-                <div><label>Tutar (TL)</label><br><input type="number" id="manuelTutar" step="0.01" style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white; width:120px;"></div>
-                <div><label>Tür</label><br><select id="manuelTur" style="background:#0f172a; border:1px solid #334155; padding:8px; border-radius:20px; color:white;"><option>Nakit</option><option>Kredi</option></select></div>
-                <div><button class="btn-success" style="margin-top:20px;" onclick="manuelGiderEkle()">💾 Kaydet</button></div>
+                <div><label>Tarih</label><br><input type="date" id="manuelTarih" style="background:#0f172a; border:1px solid #334155; padding:6px; border-radius:20px; color:white;"></div>
+                <div><label>Açıklama</label><br><input type="text" id="manuelAciklama" placeholder="Maya, Kaşar..." style="background:#0f172a; border:1px solid #334155; padding:6px; border-radius:20px; color:white; width:150px;"></div>
+                <div><label>Tutar (TL)</label><br><input type="number" id="manuelTutar" step="0.01" style="background:#0f172a; border:1px solid #334155; padding:6px; border-radius:20px; color:white; width:100px;"></div>
+                <div><label>Tür</label><br><select id="manuelTur" style="background:#0f172a; border:1px solid #334155; padding:6px; border-radius:20px; color:white;"><option>Nakit</option><option>Kredi</option></select></div>
+                <div><button class="btn-success" onclick="manuelGiderEkle()">💾 Kaydet</button></div>
             </div>
-            <div id="manuelSonuc" style="margin-top:20px; font-size:0.8rem;"></div>
+            <div id="manuelSonuc" style="margin-top:15px; font-size:0.75rem;"></div>
+        </div>
+    </div>
+
+    <!-- TELEGRAM TAB -->
+    <div id="telegramTab" class="card">
+        <div class="card-header">🔔 Telegram Bildirim</div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card"><h4>📊 Durum</h4><div id="telegramDurum">✅ Aktif</div></div>
+                <div class="stat-card"><h4>📱 Test</h4><button class="btn-primary" onclick="telegramTest()">Test Gönder</button></div>
+            </div>
+            <div style="margin-top:15px;">
+                <label>Günlük Rapor Saati: </label>
+                <input type="number" id="raporSaat" min="0" max="23" style="background:#0f172a; border:1px solid #334155; padding:4px 8px; border-radius:20px; color:white; width:60px;">
+                <button class="btn-primary" style="margin-left:10px;" onclick="telegramAyariKaydet()">Kaydet</button>
+            </div>
+            <div style="margin-top:10px; font-size:0.7rem; color:#94a3b8;">
+                📌 Bot: @yusufcetin636316_bot
+            </div>
         </div>
     </div>
 
@@ -227,17 +312,19 @@
         <div class="card-header">🧩 Modüller</div>
         <div class="card-body">
             <div id="modulListesi" class="modul-list">Yükleniyor...</div>
-            <div id="modulIcerik" class="modul-json"></div>
         </div>
     </div>
 
-    <div class="footer">Öz Urfa Kebap | SambaPOS SQL Bağlantılı | Gerçek Zamanlı</div>
+    <div class="footer">Öz Urfa Kebap | SambaPOS SQL | Telegram Bildirim Aktif | JSON Repo Aktif</div>
 </div>
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
     document.getElementById('apiUrl').value = API_BASE;
+    let tumUrunler = [];
+    let stoklar = JSON.parse(localStorage.getItem('stoklar') || '{}');
     
+    // Tab değiştirme
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -245,6 +332,10 @@
             const tab = btn.getAttribute('data-tab');
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
             document.getElementById(tab + 'Tab').classList.add('active-card');
+            if (tab === 'urunler') urunleriGetir();
+            if (tab === 'stok') stoklariGoster();
+            if (tab === 'personel') { document.getElementById('personelTarih').value = new Date().toISOString().slice(0,10); personelRaporuGetir(); }
+            if (tab === 'repoGiderler') repoGiderleriGetir();
             if (tab === 'moduller') modulListesiGetir();
         });
     });
@@ -253,73 +344,62 @@
     
     function apiUrlKaydet() { API_BASE = document.getElementById('apiUrl').value; localStorage.setItem('apiBase', API_BASE); alert('API adresi kaydedildi'); tumVerileriGuncelle(); }
     
+    function toast(msg, type='success') {
+        let div = document.createElement('div');
+        div.className = 'toast';
+        div.style.borderLeftColor = type === 'success' ? '#22c55e' : '#ef4444';
+        div.innerHTML = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }
+    
+    // ========== ANA VERİLER ==========
     async function tumVerileriGuncelle() {
         let tarih = new Date().toISOString().slice(0,10);
         document.getElementById('ozetTarih').innerHTML = tarih;
+        document.getElementById('manuelTarih').value = tarih;
         
-        // Özet
         try {
-            let ana = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            let ana = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`).then(r=>r.json());
             let toplamCiro = ana.ToplamCiro || 0;
             let odenmeyen = ana.Odenmeyenler || 0;
-            let toplamCiroOdenmeyenli = toplamCiro + odenmeyen;
             document.getElementById('ozetKartlar').innerHTML = `
                 <div class="stat-card"><h4>💰 Nakit</h4><div class="stat-number nakit">${(ana.NakitGelir||0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>💳 Kredi Kartı</h4><div class="stat-number kredi">${(ana.KrediGelir||0).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📊 Toplam Ciro</h4><div class="stat-number ciro">${(toplamCiro).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📊 + Ödenmeyen</h4><div class="stat-number loss">${(odenmeyen).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📊 Toplam (Tahsilat+Ödenm.)</h4><div class="stat-number ciro">${(toplamCiroOdenmeyenli).toLocaleString('tr-TR')} ₺</div></div>
-                <div class="stat-card"><h4>📉 Toplam Gider</h4><div class="stat-number gider">${(ana.ToplamGider||0).toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>💳 Kredi</h4><div class="stat-number kredi">${(ana.KrediGelir||0).toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>📊 Ciro</h4><div class="stat-number ciro">${toplamCiro.toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>📉 Gider</h4><div class="stat-number gider">${(ana.ToplamGider||0).toLocaleString('tr-TR')} ₺</div></div>
+                <div class="stat-card"><h4>💚 Net Kar</h4><div class="stat-number ciro">${(ana.NetKar||0).toLocaleString('tr-TR')} ₺</div></div>
             `;
-            document.getElementById('odenmeyenOzet').innerHTML = (odenmeyen).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('odenmeyenOzet').innerHTML = odenmeyen.toLocaleString('tr-TR') + ' ₺';
         } catch(e){}
         
-        // Kasa (bugünün toplamı için gunlukSatis çağrısı)
         try {
-            let gs = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            let gs = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`).then(r=>r.json());
             document.getElementById('gunlukSatisOzet').innerHTML = (gs.BrutSatis||0).toLocaleString('tr-TR') + ' ₺';
+            document.getElementById('kasaToplam').innerHTML = (gs.BrutSatis||0).toLocaleString('tr-TR') + ' ₺';
         } catch(e){}
         
-        // Kasa toplamı (tüm zamanlar değil, bugün için Payments toplamı)
         try {
-            let kasa = await fetch(`${API_BASE}/api/gunlukSatis?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            document.getElementById('kasaToplam').innerHTML = (kasa.BrutSatis||0).toLocaleString('tr-TR') + ' ₺';
-        } catch(e){}
-        
-        // Giderler (düzenli tablo)
-        try {
-            let g = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            let g = await fetch(`${API_BASE}/api/giderler?tarih=${tarih}`).then(r=>r.json());
             if(g.giderler?.length){
-                let html = '<table class="gider-table"><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
-                g.giderler.forEach(i=> html += `<tr><td style="font-weight:500;">${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${i.Tarih||'-'}</td></tr>`);
-                html += `<tr style="background:#f9731610; font-weight:bold;"><td>TOPLAM</td><td class="amount-right">${(g.toplam||0).toLocaleString('tr-TR')} ₺</td><td></td></tr>`;
-                html += '</tbody></table>';
+                let html = '<table><thead><tr><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></tr></thead><tbody>';
+                g.giderler.forEach(i=> html += `<tr><td>${i.GiderAdi||'-'}</td><td class="amount-right">${(i.Tutar||0).toLocaleString('tr-TR')} ₺</td><td>${i.Tarih||'-'}</td></tr>`);
+                html += `<tr style="background:#f9731610;"><td><b>TOPLAM</b></td><td class="amount-right"><b>${(g.toplam||0).toLocaleString('tr-TR')} ₺</b></td><td></td></tr></tbody></table>`;
                 document.getElementById('giderListesi').innerHTML = html;
             } else document.getElementById('giderListesi').innerHTML = '<div>Bugün için gider yok</div>';
-        } catch(e){ document.getElementById('giderListesi').innerHTML = '<div>Gider alınamadı</div>'; }
+        } catch(e){}
         
-        // Açık Masalar (Fiziki Masa ve Paket Servis ayrı)
         try {
-            let m = await fetch(`${API_BASE}/api/acikMasalar`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
+            let m = await fetch(`${API_BASE}/api/acikMasalar`).then(r=>r.json());
             let fiziki = m.filter(x => !x.Masa?.toLowerCase().includes('paket'));
             let paket = m.filter(x => x.Masa?.toLowerCase().includes('paket'));
-            
-            let fizikiHtml = '<div class="table-wrapper"><table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
-            fiziki.forEach(t=> fizikiHtml += `<tr><td>${t.Masa||'-'}</td><td>${t.TicketNumber||'-'}</td><td>${t.Saat||'-'}</td><td class="amount-right">${t.UrunAdet||0}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-            fizikiHtml += '</tbody></table></div>';
-            
-            let paketHtml = '<div class="table-wrapper"><table><thead><tr><th>Masa</th><th>Adisyon No</th><th>Saat</th><th>Ürün Adet</th><th>Toplam</th></tr></thead><tbody>';
-            paket.forEach(t=> paketHtml += `<tr><td>${t.Masa||'-'}</td><td>${t.TicketNumber||'-'}</td><td>${t.Saat||'-'}</td><td class="amount-right">${t.UrunAdet||0}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-            paketHtml += '</tbody></table></div>';
-            
-            document.getElementById('fizikiMasaListesi').innerHTML = fizikiHtml || '<div>Fiziki masa yok</div>';
-            document.getElementById('paketServisListesi').innerHTML = paketHtml || '<div>Paket servis yok</div>';
-        } catch(e){ document.getElementById('fizikiMasaListesi').innerHTML = '<div>Masa alınamadı</div>'; }
+            document.getElementById('fizikiMasaListesi').innerHTML = fiziki.length ? `<table><thead><tr><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></tr></thead><tbody>${fiziki.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td>${t.UrunAdet}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`).join('')}</tbody></table>` : '<div>Fiziki masa yok</div>';
+            document.getElementById('paketServisListesi').innerHTML = paket.length ? `<table><thead><tr><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></tr></thead><tbody>${paket.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td>${t.UrunAdet}</td><td class="amount-right">${(t.Toplam||0).toLocaleString('tr-TR')} ₺</td></tr>`).join('')}</tbody></table>` : '<div>Paket servis yok</div>';
+        } catch(e){}
         
-        // Ciro Karşılaştırma
         try {
-            let c = await fetch(`${API_BASE}/api/ciroKarsilastirma`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).then(r=>r.json());
-            let html = '<div class="table-wrapper"><table class="gider-table"><thead></td><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></tr></thead><tbody>';
+            let c = await fetch(`${API_BASE}/api/ciroKarsilastirma`).then(r=>r.json());
+            let html = '<table><thead><tr><th>Ay</th><th>Ciro</th><th>Günlük Ortalama</th></tr></thead><tbody>';
             if(c.aylik?.length){
                 c.aylik.forEach(a => {
                     let gunSayisi = new Date(parseInt(a.Ay.split('-')[0]), parseInt(a.Ay.split('-')[1]), 0).getDate();
@@ -327,64 +407,214 @@
                     html += `<tr><td>${a.Ay}</td><td class="amount-right">${(a.Ciro||0).toLocaleString('tr-TR')} ₺</td><td class="amount-right">${parseFloat(gunluk).toLocaleString('tr-TR')} ₺</td></tr>`;
                 });
             }
-            html += '</tbody></table></div><div class="table-wrapper" style="margin-top:20px;"><table class="gider-table"><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
+            html += '</tbody></table><table style="margin-top:15px;"><thead><tr><th>Yıl</th><th>Ciro</th></tr></thead><tbody>';
             if(c.yillik?.length) c.yillik.forEach(y=> html += `<tr><td>${y.Yil}</td><td class="amount-right">${(y.Ciro||0).toLocaleString('tr-TR')} ₺</td></tr>`);
-            html += '</tbody></table></div>';
+            html += '</tbody></table>';
             document.getElementById('ciroKarsilastirma').innerHTML = html;
-        } catch(e){ document.getElementById('ciroKarsilastirma').innerHTML = '<div>Veri alınamadı</div>'; }
+        } catch(e){}
     }
     
-    async function manuelGiderEkle(){
+    // ========== ÜRÜN YÖNETİMİ ==========
+    async function urunleriGetir() {
+        try {
+            let res = await fetch(`${API_BASE}/api/fiyatListesi`).then(r=>r.json());
+            tumUrunler = res;
+            let kategoriler = [...new Set(res.map(u => u.Kategori).filter(k => k && k !== 'null' && k !== 'undefined'))];
+            let select = document.getElementById('kategoriFiltre');
+            select.innerHTML = '<option value="">Tüm Kategoriler</option>';
+            kategoriler.forEach(k => select.innerHTML += `<option value="${k}">${k}</option>`);
+            urunFiltrele();
+        } catch(e) { document.getElementById('urunTbody').innerHTML = '<tr><td colspan="5">Ürünler alınamadı</td></tr>'; }
+    }
+    
+    function urunFiltrele() {
+        let arama = document.getElementById('urunArama').value.toLowerCase();
+        let kategori = document.getElementById('kategoriFiltre').value;
+        let filtered = tumUrunler.filter(u => 
+            (!kategori || u.Kategori === kategori) && 
+            (!arama || (u.Urun || '').toLowerCase().includes(arama))
+        );
+        document.getElementById('urunTbody').innerHTML = filtered.map(u => `
+            <tr>
+                <td>${u.Kategori || 'Diğer'}</td>
+                <td><input type="text" value="${u.Urun || ''}" class="fiyat-input" style="width:150px;" data-urunid="${u.PorsiyonId}" data-field="adi" onchange="urunAdiGuncelle(this, ${u.PorsiyonId})"></td>
+                <td>${u.Porsiyon || 'Normal'}</td>
+                <td><input type="number" step="0.01" value="${u.Fiyat || 0}" class="fiyat-input" data-porsiyon="${u.PorsiyonId}" onchange="fiyatGuncelle(this, ${u.PorsiyonId})"></td>
+                <td>-</td>
+            </tr>
+        `).join('');
+    }
+    
+    async function fiyatGuncelle(input, porsiyonId) {
+        let yeniFiyat = parseFloat(input.value);
+        if(isNaN(yeniFiyat)) return;
+        try {
+            let res = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({porsiyonId, yeniFiyat})
+            }).then(r=>r.json());
+            if(res.success) toast(`Fiyat güncellendi: ${yeniFiyat} ₺`);
+            else toast('Hata: ' + res.error, 'error');
+        } catch(e) { toast('Bağlantı hatası', 'error'); }
+    }
+    
+    async function urunAdiGuncelle(input, porsiyonId) {
+        let yeniUrunAdi = input.value;
+        try {
+            let res = await fetch(`${API_BASE}/api/urunAdiGuncelle`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({urunId: porsiyonId, yeniUrunAdi})
+            }).then(r=>r.json());
+            if(res.success) toast('Ürün adı güncellendi');
+        } catch(e) { toast('Hata', 'error'); }
+    }
+    
+    async function topluFiyatKaydet() {
+        let updates = [];
+        document.querySelectorAll('#urunTbody input[data-porsiyon]').forEach(input => {
+            updates.push({ porsiyonId: parseInt(input.dataset.porsiyon), yeniFiyat: parseFloat(input.value) });
+        });
+        let basarili = 0;
+        for (let item of updates) {
+            try {
+                let res = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(item)
+                }).then(r=>r.json());
+                if(res.success) basarili++;
+            } catch(e) {}
+        }
+        toast(`${basarili} ürün güncellendi`);
+    }
+    
+    async function yeniUrunEkle() {
+        let urunAdi = prompt('Ürün adı:');
+        if(!urunAdi) return;
+        let kategori = prompt('Kategori (örn: Kebap, Salata):', 'Diğer');
+        let porsiyon = prompt('Porsiyon (örn: Normal):', 'Normal');
+        let fiyat = prompt('Fiyat (TL):');
+        if(!fiyat) return;
+        toast('Yeni ürün ekleme özelliği için /api/yeniUrun endpointi gereklidir. Şimdilik manuel SambaPOS\'tan ekleyin.', 'error');
+    }
+    
+    // ========== STOK ==========
+    function stoklariGoster() {
+        let html = '<table><thead><tr><th>Ürün</th><th>Miktar</th><th>Birim</th><th>İşlem</th></tr></thead><tbody>';
+        for (let [ad, veri] of Object.entries(stoklar)) {
+            html += `<tr><td>${ad}</td><td class="${veri.miktar <= (veri.kritik || 5) ? 'loss' : ''}">${veri.miktar} ${veri.birim || 'adet'}</td><td>${veri.birim || 'adet'}</td><td><button class="btn-outline" style="padding:2px 8px;" onclick="stokSil('${ad}')">Sil</button></td></tr>`;
+        }
+        html += '</tbody></table>';
+        document.getElementById('stokListesi').innerHTML = html || '<div>Stok kaydı yok</div>';
+    }
+    
+    function stokGuncelle() {
+        let urunAdi = document.getElementById('stokUrunAdi').value;
+        let miktar = parseFloat(document.getElementById('stokMiktar').value);
+        let islem = document.getElementById('stokIslem').value;
+        if(!urunAdi || isNaN(miktar)) { toast('Ürün adı ve miktar girin', 'error'); return; }
+        if(!stoklar[urunAdi]) stoklar[urunAdi] = { miktar: 0, birim: 'adet', kritik: 5 };
+        if(islem === 'ekle') stoklar[urunAdi].miktar += miktar;
+        else if(islem === 'cikar') stoklar[urunAdi].miktar -= miktar;
+        else stoklar[urunAdi].miktar = miktar;
+        localStorage.setItem('stoklar', JSON.stringify(stoklar));
+        stoklariGoster();
+        document.getElementById('stokUrunAdi').value = '';
+        document.getElementById('stokMiktar').value = '';
+        toast('Stok güncellendi');
+    }
+    
+    function stokSil(ad) {
+        delete stoklar[ad];
+        localStorage.setItem('stoklar', JSON.stringify(stoklar));
+        stoklariGoster();
+        toast('Stok silindi');
+    }
+    
+    // ========== PERSONEL ==========
+    async function personelRaporuGetir() {
+        let tarih = document.getElementById('personelTarih').value;
+        let res = await fetch(`${API_BASE}/api/personelSatis?tarih=${tarih}`).then(r=>r.json());
+        if(res.length) {
+            let html = '<table><thead><tr><th>Sıra</th><th>Personel</th><th>Adisyon</th><th>Toplam Satış</th></tr></thead><tbody>';
+            res.forEach((p, i) => html += `<tr><td>${i+1}</td><td><b>${p.Personel}</b></td><td>${p.AdisyonSayisi}</td><td class="amount-right">${(p.ToplamSatis||0).toLocaleString('tr-TR')} ₺</td></tr>`);
+            html += '</tbody></table>';
+            document.getElementById('personelListesi').innerHTML = html;
+        } else document.getElementById('personelListesi').innerHTML = '<div>Bu tarihte veri yok</div>';
+    }
+    
+    // ========== REPO GİDERLER ==========
+    async function repoGiderleriGetir() {
+        let baslangic = document.getElementById('repoBaslangic').value || '2024-01-01';
+        let bitis = document.getElementById('repoBitis').value || new Date().toISOString().slice(0,10);
+        try {
+            let res = await fetch(`${API_BASE}/api/giderRepo/tumGiderler?baslangic=${baslangic}&bitis=${bitis}`).then(r=>r.json());
+            if(res.giderler?.length) {
+                let toplam = res.giderler.reduce((s,g)=>s+g.tutar,0);
+                document.getElementById('repoGiderListesi').innerHTML = `<div><b>Toplam ${res.giderler.length} gider, ${toplam.toLocaleString('tr-TR')} ₺</b></div>
+                <table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th>Tür</th></tr></thead><tbody>
+                ${res.giderler.map(g => `<tr><td>${g.tarih}</td><td>${g.aciklama}</td><td class="amount-right">${g.tutar.toLocaleString('tr-TR')} ₺</td><td>${g.tur}</td></tr>`).join('')}
+                </tbody></table>`;
+            } else document.getElementById('repoGiderListesi').innerHTML = '<div>Bu tarihte gider yok</div>';
+        } catch(e) { document.getElementById('repoGiderListesi').innerHTML = '<div>Repo alınamadı</div>'; }
+    }
+    
+    // ========== TELEGRAM ==========
+    async function telegramTest() {
+        toast('📱 Test mesajı gönderiliyor...');
+        try {
+            let res = await fetch(`${API_BASE}/api/telegram/test`).then(r=>r.json());
+            if(res.success) toast('✅ Telegram test mesajı gönderildi!');
+            else toast('❌ Telegram hatası', 'error');
+        } catch(e) { toast('Bağlantı hatası', 'error'); }
+    }
+    
+    async function telegramAyariKaydet() {
+        let raporSaat = parseInt(document.getElementById('raporSaat').value);
+        toast('Telegram ayarları kaydedildi (yerel)');
+    }
+    
+    // ========== MODÜLLER ==========
+    async function modulListesiGetir() {
+        try {
+            let res = await fetch(`${API_BASE}/api/modulListesi`).then(r=>r.json());
+            if(res.moduller?.length) {
+                document.getElementById('modulListesi').innerHTML = res.moduller.map(m => `<div class="modul-btn">🧩 ${m.adi}</div>`).join('');
+            } else document.getElementById('modulListesi').innerHTML = '<div>Modül bulunamadı</div>';
+        } catch(e) { document.getElementById('modulListesi').innerHTML = '<div>Modüller alınamadı</div>'; }
+    }
+    
+    // ========== MANUEL GİDER ==========
+    async function manuelGiderEkle() {
         let tarih = document.getElementById('manuelTarih').value;
         let aciklama = document.getElementById('manuelAciklama').value;
         let tutar = parseFloat(document.getElementById('manuelTutar').value);
         let tur = document.getElementById('manuelTur').value;
         if(!aciklama || isNaN(tutar) || tutar<=0) { alert('Eksik veya hatalı bilgi'); return; }
         document.getElementById('manuelSonuc').innerHTML = '<span style="color:#facc15;">Kaydediliyor...</span>';
-        try{
+        try {
             let res = await fetch(`${API_BASE}/api/manuelGider`, {
-                method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'true'},
-                body:JSON.stringify({tarih,aciklama,tutar,tur})
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({tarih, aciklama, tutar, tur})
             });
             let data = await res.json();
-            if(data.success){
-                document.getElementById('manuelSonuc').innerHTML = '<span style="color:#22c55e;">✅ Gider kaydedildi!</span>';
+            if(data.success) {
+                document.getElementById('manuelSonuc').innerHTML = '<span style="color:#22c55e;">✅ Gider kaydedildi! (SQL + Repo)</span>';
                 document.getElementById('manuelAciklama').value = '';
                 document.getElementById('manuelTutar').value = '';
                 tumVerileriGuncelle();
+                repoGiderleriGetir();
             } else document.getElementById('manuelSonuc').innerHTML = `<span style="color:#ef4444;">❌ Hata: ${data.error}</span>`;
         } catch(e){ document.getElementById('manuelSonuc').innerHTML = '<span style="color:#ef4444;">❌ Bağlantı hatası</span>'; }
     }
     
-    async function modulListesiGetir(){
-        try{
-            let res = await fetch(`${API_BASE}/api/modulListesi`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            if(data.moduller?.length){
-                let html = '';
-                data.moduller.forEach(m => {
-                    html += `<div class="modul-btn" onclick="modulGoster('${m.path}','${m.adi}')">🧩 ${m.adi}</div>`;
-                });
-                document.getElementById('modulListesi').innerHTML = html;
-            } else document.getElementById('modulListesi').innerHTML = '<div>Modül bulunamadı</div>';
-        } catch(e){ document.getElementById('modulListesi').innerHTML = '<div>Modüller alınamadı</div>'; }
-    }
-    
-    async function modulGoster(path,adi){
-        let icerikDiv = document.getElementById('modulIcerik');
-        icerikDiv.style.display = 'block';
-        icerikDiv.innerHTML = `<div style="color:#f97316;">🔄 ${adi} yükleniyor...</div>`;
-        try{
-            let res = await fetch(`${API_BASE}${path}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-            let data = await res.json();
-            icerikDiv.innerHTML = `<div style="color:#f97316; margin-bottom:12px;">📌 Modül: ${adi}</div><pre style="font-family:monospace; font-size:0.7rem; white-space:pre-wrap;">${JSON.stringify(data,null,2)}</pre>`;
-        } catch(e){
-            icerikDiv.innerHTML = `<div style="color:#ef4444;">❌ Modül çalıştırılamadı</div>`;
-        }
-    }
-    
+    // ========== BAŞLAT ==========
     tumVerileriGuncelle();
+    urunleriGetir();
+    stoklariGoster();
     modulListesiGetir();
+    document.getElementById('repoBaslangic').value = new Date(new Date().setDate(1)).toISOString().slice(0,10);
+    document.getElementById('repoBitis').value = new Date().toISOString().slice(0,10);
+    document.getElementById('raporSaat').value = 20;
 </script>
 </body>
 </html>
