@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Öz Urfa Kebap | Alfa Patron Dashboard</title>
+    <title>Öz Urfa Kebap | Patron Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -18,7 +17,7 @@
         .container { max-width: 1600px; margin: 0 auto; }
         
         .header {
-            background: rgba(15,23,42,0.8);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(12px);
             border-radius: 32px;
             padding: 20px 28px;
@@ -32,16 +31,17 @@
         }
         .header h1 { font-size: 1.6rem; background: linear-gradient(135deg, #f97316, #facc15); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .header p { color: #94a3b8; font-size: 0.75rem; margin-top: 5px; }
-        .date-time { background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 40px; font-size: 0.85rem; color: #f97316; }
+        .date-time { background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 40px; font-family: monospace; font-size: 0.85rem; color: #f97316; }
         
         .btn { padding: 8px 18px; border-radius: 40px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; font-size: 0.75rem; }
         .btn-primary { background: linear-gradient(95deg, #f97316, #ea580c); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(249,115,22,0.4); }
         .btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
         .btn-outline:hover { background: rgba(249,115,22,0.2); border-color: #f97316; color: #f97316; }
         .btn-success { background: #10b981; color: white; }
         .btn-danger { background: #ef4444; color: white; }
         .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 4px 12px; font-size: 0.7rem; }
         
         .api-bar {
             background: rgba(30,41,59,0.6);
@@ -127,6 +127,17 @@
         td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .amount-right { text-align: right; font-weight: 600; }
         
+        .fiyat-input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 6px 10px;
+            border-radius: 12px;
+            color: white;
+            width: 100px;
+            text-align: right;
+        }
+        .fiyat-input:focus { outline: none; border-color: #f97316; }
+        
         .modal {
             display: none;
             position: fixed;
@@ -166,6 +177,25 @@
         
         .footer { text-align: center; font-size: 0.6rem; color: #5b6e8c; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
         
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            border-left: 4px solid #22c55e;
+            padding: 10px 16px;
+            border-radius: 12px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            font-size: 0.75rem;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .critical-stock { background: rgba(239,68,68,0.2); color: #ef4444; }
+        
         @media (max-width: 700px) {
             .stat-number { font-size: 1rem; }
             .tab-btn { padding: 6px 12px; font-size: 0.6rem; }
@@ -177,7 +207,7 @@
     <div class="header">
         <div>
             <h1>🧾 ÖZ URFA KEBAP</h1>
-            <p>Alfa Patron Dashboard | SambaPOS SQL | Anlık Takip | Telegram Bildirim</p>
+            <p>Patron Dashboard | SambaPOS SQL | Anlık Takip | Telegram Bildirim</p>
         </div>
         <div class="date-time" id="dateTime"></div>
     </div>
@@ -186,7 +216,7 @@
         <div class="flex-row">
             <span>🌐 API:</span>
             <input type="text" id="apiUrl" value="http://100.97.45.8:3001">
-            <button class="btn-primary" onclick="apiUrlKaydet()">Bağlan</button>
+            <button class="btn-primary" onclick="apiBaglan()">Bağlan</button>
         </div>
         <button class="btn-outline" onclick="tumVerileriGuncelle()">🔄 Güncelle</button>
         <button class="btn-outline" onclick="patronOzetiGoster()">👑 Patron Özeti</button>
@@ -196,18 +226,19 @@
 
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="ozet">📊 Özet</button>
-        <button class="tab-btn" data-tab="gunSonu">📋 Gün Sonu</button>
+        <button class="tab-btn" data-tab="urunler">🏷️ Ürünler</button>
         <button class="tab-btn" data-tab="urunSatis">🍽️ Ürün Satış</button>
         <button class="tab-btn" data-tab="personelSatis">👥 Personel</button>
         <button class="tab-btn" data-tab="fire">⚠️ İkram/İade/Zayi</button>
-        <button class="tab-btn" data-tab="iskonto">💰 İskonto/Yuvarlama</button>
-        <button class="tab-btn" data-tab="musteriCari">👤 Müşteri Cari</button>
-        <button class="tab-btn" data-tab="saatlikCiro">⏰ Saatlik Ciro</button>
-        <button class="tab-btn" data-tab="stok">📦 Stok</button>
-        <button class="tab-btn" data-tab="hedef">🎯 Hedef</button>
         <button class="tab-btn" data-tab="onlineSiparis">📱 Online</button>
+        <button class="tab-btn" data-tab="gunSonu">📋 Gün Sonu</button>
         <button class="tab-btn" data-tab="masalar">🪑 Masalar</button>
         <button class="tab-btn" data-tab="ciro">📈 Ciro</button>
+        <button class="tab-btn" data-tab="hedef">🎯 Hedef</button>
+        <button class="tab-btn" data-tab="stok">📦 Stok</button>
+        <button class="tab-btn" data-tab="musteriCari">👤 Müşteri Cari</button>
+        <button class="tab-btn" data-tab="saatlikCiro">⏰ Saatlik</button>
+        <button class="tab-btn" data-tab="iskonto">💰 İskonto</button>
         <button class="tab-btn" data-tab="giderler">📝 Giderler</button>
         <button class="tab-btn" data-tab="manuel">✏️ Gider Ekle</button>
         <button class="tab-btn" data-tab="moduller">🧩 Modüller</button>
@@ -227,31 +258,161 @@
         </div>
     </div>
 
-    <div id="gunSonuTab" class="card"><div class="card-header">📋 Gün Sonu Raporu</div><div class="card-body" id="gunSonuRaporu">Yükleniyor...</div></div>
-    <div id="urunSatisTab" class="card"><div class="card-header">🍽️ Ürün Satış Raporu</div><div class="card-body" id="urunSatisRaporu">Yükleniyor...</div></div>
-    <div id="personelSatisTab" class="card"><div class="card-header">👥 Personel Satış Raporu</div><div class="card-body" id="personelSatisRaporu">Yükleniyor...</div></div>
-    <div id="fireTab" class="card"><div class="card-header">⚠️ İkram / İade / Zayi Raporu</div><div class="card-body" id="fireRaporu">Yükleniyor...</div></div>
-    <div id="iskontoTab" class="card"><div class="card-header">💰 İskonto ve Yuvarlama Raporu</div><div class="card-body" id="iskontoRaporu">Yükleniyor...</div></div>
-    <div id="musteriCariTab" class="card"><div class="card-header">👤 Müşteri Cari Hesap</div><div class="card-body" id="musteriCariRaporu">Yükleniyor...</div></div>
-    <div id="saatlikCiroTab" class="card"><div class="card-header">⏰ Saatlik Ciro Dağılımı</div><div class="card-body" id="saatlikCiroRaporu">Yükleniyor...</div></div>
-    <div id="stokTab" class="card"><div class="card-header">📦 Stok Takibi</div><div class="card-body" id="stokRaporu">Yükleniyor...</div></div>
-    <div id="hedefTab" class="card"><div class="card-header">🎯 Hedef Takibi</div><div class="card-body" id="hedefRaporu">Yükleniyor...</div></div>
-    <div id="onlineSiparisTab" class="card"><div class="card-header">📱 Online Siparişler (%40 Komisyon)</div><div class="card-body" id="onlineSiparisRaporu">Yükleniyor...</div></div>
-    <div id="masalarTab" class="card"><div class="card-header">🪑 Açık Masalar</div><div class="card-body" id="masaListesi">Yükleniyor...</div></div>
-    <div id="ciroTab" class="card"><div class="card-header">📈 Aylık & Yıllık Ciro</div><div class="card-body" id="ciroKarsilastirma">Yükleniyor...</div></div>
-    <div id="giderlerTab" class="card"><div class="card-header">📝 Giderler</div><div class="card-body" id="giderListesi">Yükleniyor...</div></div>
-    <div id="manuelTab" class="card"><div class="card-header">✏️ Manuel Gider Ekle</div><div class="card-body"><div class="flex-row"><div><label>Tarih</label><br><input type="date" id="manuelTarih"></div><div><label>Açıklama</label><br><input type="text" id="manuelAciklama" placeholder="Maya, Kaşar..."></div><div><label>Tutar</label><br><input type="number" id="manuelTutar" step="0.01"></div><div><label>Tür</label><br><select id="manuelTur"><option>Nakit</option><option>Kredi</option></select></div><div><button class="btn-success" onclick="manuelGiderEkle()">💾 Kaydet</button></div></div><div id="manuelSonuc" style="margin-top:15px;"></div></div></div>
-    <div id="modullerTab" class="card"><div class="card-header">🧩 Modüller</div><div class="card-body"><div id="modulListesi" class="flex-row" style="gap:10px; flex-wrap:wrap;">Yükleniyor...</div><div id="modulCikti" style="margin-top:15px; background:#0f172a; border-radius:16px; padding:16px; display:none;"></div></div></div>
+    <!-- ÜRÜN YÖNETİMİ TAB -->
+    <div id="urunlerTab" class="card">
+        <div class="card-header">🏷️ Ürün & Fiyat Yönetimi <button class="btn-success btn-sm" onclick="topluFiyatKaydet()">💾 Toplu Kaydet</button></div>
+        <div class="card-body">
+            <div class="flex-row" style="margin-bottom:15px; gap:10px;">
+                <input type="text" id="urunArama" placeholder="Ürün ara..." style="width:200px;" onkeyup="urunFiltrele()">
+                <select id="kategoriFiltre" onchange="urunFiltrele()">
+                    <option value="">Tüm Kategoriler</option>
+                </select>
+                <button class="btn-outline btn-sm" onclick="urunleriGetir()">🔄 Yenile</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="urunTablosu">
+                    <thead><tr><th>Kategori</th><th>Ürün Adı</th><th>Porsiyon</th><th>Fiyat (₺)</th><th>İşlem</th></tr></thead>
+                    <tbody id="urunTbody">Yükleniyor...</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    <div class="footer">Öz Urfa Kebap | Alfa Patron Dashboard | SambaPOS SQL | Telegram Anlık Bildirim</div>
+    <!-- ÜRÜN SATIŞ TAB -->
+    <div id="urunSatisTab" class="card">
+        <div class="card-header">🍽️ Ürün Satış Raporu — <span id="urunSatisTarih"></span></div>
+        <div class="card-body" id="urunSatisRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- PERSONEL SATIŞ TAB -->
+    <div id="personelSatisTab" class="card">
+        <div class="card-header">👥 Personel Satış Raporu — <span id="personelSatisTarih"></span></div>
+        <div class="card-body" id="personelSatisRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- İKRAM/İADE/ZAYİ TAB -->
+    <div id="fireTab" class="card">
+        <div class="card-header">⚠️ İkram / İade / Zayi Raporu — <span id="fireTarih"></span></div>
+        <div class="card-body" id="fireRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- ONLINE SİPARİŞ TAB -->
+    <div id="onlineSiparisTab" class="card">
+        <div class="card-header">📱 Online Siparişler (%40 Komisyon) — <span id="onlineSiparisTarih"></span></div>
+        <div class="card-body" id="onlineSiparisRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- GÜN SONU TAB -->
+    <div id="gunSonuTab" class="card">
+        <div class="card-header">📋 Gün Sonu Raporu — <span id="gunSonuTarih"></span></div>
+        <div class="card-body" id="gunSonuRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- AÇIK MASALAR TAB -->
+    <div id="masalarTab" class="card">
+        <div class="card-header">🪑 Açık Masalar</div>
+        <div class="card-body" id="masaListesi">Yükleniyor...</div>
+    </div>
+
+    <!-- CİRO TAB -->
+    <div id="ciroTab" class="card">
+        <div class="card-header">📈 Aylık & Yıllık Ciro</div>
+        <div class="card-body" id="ciroKarsilastirma">Yükleniyor...</div>
+    </div>
+
+    <!-- HEDEF TAB -->
+    <div id="hedefTab" class="card">
+        <div class="card-header">🎯 Hedef Takibi</div>
+        <div class="card-body" id="hedefRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- STOK TAB -->
+    <div id="stokTab" class="card">
+        <div class="card-header">📦 Stok Takibi</div>
+        <div class="card-body" id="stokRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- MÜŞTERİ CARİ TAB -->
+    <div id="musteriCariTab" class="card">
+        <div class="card-header">👤 Müşteri Cari Hesap</div>
+        <div class="card-body" id="musteriCariRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- SAATLİK CİRO TAB -->
+    <div id="saatlikCiroTab" class="card">
+        <div class="card-header">⏰ Saatlik Ciro Dağılımı</div>
+        <div class="card-body" id="saatlikCiroRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- İSKONTO TAB -->
+    <div id="iskontoTab" class="card">
+        <div class="card-header">💰 İskonto ve Yuvarlama Raporu</div>
+        <div class="card-body" id="iskontoRaporu">Yükleniyor...</div>
+    </div>
+
+    <!-- GİDERLER TAB -->
+    <div id="giderlerTab" class="card">
+        <div class="card-header">📝 Giderler</div>
+        <div class="card-body" id="giderListesi">Yükleniyor...</div>
+    </div>
+
+    <!-- MANUEL GİDER TAB -->
+    <div id="manuelTab" class="card">
+        <div class="card-header">✏️ Manuel Gider Ekle</div>
+        <div class="card-body">
+            <div class="flex-row">
+                <div><label>Tarih</label><br><input type="date" id="manuelTarih"></div>
+                <div><label>Açıklama</label><br><input type="text" id="manuelAciklama" placeholder="Maya, Kaşar..."></div>
+                <div><label>Tutar (TL)</label><br><input type="number" id="manuelTutar" step="0.01"></div>
+                <div><label>Tür</label><br><select id="manuelTur"><option>Nakit</option><option>Kredi</option></select></div>
+                <div><button class="btn-success" onclick="manuelGiderEkle()">💾 Kaydet</button></div>
+            </div>
+            <div id="manuelSonuc" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <!-- MODÜLLER TAB -->
+    <div id="modullerTab" class="card">
+        <div class="card-header">🧩 Modüller</div>
+        <div class="card-body">
+            <div id="modulListesi" class="flex-row" style="gap:10px; flex-wrap:wrap;">Yükleniyor...</div>
+            <div id="modulCikti" style="margin-top:15px; background:#0f172a; border-radius:16px; padding:16px; display:none; font-family:monospace;"></div>
+        </div>
+    </div>
+
+    <div class="footer">Öz Urfa Kebap | Patron Dashboard | SambaPOS SQL | Telegram Anlık Bildirim</div>
 </div>
 
 <!-- Mesaj Modal -->
-<div id="mesajModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>💬 Patrona Mesaj Gönder</h3><button class="close-modal" onclick="kapatModal()">&times;</button></div><div class="modal-body"><label>Mesajınız</label><textarea id="mesajIcerik" rows="4" placeholder="Mesajınızı yazın..."></textarea><button class="btn-primary" style="margin-top:10px;" onclick="mesajGonderGonder()">Gönder</button></div></div></div>
+<div id="mesajModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>💬 Patrona Mesaj Gönder</h3>
+            <button class="close-modal" onclick="kapatModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <label>Mesajınız</label>
+            <textarea id="mesajIcerik" rows="4" placeholder="Mesajınızı yazın..."></textarea>
+            <button class="btn-primary" style="margin-top:10px;" onclick="mesajGonderGonder()">Gönder</button>
+        </div>
+    </div>
+</div>
 
 <script>
     let API_BASE = localStorage.getItem('apiBase') || 'http://100.97.45.8:3001';
     document.getElementById('apiUrl').value = API_BASE;
+    let tumUrunler = [];
+
+    function toast(msg, type) {
+        let div = document.createElement('div');
+        div.className = 'toast';
+        div.style.borderLeftColor = type === 'success' ? '#22c55e' : '#ef4444';
+        div.innerHTML = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }
+
+    function kapatModal() { document.getElementById('mesajModal').style.display = 'none'; }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -260,32 +421,51 @@
             const tab = btn.getAttribute('data-tab');
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
             document.getElementById(tab + 'Tab').classList.add('active-card');
-            if (tab === 'gunSonu') gunSonuRaporuGetir();
+            if (tab === 'urunler') urunleriGetir();
             if (tab === 'urunSatis') urunSatisRaporuGetir();
             if (tab === 'personelSatis') personelSatisRaporuGetir();
             if (tab === 'fire') fireRaporuGetir();
-            if (tab === 'iskonto') iskontoRaporuGetir();
-            if (tab === 'musteriCari') musteriCariGetir();
-            if (tab === 'saatlikCiro') saatlikCiroGetir();
-            if (tab === 'stok') stokRaporuGetir();
-            if (tab === 'hedef') hedefRaporuGetir();
             if (tab === 'onlineSiparis') onlineSiparisRaporuGetir();
+            if (tab === 'gunSonu') gunSonuRaporuGetir();
             if (tab === 'masalar') acikMasalarGetir();
             if (tab === 'ciro') ciroKarsilastirmaGetir();
+            if (tab === 'hedef') hedefRaporuGetir();
+            if (tab === 'stok') stokRaporuGetir();
+            if (tab === 'musteriCari') musteriCariGetir();
+            if (tab === 'saatlikCiro') saatlikCiroGetir();
+            if (tab === 'iskonto') iskontoRaporuGetir();
             if (tab === 'giderler') giderlerGetir();
             if (tab === 'moduller') modulListesiGetir();
         });
     });
 
-    setInterval(() => document.getElementById('dateTime').innerHTML = `📅 ${new Date().toLocaleDateString('tr-TR')} 🕐 ${new Date().toLocaleTimeString('tr-TR')}`, 1000);
-    
-    function apiUrlKaydet() { API_BASE = document.getElementById('apiUrl').value; localStorage.setItem('apiBase', API_BASE); alert('API adresi kaydedildi'); tumVerileriGuncelle(); }
-    function kapatModal() { document.getElementById('mesajModal').style.display = 'none'; }
-    
+    setInterval(() => {
+        document.getElementById('dateTime').innerHTML = `📅 ${new Date().toLocaleDateString('tr-TR')} 🕐 ${new Date().toLocaleTimeString('tr-TR')}`;
+    }, 1000);
+
+    async function apiBaglan() {
+        API_BASE = document.getElementById('apiUrl').value;
+        localStorage.setItem('apiBase', API_BASE);
+        try {
+            let test = await fetch(`${API_BASE}/api/test`).then(r=>r.json());
+            if(test.success) toast('✅ API bağlantısı başarılı!', 'success');
+            else toast('❌ API hatası!', 'error');
+        } catch(e) {
+            toast('❌ API bağlantısı başarısız!', 'error');
+        }
+        tumVerileriGuncelle();
+    }
+
     async function tumVerileriGuncelle() {
         let tarih = new Date().toISOString().slice(0,10);
         document.getElementById('ozetTarih').innerHTML = tarih;
         document.getElementById('manuelTarih').value = tarih;
+        document.getElementById('urunSatisTarih').innerHTML = tarih;
+        document.getElementById('personelSatisTarih').innerHTML = tarih;
+        document.getElementById('fireTarih').innerHTML = tarih;
+        document.getElementById('onlineSiparisTarih').innerHTML = tarih;
+        document.getElementById('gunSonuTarih').innerHTML = tarih;
+
         try {
             let ana = await fetch(`${API_BASE}/api/anaPanel?tarih=${tarih}`).then(r=>r.json());
             document.getElementById('ozetKartlar').innerHTML = `
@@ -299,31 +479,252 @@
             document.getElementById('doluMasa').innerHTML = ana.DoluMasa || 0;
             document.getElementById('kasaToplam').innerHTML = (ana.ToplamCiro||0).toLocaleString('tr-TR') + ' ₺';
             document.getElementById('gunlukSatisOzet').innerHTML = (ana.ToplamCiro||0).toLocaleString('tr-TR') + ' ₺';
-        } catch(e){}
-        gunSonuRaporuGetir(); urunSatisRaporuGetir(); personelSatisRaporuGetir(); fireRaporuGetir(); iskontoRaporuGetir(); musteriCariGetir(); saatlikCiroGetir(); stokRaporuGetir(); hedefRaporuGetir(); onlineSiparisRaporuGetir(); acikMasalarGetir(); ciroKarsilastirmaGetir(); giderlerGetir(); modulListesiGetir();
+        } catch(e) { console.error('Özet hatası:', e); }
     }
 
-    async function gunSonuRaporuGetir() { let res = await fetch(`${API_BASE}/api/rapor/gunSonu`).then(r=>r.json()); if(res.success) document.getElementById('gunSonuRaporu').innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>Toplam Ciro</h4><div class="stat-number positive">${res.toplamCiro.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Toplam Gider</h4><div class="stat-number negative">${res.toplamGider.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Net Kar</h4><div class="stat-number positive">${(res.toplamCiro-res.toplamGider).toLocaleString()} ₺</div></div></div><h4>Gelirler</h4><div class="table-wrapper"><table><thead><th>Ödeme Tipi</th><th>Tutar</th></thead><tbody>${res.satislar.map(s=>`<tr><td>${s.OdemeTipi}</td><td class="amount-right">${s.Tutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div><h4>Giderler</h4><div class="table-wrapper"><table><thead><th>Gider Adı</th><th>Tutar</th></thead><tbody>${res.giderler.map(g=>`<tr><td>${g.GiderAdi}</td><td class="amount-right">${g.Tutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function urunSatisRaporuGetir() { let res = await fetch(`${API_BASE}/api/rapor/urunSatis`).then(r=>r.json()); if(res.success) document.getElementById('urunSatisRaporu').innerHTML = `<div class="table-wrapper"><table><thead><th>Ürün</th><th>Porsiyon</th><th>Adet</th><th>Toplam Tutar</th></thead><tbody>${res.urunler.map(u=>`<tr><td>${u.UrunAdi}</td><td>${u.Porsiyon}</td><td class="amount-right">${u.Adet}</td><td class="amount-right">${u.ToplamTutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody><tr style="background:#334155;"><td><b>TOPLAM</b></td><td></td><td class="amount-right"><b>${res.toplam.adet}</b></td><td class="amount-right"><b>${res.toplam.tutar.toLocaleString()} ₺</b></td></tr></table></div>`; }
-    async function personelSatisRaporuGetir() { let res = await fetch(`${API_BASE}/api/rapor/personelSatis`).then(r=>r.json()); if(res.success) document.getElementById('personelSatisRaporu').innerHTML = `<div class="table-wrapper"><table><thead><th>Personel</th><th>Adisyon</th><th>Sipariş</th><th>Toplam Satış</th></thead><tbody>${res.personeller.map(p=>`<tr><td><b>${p.Personel}</b></td><td class="amount-right">${p.AdisyonSayisi}</td><td class="amount-right">${p.SiparisSayisi}</td><td class="amount-right">${p.ToplamSatis.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function fireRaporuGetir() { let res = await fetch(`${API_BASE}/api/rapor/fire`).then(r=>r.json()); if(res.success) document.getElementById('fireRaporu').innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>İade</h4><div class="stat-number negative">${res.toplamlar.iade.toLocaleString()} ₺</div></div><div class="stat-card"><h4>İkram</h4><div class="stat-number warning">${res.toplamlar.ikram.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Zayi</h4><div class="stat-number negative">${res.toplamlar.zayi.toLocaleString()} ₺</div></div></div><h4>İade Edilenler</h4><div class="table-wrapper"><table><thead><th>Ürün</th><th>Adet</th><th>Tutar</th></thead><tbody>${res.iade.map(i=>`<tr><td>${i.UrunAdi}</td><td class="amount-right">${i.Adet}</td><td class="amount-right negative">${i.ToplamTutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function iskontoRaporuGetir() { let res = await fetch(`${API_BASE}/api/rapor/iskontoYuvarlama`).then(r=>r.json()); if(res.success) document.getElementById('iskontoRaporu').innerHTML = `<h4>İskonto Yapılan Adisyonlar</h4><div class="table-wrapper"><table><thead><th>Adisyon No</th><th>Kullanıcı</th><th>Tahsilat</th><th>İskonto</th></thead><tbody>${res.iskonto.map(i=>`<tr><td>#${i.AdisyonNo}</td><td>${i.Kullanici}</td><td class="amount-right">${i.Tahsilat.toLocaleString()} ₺</td><td class="amount-right negative">${i.IskontoTutari?.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function musteriCariGetir() { let res = await fetch(`${API_BASE}/api/musteri/cari`).then(r=>r.json()); if(res.success) document.getElementById('musteriCariRaporu').innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>Toplam Borç</h4><div class="stat-number negative">${res.toplamBorc.toLocaleString()} ₺</div></div></div><div class="table-wrapper"><table><thead><th>Müşteri</th><th>Telefon</th><th>Bakiye</th></thead><tbody>${res.musteriler.map(m=>`<tr><td>${m.MusteriAdi}</td><td>${m.Telefon || '-'}</td><td class="amount-right ${m.Bakiye<0?'positive':'negative'}">${m.Bakiye.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function saatlikCiroGetir() { let res = await fetch(`${API_BASE}/api/rapor/saatlikCiro`).then(r=>r.json()); if(res.success) document.getElementById('saatlikCiroRaporu').innerHTML = `<div class="table-wrapper"><table><thead><th>Saat</th><th>Sipariş Sayısı</th><th>Ciro</th></thead><tbody>${res.saatlik.map(s=>`<tr><td>${s.Saat}:00</td><td class="amount-right">${s.SiparisSayisi}</td><td class="amount-right">${s.Ciro.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function stokRaporuGetir() { let res = await fetch(`${API_BASE}/api/stok/durum`).then(r=>r.json()); if(res.success) document.getElementById('stokRaporu').innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>Kritik Stok</h4><div class="stat-number negative">${res.kritikStoklar.length}</div></div></div><div class="table-wrapper"><table><thead><th>Ürün</th><th>Stok</th><th>Kritik Seviye</th><th>Durum</th></thead><tbody>${res.stoklar.map(s=>`<tr class="${s.Stok<=s.KritikStok?'critical-stock':''}"><td>${s.UrunAdi}</td><td class="amount-right">${s.Stok}</td><td class="amount-right">${s.KritikStok}</td><td>${s.Stok<=s.KritikStok?'🔴 KRİTİK':'🟢 Normal'}</td></tr>`).join('')}</tbody></table></div>`; }
-    async function hedefRaporuGetir() { let res = await fetch(`${API_BASE}/api/hedef/durum`).then(r=>r.json()); if(res.success) document.getElementById('hedefRaporu').innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>Günlük Hedef</h4><div class="stat-number">${res.gunlukHedef.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Gerçekleşen</h4><div class="stat-number positive">${res.gerceklesen.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Tamamlanma</h4><div class="stat-number ${res.tamamlanma>=70?'positive':'warning'}">%${res.tamamlanma}</div></div></div>`; }
-    async function onlineSiparisRaporuGetir() { let res = await fetch(`${API_BASE}/api/rapor/onlineSiparis`).then(r=>r.json()); if(res.success) document.getElementById('onlineSiparisRaporu').innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>Brüt Ciro</h4><div class="stat-number positive">${res.genelToplam.brut.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Komisyon %40</h4><div class="stat-number negative">${res.genelToplam.komisyon.toLocaleString()} ₺</div></div><div class="stat-card"><h4>Net Ciro</h4><div class="stat-number positive">${res.genelToplam.net.toLocaleString()} ₺</div></div></div><div class="table-wrapper"><table><thead><th>Platform</th><th>Sipariş</th><th>Brüt</th><th>Komisyon</th><th>Net</th></thead><tbody>${res.platformlar.map(p=>`<tr><td><b>${p.Platform}</b></td><td class="amount-right">${p.SiparisSayisi}</td><td class="amount-right">${p.ToplamTutar.toLocaleString()} ₺</td><td class="amount-right negative">${p.Komisyon.toLocaleString()} ₺</td><td class="amount-right positive">${p.NetTutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function acikMasalarGetir() { let res = await fetch(`${API_BASE}/api/acikMasalar`).then(r=>r.json()); document.getElementById('masaListesi').innerHTML = res.length ? `<div class="table-wrapper"><tr><thead><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></thead><tbody>${res.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td class="amount-right">${t.UrunAdet}</td><td class="amount-right">${t.Toplam.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>` : '<div>Açık masa yok</div>'; }
-    async function ciroKarsilastirmaGetir() { let res = await fetch(`${API_BASE}/api/ciroKarsilastirma`).then(r=>r.json()); document.getElementById('ciroKarsilastirma').innerHTML = `<div class="table-wrapper"><table><thead><th>Ay</th><th>Ciro</th><th>Günlük Ort.</th></thead><tbody>${res.aylik.map(a=>`<tr><td>${a.Ay}</td><td class="amount-right">${a.Ciro.toLocaleString()} ₺</td><td class="amount-right">${a.GunlukOrtalama.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div><div class="table-wrapper"><tr><thead><th>Yıl</th><th>Ciro</th></thead><tbody>${res.yillik.map(y=>`<tr><td>${y.Yil}</td><td class="amount-right">${y.Ciro.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>`; }
-    async function giderlerGetir() { let res = await fetch(`${API_BASE}/api/giderler`).then(r=>r.json()); if(res.giderler?.length) document.getElementById('giderListesi').innerHTML = `<div class="table-wrapper"><table><thead><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></thead><tbody>${res.giderler.map(g=>`<tr><td>${g.GiderAdi}</td><td class="amount-right negative">${g.Tutar.toLocaleString()} ₺</td><td>${g.Tarih}</td></tr>`).join('')}<tr style="background:#334155;"><td><b>TOPLAM</b></td><td class="amount-right"><b>${res.toplam.toLocaleString()} ₺</b></td><td></td></tr></tbody></table></div>`; else document.getElementById('giderListesi').innerHTML = '<div>Gider yok</div>'; }
-    async function patronOzetiGoster() { let res = await fetch(`${API_BASE}/api/patron/ozet`).then(r=>r.json()); if(res.success) alert(`👑 PATRON ÖZETİ\n\n📊 Bugünkü Ciro: ${res.bugunkuCiro.toLocaleString()} ₺\n💚 Net Kar: ${res.netKar.toLocaleString()} ₺\n🪑 Açık Masa: ${res.acikMasa}\n📦 Paket Sipariş: ${res.paketSiparis}\n📉 Bugünkü Gider: ${res.bugunkuGider.toLocaleString()} ₺\n👥 Personel: ${res.personelSayisi}\n🎯 Hedef Tamamlanma: %${res.tamamlanma}`); }
-    async function aiYorumGoster() { let res = await fetch(`${API_BASE}/api/ai/yorum`).then(r=>r.json()); if(res.success) alert(`🧠 YAPAY ZEKA YORUMU\n\n${res.yorum}`); }
+    // ========== ÜRÜN YÖNETİMİ ==========
+    async function urunleriGetir() {
+        try {
+            let res = await fetch(`${API_BASE}/api/fiyatListesi`).then(r=>r.json());
+            tumUrunler = res;
+            let kategoriler = [...new Set(res.map(u => u.Kategori).filter(k => k && k !== 'null'))];
+            let select = document.getElementById('kategoriFiltre');
+            select.innerHTML = '<option value="">Tüm Kategoriler</option>';
+            kategoriler.forEach(k => select.innerHTML += `<option value="${k}">${k}</option>`);
+            urunFiltrele();
+        } catch(e) { document.getElementById('urunTbody').innerHTML = '<tr><td colspan="5">Ürünler alınamadı</td></tr>'; }
+    }
+
+    function urunFiltrele() {
+        let arama = document.getElementById('urunArama').value.toLowerCase();
+        let kategori = document.getElementById('kategoriFiltre').value;
+        let filtered = tumUrunler.filter(u => 
+            (!kategori || u.Kategori === kategori) && 
+            (!arama || (u.Urun || '').toLowerCase().includes(arama))
+        );
+        document.getElementById('urunTbody').innerHTML = filtered.map(u => `
+            <tr>
+                <td>${u.Kategori || 'Diğer'}</td>
+                <td>${u.Urun || '-'}</td>
+                <td>${u.Porsiyon || 'Normal'}</td>
+                <td><input type="number" step="0.01" value="${u.Fiyat || 0}" class="fiyat-input" data-porsiyon="${u.PorsiyonId}" data-urun="${u.Urun}" onchange="fiyatGuncelle(this)"></td>
+                <td><button class="btn-success btn-sm" onclick="fiyatGuncelle(this.parentElement.previousElementSibling.firstChild)">💾 Kaydet</button></td>
+            </tr>
+        `).join('');
+    }
+
+    async function fiyatGuncelle(input) {
+        let porsiyonId = parseInt(input.dataset.porsiyon);
+        let yeniFiyat = parseFloat(input.value);
+        let urunAdi = input.dataset.urun;
+        if(isNaN(yeniFiyat)) return;
+        try {
+            let res = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ porsiyonId, yeniFiyat, urunAdi })
+            }).then(r=>r.json());
+            if(res.success) toast(`✅ ${urunAdi} fiyatı ${yeniFiyat} ₺ olarak güncellendi`, 'success');
+            else toast('❌ Güncelleme hatası', 'error');
+        } catch(e) { toast('❌ Bağlantı hatası', 'error'); }
+    }
+
+    async function topluFiyatKaydet() {
+        let inputs = document.querySelectorAll('#urunTbody .fiyat-input');
+        let basarili = 0;
+        for(let input of inputs) {
+            let porsiyonId = parseInt(input.dataset.porsiyon);
+            let yeniFiyat = parseFloat(input.value);
+            let urunAdi = input.dataset.urun;
+            if(isNaN(yeniFiyat)) continue;
+            try {
+                let res = await fetch(`${API_BASE}/api/fiyatGuncelle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ porsiyonId, yeniFiyat, urunAdi })
+                }).then(r=>r.json());
+                if(res.success) basarili++;
+            } catch(e) {}
+        }
+        toast(`✅ ${basarili} ürün güncellendi`, 'success');
+    }
+
+    // ========== RAPORLAR ==========
+    async function gunSonuRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/gunSonu`).then(r=>r.json());
+        if(res.success) document.getElementById('gunSonuRaporu').innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><h4>Toplam Ciro</h4><div class="stat-number positive">${res.toplamCiro.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Toplam Gider</h4><div class="stat-number negative">${res.toplamGider.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Net Kar</h4><div class="stat-number positive">${(res.toplamCiro-res.toplamGider).toLocaleString()} ₺</div></div>
+            </div>
+            <div class="table-wrapper"><h4>Gelirler</h4><table><thead><th>Ödeme Tipi</th><th>Tutar</th></thead><tbody>${res.satislar.map(s=>`<tr><td>${s.OdemeTipi}</td><td class="amount-right">${s.Tutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+            <div class="table-wrapper"><h4>Giderler</h4><table><thead><th>Gider Adı</th><th>Tutar</th></thead><tbody>${res.giderler.map(g=>`<tr><td>${g.GiderAdi}</td><td class="amount-right negative">${g.Tutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function urunSatisRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/urunSatis`).then(r=>r.json());
+        if(res.success) document.getElementById('urunSatisRaporu').innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><h4>Toplam Ürün</h4><div class="stat-number">${res.toplam.adet}</div></div>
+                <div class="stat-card"><h4>Toplam Tutar</h4><div class="stat-number positive">${res.toplam.tutar.toLocaleString()} ₺</div></div>
+            </div>
+            <div class="table-wrapper"><table><thead><th>Ürün</th><th>Porsiyon</th><th>Adet</th><th>Toplam</th></thead><tbody>${res.urunler.map(u=>`<tr><td>${u.UrunAdi}</td><td>${u.Porsiyon}</td><td class="amount-right">${u.Adet}</td><td class="amount-right">${u.ToplamTutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function personelSatisRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/personelSatis`).then(r=>r.json());
+        if(res.success) document.getElementById('personelSatisRaporu').innerHTML = `
+            <div class="table-wrapper"><table><thead><th>Personel</th><th>Adisyon</th><th>Sipariş</th><th>Toplam Satış</th></thead><tbody>${res.personeller.map(p=>`<tr><td><b>${p.Personel}</b></td><td class="amount-right">${p.AdisyonSayisi}</td><td class="amount-right">${p.SiparisSayisi}</td><td class="amount-right positive">${p.ToplamSatis.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function fireRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/fire`).then(r=>r.json());
+        if(res.success) document.getElementById('fireRaporu').innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><h4>İade</h4><div class="stat-number negative">${res.toplamlar.iade.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>İkram</h4><div class="stat-number warning">${res.toplamlar.ikram.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Zayi</h4><div class="stat-number negative">${res.toplamlar.zayi.toLocaleString()} ₺</div></div>
+            </div>
+            <div class="table-wrapper"><h4>İade Edilenler</h4></table><thead><th>Ürün</th><th>Adet</th><th>Tutar</th></thead><tbody>${res.iade.map(i=>`<tr><td>${i.UrunAdi}</td><td class="amount-right">${i.Adet}</td><td class="amount-right negative">${i.ToplamTutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function onlineSiparisRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/onlineSiparis`).then(r=>r.json());
+        if(res.success) document.getElementById('onlineSiparisRaporu').innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><h4>Brüt Ciro</h4><div class="stat-number positive">${res.genelToplam.brut.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Komisyon</h4><div class="stat-number negative">${res.genelToplam.komisyon.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Net Ciro</h4><div class="stat-number positive">${res.genelToplam.net.toLocaleString()} ₺</div></div>
+            </div>
+            <div class="table-wrapper"><tr><thead><th>Platform</th><th>Sipariş</th><th>Brüt</th><th>Komisyon</th><th>Net</th></thead><tbody>${res.platformlar.map(p=>`<tr><td><b>${p.Platform}</b></td><td class="amount-right">${p.SiparisSayisi}</td><td class="amount-right">${p.ToplamTutar.toLocaleString()} ₺</td><td class="amount-right negative">${p.Komisyon.toLocaleString()} ₺</td><td class="amount-right positive">${p.NetTutar.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function acikMasalarGetir() {
+        let res = await fetch(`${API_BASE}/api/acikMasalar`).then(r=>r.json());
+        document.getElementById('masaListesi').innerHTML = res.length ? `
+            <div class="table-wrapper"><table><thead><th>Masa</th><th>Adisyon</th><th>Saat</th><th>Ürün</th><th>Toplam</th></thead><tbody>${res.map(t=>`<tr><td>${t.Masa}</td><td>${t.TicketNumber}</td><td>${t.Saat}</td><td class="amount-right">${t.UrunAdet}</td><td class="amount-right positive">${t.Toplam.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        ` : '<div>Açık masa yok</div>';
+    }
+
+    async function ciroKarsilastirmaGetir() {
+        let res = await fetch(`${API_BASE}/api/ciroKarsilastirma`).then(r=>r.json());
+        document.getElementById('ciroKarsilastirma').innerHTML = `
+            <div class="table-wrapper"><h4>Aylık Ciro</h4><tr><thead><th>Ay</th><th>Ciro</th><th>Günlük Ort.</th></thead><tbody>${res.aylik.map(a=>`<tr><td>${a.Ay}</td><td class="amount-right positive">${a.Ciro.toLocaleString()} ₺</td><td class="amount-right">${a.GunlukOrtalama.toLocaleString()} ₺</td></table>`).join('')}</tbody></table></div>
+            <div class="table-wrapper"><h4>Yıllık Ciro</h4><table><thead><th>Yıl</th><th>Ciro</th></thead><tbody>${res.yillik.map(y=>`<tr><td>${y.Yil}</td><td class="amount-right positive">${y.Ciro.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function hedefRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/hedef/durum`).then(r=>r.json());
+        if(res.success) document.getElementById('hedefRaporu').innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><h4>Günlük Hedef</h4><div class="stat-number">${res.gunlukHedef.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Gerçekleşen</h4><div class="stat-number positive">${res.gerceklesen.toLocaleString()} ₺</div></div>
+                <div class="stat-card"><h4>Tamamlanma</h4><div class="stat-number ${res.tamamlanma>=70?'positive':'warning'}">%${res.tamamlanma}</div></div>
+            </div>
+        `;
+    }
+
+    async function stokRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/stok/durum`).then(r=>r.json());
+        if(res.success) document.getElementById('stokRaporu').innerHTML = `
+            <div class="stats-grid"><div class="stat-card"><h4>Kritik Stok</h4><div class="stat-number negative">${res.kritikStoklar.length}</div></div></div>
+            <div class="table-wrapper"><table><thead><th>Ürün</th><th>Stok</th><th>Kritik</th><th>Durum</th></thead><tbody>${res.stoklar.map(s=>`<tr class="${s.Stok<=s.KritikStok?'critical-stock':''}"><td>${s.UrunAdi}</td><td class="amount-right">${s.Stok}</td><td class="amount-right">${s.KritikStok}</td><td>${s.Stok<=s.KritikStok?'🔴 KRİTİK':'🟢 Normal'}</tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function musteriCariGetir() {
+        let res = await fetch(`${API_BASE}/api/musteri/cari`).then(r=>r.json());
+        if(res.success) document.getElementById('musteriCariRaporu').innerHTML = `
+            <div class="stats-grid"><div class="stat-card"><h4>Toplam Borç</h4><div class="stat-number negative">${res.toplamBorc.toLocaleString()} ₺</div></div></div>
+            <div class="table-wrapper"></table><thead><th>Müşteri</th><th>Telefon</th><th>Bakiye</th></thead><tbody>${res.musteriler.map(m=>`<tr><td><b>${m.MusteriAdi}</b></td><td>${m.Telefon || '-'}</td><td class="amount-right ${m.Bakiye<0?'positive':'negative'}">${m.Bakiye.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function saatlikCiroGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/saatlikCiro`).then(r=>r.json());
+        if(res.success) document.getElementById('saatlikCiroRaporu').innerHTML = `
+            <div class="table-wrapper"><tr><thead><th>Saat</th><th>Sipariş</th><th>Ciro</th></thead><tbody>${res.saatlik.map(s=>`<tr><td>${s.Saat}:00</td><td class="amount-right">${s.SiparisSayisi}</td><td class="amount-right positive">${s.Ciro.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function iskontoRaporuGetir() {
+        let res = await fetch(`${API_BASE}/api/rapor/iskontoYuvarlama`).then(r=>r.json());
+        if(res.success) document.getElementById('iskontoRaporu').innerHTML = `
+            <h4>İskonto Yapılan Adisyonlar</h4>
+            <div class="table-wrapper"><table><thead><th>Adisyon No</th><th>Kullanıcı</th><th>Tahsilat</th><th>İskonto</th></thead><tbody>${res.iskonto.map(i=>`<tr><td>#${i.AdisyonNo}</td><td>${i.Kullanici}</td><td class="amount-right">${i.Tahsilat.toLocaleString()} ₺</td><td class="amount-right negative">${i.IskontoTutari?.toLocaleString()} ₺</td></tr>`).join('')}</tbody></table></div>
+        `;
+    }
+
+    async function giderlerGetir() {
+        let res = await fetch(`${API_BASE}/api/giderler`).then(r=>r.json());
+        if(res.giderler?.length) document.getElementById('giderListesi').innerHTML = `
+            <div class="table-wrapper"><table><thead><th>Gider Adı</th><th>Tutar</th><th>Tarih</th></thead><tbody>${res.giderler.map(g=>`<tr><td>${g.GiderAdi}</td><td class="amount-right negative">${g.Tutar.toLocaleString()} ₺</td><td>${g.Tarih}</td></tr>`).join('')}<tr style="background:#334155;"><td><b>TOPLAM</b></td><td class="amount-right"><b>${res.toplam.toLocaleString()} ₺</b></td><td></td></tr></tbody></table></div>
+        `;
+        else document.getElementById('giderListesi').innerHTML = '<div>Gider yok</div>';
+    }
+
+    async function patronOzetiGoster() {
+        let res = await fetch(`${API_BASE}/api/patron/ozet`).then(r=>r.json());
+        if(res.success) alert(`👑 PATRON ÖZETİ\n\n📊 Bugünkü Ciro: ${res.bugunkuCiro.toLocaleString()} ₺\n💚 Net Kar: ${res.netKar.toLocaleString()} ₺\n🪑 Açık Masa: ${res.acikMasa}\n📦 Paket Sipariş: ${res.paketSiparis}\n📉 Bugünkü Gider: ${res.bugunkuGider.toLocaleString()} ₺\n👥 Personel: ${res.personelSayisi}\n🎯 Hedef Tamamlanma: %${res.tamamlanma}`);
+    }
+
+    async function aiYorumGoster() {
+        let res = await fetch(`${API_BASE}/api/ai/yorum`).then(r=>r.json());
+        if(res.success) alert(`🧠 YAPAY ZEKA YORUMU\n\n${res.yorum}`);
+    }
+
     function mesajGonder() { document.getElementById('mesajModal').style.display = 'flex'; }
-    async function mesajGonderGonder() { let mesaj = document.getElementById('mesajIcerik').value; if(!mesaj) { alert('Mesaj girin'); return; } await fetch(`${API_BASE}/api/mesaj/gonder`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ mesaj, gonderici: 'Personel' }) }); alert('Mesaj gönderildi!'); kapatModal(); document.getElementById('mesajIcerik').value = ''; }
-    async function manuelGiderEkle() { let tarih = document.getElementById('manuelTarih').value, aciklama = document.getElementById('manuelAciklama').value, tutar = parseFloat(document.getElementById('manuelTutar').value), tur = document.getElementById('manuelTur').value; if(!aciklama || isNaN(tutar) || tutar<=0) { alert('Eksik bilgi'); return; } document.getElementById('manuelSonuc').innerHTML = '<span style="color:#facc15;">Kaydediliyor...</span>'; let res = await fetch(`${API_BASE}/api/manuelGider`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tarih, aciklama, tutar, tur}) }).then(r=>r.json()); if(res.success) { document.getElementById('manuelSonuc').innerHTML = '<span style="color:#22c55e;">✅ Gider kaydedildi + Telegram bildirimi gönderildi!</span>'; document.getElementById('manuelAciklama').value = ''; document.getElementById('manuelTutar').value = ''; tumVerileriGuncelle(); } else document.getElementById('manuelSonuc').innerHTML = `<span style="color:#ef4444;">❌ Hata</span>`; }
-    async function modulListesiGetir() { let res = await fetch(`${API_BASE}/api/modulListesi`).then(r=>r.json()); if(res.moduller?.length) document.getElementById('modulListesi').innerHTML = res.moduller.map(m => `<button class="btn-outline btn-sm" onclick="modulCalistir('${m.adi}')">🧩 ${m.adi}</button>`).join(''); else document.getElementById('modulListesi').innerHTML = '<div>Modül yok</div>'; }
-    async function modulCalistir(adi) { document.getElementById('modulCikti').style.display = 'block'; document.getElementById('modulCikti').innerHTML = `🔄 ${adi} yükleniyor...`; let res = await fetch(`${API_BASE}/api/modul/${adi}`).then(r=>r.json()); document.getElementById('modulCikti').innerHTML = `<strong>📌 ${adi}</strong><br><pre>${JSON.stringify(res, null, 2)}</pre>`; }
+
+    async function mesajGonderGonder() {
+        let mesaj = document.getElementById('mesajIcerik').value;
+        if(!mesaj) { alert('Mesaj girin'); return; }
+        await fetch(`${API_BASE}/api/mesaj/gonder`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ mesaj, gonderici: 'Personel' }) });
+        alert('Mesaj gönderildi!');
+        kapatModal();
+        document.getElementById('mesajIcerik').value = '';
+    }
+
+    async function manuelGiderEkle() {
+        let tarih = document.getElementById('manuelTarih').value;
+        let aciklama = document.getElementById('manuelAciklama').value;
+        let tutar = parseFloat(document.getElementById('manuelTutar').value);
+        let tur = document.getElementById('manuelTur').value;
+        if(!aciklama || isNaN(tutar) || tutar<=0) { alert('Eksik bilgi'); return; }
+        document.getElementById('manuelSonuc').innerHTML = '<span style="color:#facc15;">Kaydediliyor...</span>';
+        let res = await fetch(`${API_BASE}/api/manuelGider`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ tarih, aciklama, tutar, tur }) }).then(r=>r.json());
+        if(res.success) {
+            document.getElementById('manuelSonuc').innerHTML = '<span style="color:#22c55e;">✅ Gider kaydedildi + Telegram bildirimi gönderildi!</span>';
+            document.getElementById('manuelAciklama').value = '';
+            document.getElementById('manuelTutar').value = '';
+            tumVerileriGuncelle();
+            giderlerGetir();
+        } else document.getElementById('manuelSonuc').innerHTML = `<span style="color:#ef4444;">❌ Hata</span>`;
+    }
+
+    async function modulListesiGetir() {
+        let res = await fetch(`${API_BASE}/api/modulListesi`).then(r=>r.json());
+        if(res.moduller?.length) document.getElementById('modulListesi').innerHTML = res.moduller.map(m => `<button class="btn-outline btn-sm" onclick="modulCalistir('${m.adi}')">🧩 ${m.adi}</button>`).join('');
+        else document.getElementById('modulListesi').innerHTML = '<div>Modül yok</div>';
+    }
+
+    async function modulCalistir(adi) {
+        document.getElementById('modulCikti').style.display = 'block';
+        document.getElementById('modulCikti').innerHTML = `🔄 ${adi} yükleniyor...`;
+        let res = await fetch(`${API_BASE}/api/modul/${adi}`).then(r=>r.json());
+        document.getElementById('modulCikti').innerHTML = `<strong>📌 ${adi}</strong><br><pre style="white-space:pre-wrap;">${JSON.stringify(res, null, 2)}</pre>`;
+    }
+
+    // Başlat
     tumVerileriGuncelle();
+    urunleriGetir();
+    setInterval(tumVerileriGuncelle, 60000);
 </script>
 </body>
 </html>
